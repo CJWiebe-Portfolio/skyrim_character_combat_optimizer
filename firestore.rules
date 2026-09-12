@@ -1,0 +1,31 @@
+rules_version = '2';
+
+// =========================================================
+// FILE: firestore.rules
+// PROJECT: Skyrim Character Combat Optimization System
+// =========================================================
+// Every document lives under users/{uid}. A signed-in user can read and write
+// their own subtree and nothing else. This is what replaces the PHP
+// "WHERE account_id = $_SESSION['account_id']" checks — and unlike those, it is
+// enforced by the server, so it cannot be bypassed by editing the page.
+//
+// Paste this into the Firebase console:
+//   Firestore Database -> Rules -> replace everything -> Publish
+// =========================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // The user's profile document, plus everything nested under it
+    // (characters, and each character's inventory).
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Anything not matched above is denied.
+  }
+}

@@ -1,0 +1,125 @@
+<!--
+=========================================================
+FILE: read_account.html
+PROJECT: Skyrim Character Combat Optimization System
+AUTHOR: C.J. Wiebe
+=========================================================
+DESCRIPTION:
+Shows the signed-in user's profile from users/{uid} in Firestore.
+=========================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- ===================== PAGE TITLE ===================== -->
+    <title>My Account</title>
+
+    <!-- ===================== FAVICON ===================== -->
+    <link rel="icon" type="image/png" href="../assets/images/skyrim_icon.png">
+
+    <!-- ===================== CSS ===================== -->
+    <!-- =========== BOOTSTRAP =========== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- =========== GENERAL STYLES =========== -->
+    <link rel="stylesheet" href="../assets/css/general_style.css">
+    <!-- =========== BACKGROUND =========== -->
+    <link rel="stylesheet" href="../assets/css/background_picture.css">
+</head>
+
+<body>
+    <div class="d-flex flex-column min-vh-100">
+
+        <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
+        <div id="navbar-slot"></div>
+
+        <!-- ===================== MAIN CONTENT ===================== -->
+        <div class="container py-5 mt-1 flex-grow-1">
+            <div class="main-container p-4">
+                <div class="main-container p-5">
+
+                    <div class="section-title">
+                        <h1 class="section-title title-main text-center">&#129534; Account Information &#129534;</h1>
+                        <h5 class="text-muted-custom text-center">
+                            This is the account information of <span id="acct-email"></span>
+                        </h5>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="p-3 text-center">
+                                <a href="update_account.html" class="skyrim-btn skyrim-btn-update text-lg">
+                                    &#9999;&#65039; Update Account Information
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 text-center">
+                                <a href="delete_account.html" class="skyrim-btn skyrim-btn-delete text-lg">
+                                    &#128465;&#65039; Delete Account
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="alert-slot"></div>
+
+                    <div class="table-responsive">
+                        <table class="table-skyrim text-lg">
+                            <thead>
+                                <tr>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Email</th>
+                                    <th>Date of Birth</th>
+                                </tr>
+                            </thead>
+                            <tbody id="acct-rows">
+                                <tr><td colspan="4">Loading&hellip;</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== FOOTER (rendered by app.js) ===================== -->
+        <div id="footer-slot"></div>
+
+    </div>
+
+    <!-- ===================== SCRIPTS ===================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>window.SITE_ROOT = "../";</script>
+    <script type="module">
+        import { renderChrome, requireAuth, getProfile, esc, friendlyError, setAlert }
+            from "../assets/js/app.js";
+
+        renderChrome("account");
+        const user = await requireAuth();
+
+        document.getElementById("acct-email").textContent = user.email;
+
+        const tbody = document.getElementById("acct-rows");
+
+        try {
+            const p = (await getProfile(user.uid)) || {};
+            tbody.innerHTML = `
+                <tr>
+                    <td>${esc(p.firstName || "")}</td>
+                    <td>${esc(p.lastName || "")}</td>
+                    <td>${esc(p.email || user.email)}</td>
+                    <td>${esc(p.dob || "\u2014")}</td>
+                </tr>`;
+        } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="4">\u2014</td></tr>`;
+            setAlert(document.getElementById("alert-slot"), friendlyError(err));
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,152 @@
+<!--
+=========================================================
+FILE: create_account.html
+PROJECT: Skyrim Character Combat Optimization System
+AUTHOR: C.J. Wiebe
+=========================================================
+DESCRIPTION:
+Registration page. Creates the Firebase Auth user and their users/{uid}
+profile document in one step.
+=========================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- ===================== PAGE TITLE ===================== -->
+    <title>Create Account</title>
+
+    <!-- ===================== FAVICON ===================== -->
+    <link rel="icon" type="image/png" href="../assets/images/skyrim_icon.png">
+
+    <!-- ===================== CSS ===================== -->
+    <!-- =========== BOOTSTRAP =========== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- =========== GENERAL STYLES =========== -->
+    <link rel="stylesheet" href="../assets/css/general_style.css">
+    <!-- =========== BACKGROUND =========== -->
+    <link rel="stylesheet" href="../assets/css/background_picture.css">
+</head>
+
+<body>
+    <div class="d-flex flex-column min-vh-100">
+
+        <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
+        <div id="navbar-slot"></div>
+
+        <!-- ===================== MAIN CONTENT ===================== -->
+        <div class="container py-5 mt-1 flex-grow-1">
+            <div class="main-container p-4">
+                <div class="main-container p-5">
+
+                    <h1 class="section-title title-main text-center">&#10133; Create Account</h1>
+                    <h5 class="text-muted-custom text-center">Register to start building characters and inventories</h5>
+                    <br>
+
+                    <div id="alert-slot"></div>
+
+                    <form id="signup-form">
+
+                        <div class="mb-3">
+                            <label class="form-label text-lg" for="first_name">First Name</label>
+                            <input id="first_name" type="text" class="form-control text-lg" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-lg" for="last_name">Last Name</label>
+                            <input id="last_name" type="text" class="form-control text-lg" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-lg" for="email">Email [e.g. email@email.email]</label>
+                            <input id="email" type="email" class="form-control text-lg" required autocomplete="email">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-lg" for="dob">Date of Birth</label>
+                            <input id="dob" type="date" class="form-control text-lg">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-lg" for="password">Password (at least 8 characters)</label>
+                            <input id="password" type="password" class="form-control text-lg" required
+                                   autocomplete="new-password">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-lg" for="confirm">Confirm Password</label>
+                            <input id="confirm" type="password" class="form-control text-lg" required
+                                   autocomplete="new-password">
+                        </div>
+
+                        <br>
+                        <div class="d-flex gap-2">
+                            <button id="submit-btn" type="submit" class="skyrim-btn skyrim-btn-create text-lg">
+                                &#128190; Create Account
+                            </button>
+                            <a href="login.html" class="btn btn-primary text-lg">Back to Login</a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== FOOTER (rendered by app.js) ===================== -->
+        <div id="footer-slot"></div>
+
+    </div>
+
+    <!-- ===================== SCRIPTS ===================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>window.SITE_ROOT = "../";</script>
+    <script type="module">
+        import { renderChrome, signup, url, friendlyError, setAlert } from "../assets/js/app.js";
+
+        const { user } = await renderChrome("signup");
+        if (user) window.location.href = url("home.html");
+
+        const form  = document.getElementById("signup-form");
+        const btn   = document.getElementById("submit-btn");
+        const alert = document.getElementById("alert-slot");
+
+        form.addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            setAlert(alert, "");
+
+            const password = document.getElementById("password").value;
+            const confirm  = document.getElementById("confirm").value;
+
+            // Same validation rules the PHP update_account.php applied.
+            if (password !== confirm) {
+                setAlert(alert, "Passwords do not match.");
+                return;
+            }
+            if (password.length < 8) {
+                setAlert(alert, "Password must be at least 8 characters.");
+                return;
+            }
+
+            btn.disabled = true;
+            try {
+                await signup({
+                    firstName: document.getElementById("first_name").value.trim(),
+                    lastName:  document.getElementById("last_name").value.trim(),
+                    email:     document.getElementById("email").value.trim(),
+                    dob:       document.getElementById("dob").value,
+                    password
+                });
+                window.location.href = url("home.html");
+            } catch (err) {
+                setAlert(alert, friendlyError(err));
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,149 @@
+<!--
+=========================================================
+FILE: update_character.html
+PROJECT: Skyrim Character Combat Optimization System
+AUTHOR: C.J. Wiebe
+=========================================================
+DESCRIPTION:
+Edits a character's name and race.
+=========================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- ===================== PAGE TITLE ===================== -->
+    <title>Edit Character</title>
+
+    <!-- ===================== FAVICON ===================== -->
+    <link rel="icon" type="image/png" href="../assets/images/skyrim_icon.png">
+
+    <!-- ===================== CSS ===================== -->
+    <!-- =========== BOOTSTRAP =========== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- =========== GENERAL STYLES =========== -->
+    <link rel="stylesheet" href="../assets/css/general_style.css">
+    <!-- =========== BACKGROUND =========== -->
+    <link rel="stylesheet" href="../assets/css/background_picture.css">
+</head>
+
+<body>
+    <div class="d-flex flex-column min-vh-100">
+
+        <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
+        <div id="navbar-slot"></div>
+
+        <!-- ===================== MAIN CONTENT ===================== -->
+        <div class="container py-5 mt-1 flex-grow-1">
+            <div class="main-container p-4">
+                <div class="main-container p-5">
+
+                    <div class="section-title mb-4">
+                        <h1 class="title-main">&#9999;&#65039; Editing Character <span id="char-name"></span></h1>
+                    </div>
+
+                    <div id="alert-slot"></div>
+
+                    <form id="update-form">
+
+                        <div class="mb-3">
+                            <label class="form-label" for="name">Character Name</label>
+                            <input id="name" type="text" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="race_id">Race</label>
+
+                                <select id="race_id" class="form-select text-lg" required>
+                                    <option value="">Select a race</option>
+                                </select>
+
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button id="submit-btn" type="submit" class="btn skyrim-btn-update">
+                                &#128190; Update Character
+                            </button>
+                            <a href="characters.html" class="btn btn-primary">Back to My Characters</a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== FOOTER (rendered by app.js) ===================== -->
+        <div id="footer-slot"></div>
+
+    </div>
+
+    <!-- ===================== SCRIPTS ===================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>window.SITE_ROOT = "../";</script>
+    <script type="module">
+        import {
+            renderChrome, requireAuth, refData, getCharacter, updateCharacter,
+            halt, friendlyError, setAlert
+        } from "../assets/js/app.js";
+
+        renderChrome("characters");
+        const user = await requireAuth();
+
+        const alert = document.getElementById("alert-slot");
+        const id = new URLSearchParams(location.search).get("id");
+
+        if (!id) {
+            setAlert(alert, "Invalid character ID.");
+            await halt();
+        }
+
+        const data   = await refData();
+        const select = document.getElementById("race_id");
+        const btn    = document.getElementById("submit-btn");
+
+        for (const [rid, name] of Object.entries(data.races)) {
+            const opt = document.createElement("option");
+            opt.value = rid;
+            opt.textContent = name;
+            select.appendChild(opt);
+        }
+
+        const character = await getCharacter(user.uid, id);
+        if (!character) {
+            setAlert(alert, "Character not found or access denied.");
+            await halt();
+        }
+
+        document.getElementById("char-name").textContent = character.name;
+        document.getElementById("name").value = character.name;
+        select.value = String(character.raceId);
+
+        document.getElementById("update-form").addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            setAlert(alert, "");
+
+            const name   = document.getElementById("name").value.trim();
+            const raceId = select.value;
+
+            if (!name || !data.races[raceId]) {
+                setAlert(alert, "Please enter a character name and choose a valid race.");
+                return;
+            }
+
+            btn.disabled = true;
+            try {
+                await updateCharacter(user.uid, id, { name, raceId });
+                window.location.href = "read_character.html?id=" + encodeURIComponent(id);
+            } catch (err) {
+                setAlert(alert, "Update failed: " + friendlyError(err));
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

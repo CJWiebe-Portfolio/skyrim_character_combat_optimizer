@@ -1,0 +1,127 @@
+<!--
+=========================================================
+FILE: delete_account.html
+PROJECT: Skyrim Character Combat Optimization System
+AUTHOR: C.J. Wiebe
+=========================================================
+DESCRIPTION:
+Deletes the user's characters, inventories, profile document and Firebase Auth
+user, in that order.
+=========================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- ===================== PAGE TITLE ===================== -->
+    <title>Delete Account</title>
+
+    <!-- ===================== FAVICON ===================== -->
+    <link rel="icon" type="image/png" href="../assets/images/skyrim_icon.png">
+
+    <!-- ===================== CSS ===================== -->
+    <!-- =========== BOOTSTRAP =========== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- =========== GENERAL STYLES =========== -->
+    <link rel="stylesheet" href="../assets/css/general_style.css">
+    <!-- =========== BACKGROUND =========== -->
+    <link rel="stylesheet" href="../assets/css/background_picture.css">
+</head>
+
+<body>
+    <div class="d-flex flex-column min-vh-100">
+
+        <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
+        <div id="navbar-slot"></div>
+
+        <!-- ===================== MAIN CONTENT ===================== -->
+        <div class="container py-5 mt-1 flex-grow-1">
+            <div class="main-container p-4">
+                <div class="main-container p-5">
+
+                    <h1 class="section-title text-center">You are about to delete your account?</h1>
+                    <h5 class="text-muted-custom text-center">There is no return from this action! &#128553;</h5>
+                    <br>
+
+                    <div id="alert-slot"></div>
+
+                    <form id="delete-form">
+
+                        <div class="mb-3 col-md-6">
+                            <label class="form-label text-lg" for="password">
+                                Confirm your password to continue
+                            </label>
+                            <input id="password" type="password" class="form-control text-lg" required
+                                   autocomplete="current-password">
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button id="submit-btn" type="submit" class="skyrim-btn skyrim-btn-delete text-xl">
+                                &#128465;&#65039; I accept my fate and wish to delete the account. &#128465;&#65039;
+                            </button>
+                            <a href="read_account.html" class="btn btn-primary text-lg">Cancel</a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== FOOTER (rendered by app.js) ===================== -->
+        <div id="footer-slot"></div>
+
+    </div>
+
+    <!-- ===================== SCRIPTS ===================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>window.SITE_ROOT = "../";</script>
+    <script type="module">
+        import {
+            renderChrome, requireAuth, reauth, deleteUser,
+            listCharacters, deleteCharacter, deleteProfileDoc,
+            url, friendlyError, setAlert
+        } from "../assets/js/app.js";
+
+        renderChrome("account");
+        const user = await requireAuth();
+
+        const form  = document.getElementById("delete-form");
+        const btn   = document.getElementById("submit-btn");
+        const alert = document.getElementById("alert-slot");
+
+        form.addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            setAlert(alert, "");
+
+            if (!confirm("This permanently deletes your account, characters and inventories. Continue?")) {
+                return;
+            }
+
+            btn.disabled = true;
+            try {
+                // Firebase needs a recent sign-in before it will delete the user.
+                await reauth(user, document.getElementById("password").value);
+
+                // Clear the user's own data first: once the Auth user is gone, the
+                // security rules no longer let anyone touch these documents.
+                const characters = await listCharacters(user.uid);
+                for (const c of characters) {
+                    await deleteCharacter(user.uid, c.id);
+                }
+                await deleteProfileDoc(user.uid);
+
+                await deleteUser(user);
+                window.location.href = url("home.html");
+            } catch (err) {
+                setAlert(alert, friendlyError(err));
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

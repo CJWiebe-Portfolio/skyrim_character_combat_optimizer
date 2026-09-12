@@ -529,9 +529,7 @@ table-responsive {
   text-align: center;
 
   /* your background */
-  /* was skyrim_bg.jpg, which does not exist in assets/images — pointed at the
-     background image that does. This class is not currently used by any page. */
-  background: url('../images/skyrim_background.jpg') center/cover no-repeat;
+  background: url('../images/skyrim_bg.jpg') center/cover no-repeat;
 }
 
 .skyrim-title-container {

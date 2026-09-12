@@ -1,0 +1,129 @@
+<!--
+=========================================================
+FILE: read_character.html
+PROJECT: Skyrim Character Combat Optimization System
+AUTHOR: C.J. Wiebe
+=========================================================
+DESCRIPTION:
+Shows one character's details, with links to edit, view inventory, or delete.
+=========================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- ===================== PAGE TITLE ===================== -->
+    <title>Character Details</title>
+
+    <!-- ===================== FAVICON ===================== -->
+    <link rel="icon" type="image/png" href="../assets/images/skyrim_icon.png">
+
+    <!-- ===================== CSS ===================== -->
+    <!-- =========== BOOTSTRAP =========== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- =========== GENERAL STYLES =========== -->
+    <link rel="stylesheet" href="../assets/css/general_style.css">
+    <!-- =========== BACKGROUND =========== -->
+    <link rel="stylesheet" href="../assets/css/background_picture.css">
+</head>
+
+<body>
+    <div class="d-flex flex-column min-vh-100">
+
+        <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
+        <div id="navbar-slot"></div>
+
+        <!-- ===================== MAIN CONTENT ===================== -->
+        <div class="container py-5 mt-1 flex-grow-1">
+            <div class="main-container p-4">
+                <div class="main-container p-5">
+
+                    <div class="section-title mb-4">
+                        <h1 class="title-main">&#129757; Character Details: <span id="char-name"></span></h1>
+
+                        <div id="alert-slot"></div>
+
+                        <!-- CHARACTER DETAILS -->
+                        <table class="table-skyrim text-lg">
+                            <tr><th>Character Number</th><td id="d-number"></td></tr>
+                            <tr><th>Name</th><td id="d-name"></td></tr>
+                            <tr><th>Race</th><td id="d-race"></td></tr>
+                        </table>
+
+                        <!-- ACTION BUTTONS -->
+                        <div class="gap-2 mt-4">
+                            <a href="characters.html" class="btn btn-primary">Back to My Characters</a>
+                            <a id="edit-link" href="#" class="btn skyrim-btn-update">&#128190; Update Character &#128190;</a>
+                            <a id="inv-link" href="#" class="btn btn-info">&#127890; Inventory &#127890;</a>
+                            <button id="delete-btn" class="btn skyrim-btn-delete">
+                                &#128465;&#65039; Delete this character &#128465;&#65039;
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== FOOTER (rendered by app.js) ===================== -->
+        <div id="footer-slot"></div>
+
+    </div>
+
+    <!-- ===================== SCRIPTS ===================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>window.SITE_ROOT = "../";</script>
+    <script type="module">
+        import {
+            renderChrome, requireAuth, refData, getCharacter, deleteCharacter,
+            halt, friendlyError, setAlert
+        } from "../assets/js/app.js";
+
+        renderChrome("characters");
+        const user = await requireAuth();
+
+        const alert = document.getElementById("alert-slot");
+        const id = new URLSearchParams(location.search).get("id");
+
+        if (!id) {
+            setAlert(alert, "Invalid character ID.");
+            await halt();
+        }
+
+        const data = await refData();
+        const character = await getCharacter(user.uid, id);
+
+        if (!character) {
+            setAlert(alert, "Character not found or access denied.");
+            await halt();
+        }
+
+        document.getElementById("char-name").textContent = character.name;
+        document.getElementById("d-number").textContent  = character.characterNumber ?? "\u2014";
+        document.getElementById("d-name").textContent    = character.name;
+        document.getElementById("d-race").textContent    = data.races[character.raceId] ?? "Unknown";
+
+        document.getElementById("edit-link").href =
+            "update_character.html?id=" + encodeURIComponent(id);
+        document.getElementById("inv-link").href =
+            "inventory.html?character_id=" + encodeURIComponent(id);
+
+        document.getElementById("delete-btn").addEventListener("click", async (ev) => {
+            ev.preventDefault();
+            if (!confirm("Are you sure you want to delete this character?")) return;
+            ev.target.disabled = true;
+            try {
+                await deleteCharacter(user.uid, id);
+                window.location.href = "characters.html";
+            } catch (err) {
+                setAlert(alert, friendlyError(err));
+                ev.target.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>
