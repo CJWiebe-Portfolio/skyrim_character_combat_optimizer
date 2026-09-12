@@ -96,7 +96,7 @@ Shows the signed-in user's profile from users/{uid} in Firestore.
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>window.SITE_ROOT = "../";</script>
     <script type="module">
-        import { renderChrome, requireAuth, getProfile, esc, friendlyError, setAlert }
+        import { renderChrome, requireAuth, ensureProfile, esc, friendlyError, setAlert }
             from "../assets/js/app.js";
 
         renderChrome("account");
@@ -107,7 +107,7 @@ Shows the signed-in user's profile from users/{uid} in Firestore.
         const tbody = document.getElementById("acct-rows");
 
         try {
-            const p = (await getProfile(user.uid)) || {};
+            const p = (await ensureProfile(user)) || {};
             tbody.innerHTML = `
                 <tr>
                     <td>${esc(p.firstName || "")}</td>

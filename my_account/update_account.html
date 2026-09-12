@@ -120,7 +120,7 @@ and password. Email and password changes are re-authenticated first.
     <script>window.SITE_ROOT = "../";</script>
     <script type="module">
         import {
-            renderChrome, requireAuth, getProfile, saveProfile,
+            renderChrome, requireAuth, ensureProfile, saveProfile,
             reauth, updatePassword, updateEmail, friendlyError, setAlert
         } from "../assets/js/app.js";
 
@@ -134,7 +134,7 @@ and password. Email and password changes are re-authenticated first.
         const $ = (id) => document.getElementById(id);
 
         // Pre-fill the form from the stored profile.
-        const profile = (await getProfile(user.uid)) || {};
+        const profile = (await ensureProfile(user)) || {};
         $("first_name").value = profile.firstName || "";
         $("last_name").value  = profile.lastName || "";
         $("email").value      = profile.email || user.email || "";
