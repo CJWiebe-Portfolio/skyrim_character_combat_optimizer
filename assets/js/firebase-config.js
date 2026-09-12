@@ -17,11 +17,14 @@
  * =========================================================
  */
 
-export const firebaseConfig = {
-  apiKey: "PASTE_YOUR_API_KEY",
-  authDomain: "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "PASTE_YOUR_PROJECT_ID",
-  storageBucket: "PASTE_YOUR_PROJECT_ID.firebasestorage.app",
-  messagingSenderId: "PASTE_YOUR_SENDER_ID",
-  appId: "PASTE_YOUR_APP_ID"
-};
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyAajCw5LC9-LLxstWqZfhBEkSvGHALKlSQ",
+    authDomain: "skyrim-optimizater.firebaseapp.com",
+    projectId: "skyrim-optimizater",
+    storageBucket: "skyrim-optimizater.firebasestorage.app",
+    messagingSenderId: "125414880139",
+    appId: "1:125414880139:web:6a69e0a27db28cbe91758e",
+    measurementId: "G-DTVKNXYRET"
+  };
