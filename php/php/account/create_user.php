@@ -3,9 +3,8 @@
  * =========================================================
  * FILE: create_user.php
  * PROJECT: Skyrim Character Combat Optimization System
- * AUTHOR: Cygnus J. Wiebe
+ * AUTHOR: C.J. Wiebe
  * DATE: April 2026
- * COURSE: INFS 657 - McGill University
  * =========================================================
  * DESCRIPTION:
  * Creates user accounts and stores them in the table `accounts` of the database. 

@@ -2,10 +2,9 @@
 
 /**
  * File: config.php
- * Author: C. J. Wiebe
+ * Author: C.J. Wiebe
  * Date: April 2026
  * Project: Skyrim Character Combat Optimization System
- * Course: INFS 657: Data Design and Development - McGill University
  *
  * Description:
  * Allows for a standardized URL.
@@ -13,4 +12,4 @@
  */
 
 // Base URL for the project
-define('BASE_URL', '/infs_657/skyrim_inventory_optimization/website');
+define('BASE_URL', '/skyrim_inventory_optimization/website');

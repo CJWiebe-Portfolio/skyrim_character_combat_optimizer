@@ -4,9 +4,8 @@
  * =========================================================
  * FILE: index.php
  * PROJECT: Skyrim Character Combat Optimization System
- * AUTHOR: Cygnus J. Wiebe
+ * AUTHOR: C.J. Wiebe
  * DATE: April 2026
- * COURSE: INFS 657 - McGill University
  * =========================================================
  * DESCRIPTION:
  * This is the landing page of the website. It displays a welcome message and a logo, and then automatically redirects the user to the home page after a short delay.

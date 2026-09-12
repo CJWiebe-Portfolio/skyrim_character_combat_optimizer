@@ -2,10 +2,9 @@
 
 /**
  * File: database.php
- * Author: Cygnus J. Wiebe
+ * Author: C.J. Wiebe
  * Date: April 2026
  * Project: Skyrim Character Combat Optimization System
- * Course: INFS 657: Data Design and Development - McGill University
  *
  * Description:
  * Establishes a connection to the database.
@@ -16,7 +15,7 @@
 
 $server = 'localhost'; // change if your server is remote
 $username = 'web_access'; // Enter your username
-$password = 'xeQxeb-jyscu3-kejmek'; // Enter your password
+$password = 'your_password_here'; // Enter your password
 $database = 'skyrim_combat-optimization'; // Enter your database name you want to access
 
 try { // Try the following code

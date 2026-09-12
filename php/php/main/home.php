@@ -3,9 +3,8 @@
  * =========================================================
  * FILE: home.php
  * PROJECT: Skyrim Character Combat Optimization System
- * AUTHOR: Cygnus J. Wiebe
+ * AUTHOR: C.J. Wiebe
  * DATE: April 2026
- * COURSE: INFS 657 - McGill University
  * =========================================================
  * DESCRIPTION:
  * Main dashboard landing page. Provides navigation to:
@@ -45,8 +44,7 @@ $pageTitle = "Home - Skyrim Optimizer";
                     <div class="text-center">
                         <h1 class="section-title title-main">Skyrim Character Combat Optimization</h1>
                         <p class="text-muted-custom">
-                            Cygnus J. Wiebe | McGill University | April 2026<br>
-                            INFS: 657 | Prof. Kartikay Chadha
+                            C.J. Wiebe
                         </p>
                     </div>
                     <br>

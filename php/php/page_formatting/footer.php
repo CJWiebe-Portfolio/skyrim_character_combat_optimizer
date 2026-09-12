@@ -3,9 +3,8 @@
  * =========================================================
  * FILE: footer.php
  * PROJECT: Skyrim Character Combat Optimization System
- * AUTHOR: Cygnus J. Wiebe
+ * AUTHOR: C.J. Wiebe
  * DATE: April 2026
- * COURSE: INFS 657 - McGill University
  * =========================================================
  * DESCRIPTION:
  * The general footer for all pages.
@@ -39,9 +38,7 @@
             <div class="col-md-4 mb-3">
                 <h6 class="fw-bold text-lg">About</h6>
                 <p class="small mb-0 text-m">
-                    Cygnus J. Wiebe<br>
-                    McGill University<br>
-                    INFS 657 · April 2026
+                    C.J. Wiebe
                 </p>
             </div>
 

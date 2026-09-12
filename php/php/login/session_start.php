@@ -2,10 +2,9 @@
 
 /**
  * File: session_start.php
- * Author: Cygnus J. Wiebe
+ * Author: C.J. Wiebe
  * Date: April 2026
  * Project: Skyrim Character Combat Optimization System
- * Course: INFS 657: Data Design and Development - McGill University
  *
  * Description:
  * This checks if login=true and determines if Admin or user.

@@ -2,10 +2,9 @@
 
 /**
  * File: login.php
- * Author: Cygnus J. Wiebe
+ * Author: C.J. Wiebe
  * Date: April 2026
  * Project: Skyrim Character Combat Optimization System
- * Course: INFS 657: Data Design and Development - McGill University
  *
  * Description:
  * This is the login page for Admin and Users in order to gain exclusive access to specific web pages.

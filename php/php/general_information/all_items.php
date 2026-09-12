@@ -3,9 +3,8 @@
  * =========================================================
  * FILE: all_items.php
  * PROJECT: Skyrim Character Combat Optimization System
- * AUTHOR: Cygnus J. Wiebe
+ * AUTHOR: C.J. Wiebe
  * DATE: April 2026
- * COURSE: INFS 657 - McGill University
  * =========================================================
  * DESCRIPTION:
  * Shows the information for all weapons and armours of skyrim, with the ability to sort the items.

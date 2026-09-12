@@ -3,9 +3,8 @@
  * =========================================================
  * FILE: header.php
  * PROJECT: Skyrim Character Combat Optimization System
- * AUTHOR: Cygnus J. Wiebe
+ * AUTHOR: C.J. Wiebe
  * DATE: April 2026
- * COURSE: INFS 657 - McGill University
  * =========================================================
  * DESCRIPTION:
  * The general header for all pages.
@@ -30,15 +29,15 @@
     <title><?= $pageTitle ?? 'Skyrim Optimizer' ?></title>
 
     <!-- ===================== FAVICON ===================== -->
-    <link rel="icon" type="image/png" href="/infs_657/skyrim_inventory_optimization/website/assets/images/skyrim_icon.png">
+    <link rel="icon" type="image/png" href="/skyrim_inventory_optimization/website/assets/images/skyrim_icon.png">
 
     <!-- ===================== CSS ===================== -->
     <!-- =========== BOOTSTRAP =========== -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- =========== GENERAL STYLES =========== -->
-    <link rel="stylesheet" href="/infs_657/skyrim_inventory_optimization/website/assets/css/general_style.css">
+    <link rel="stylesheet" href="/skyrim_inventory_optimization/website/assets/css/general_style.css">
 
     <!-- =========== BACKGROUND =========== -->
-    <link rel="stylesheet" href="/infs_657/skyrim_inventory_optimization/website/assets/css/background_picture.css">
+    <link rel="stylesheet" href="/skyrim_inventory_optimization/website/assets/css/background_picture.css">
 </head>

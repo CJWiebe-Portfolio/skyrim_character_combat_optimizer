@@ -2,10 +2,9 @@
 
 /**
  * File: create_character.php
- * Author: Cygnus J. Wiebe
+ * Author: C.J. Wiebe
  * Date: April 2026
  * Project: Skyrim Character Combat Optimization System
- * Course: INFS 657: Data Design and Development - McGill University
  *
  * Description:
  * Allows a User/Admin to create new characters.
@@ -46,7 +45,7 @@ $races = [
    ========================= */
 
 if (!isset($_SESSION['email'], $_SESSION['account_id'])) {
-    header("Location: /infs_657/skyrim_inventory_optimization/website/login/login.php");
+    header("Location: /skyrim_inventory_optimization/website/login/login.php");
     exit();
 }
 
