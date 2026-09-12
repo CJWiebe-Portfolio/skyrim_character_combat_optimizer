@@ -1,0 +1,588 @@
+/**
+ * =========================================================
+ * FILE: general_style.css
+ * PROJECT: Skyrim Character Combat Optimization System
+ * AUTHOR: Cygnus J. Wiebe
+ * DATE: April 2026
+ * COURSE: INFS 657 - McGill University
+ * =========================================================
+ * DESCRIPTION:
+ * Sets a standard style for the entire website, ensuring a consistent look and feel.
+ * =========================================================
+ */
+
+/* ===================== SKYRIM ROOT DESIGN SYSTEM ===================== */
+:root {
+  /* Root Colors */
+  --skyrim-gold: rgb(255, 201, 26);
+  --skyrim-gold-shadow: rgba(255, 201, 26, 0.4);
+  --skyrim-gold-soft: #c2a46b;
+  --skyrim-dark: #0f0f0f;
+  --skyrim-darker: #080808;
+  --skyrim-card: rgba(30, 30, 30, 0.85);
+  --skyrim-glass: rgba(0, 0, 0, 0.585);
+  --skyrim-danger: rgb(223, 86, 84);
+  --skyrim-danger-shadow: rgba(223, 86, 84, 0.4);
+  --skyrim-info: rgb(0, 217, 255, 0.856);
+  --skyrim-info-shadow: rgba(0, 217, 255, 0.4);
+  --skyrim-create: rgba(94, 255, 0, 0.856);
+  --skyrim-create-shadow: rgba(94, 255, 0, 0.4);
+
+  --text-main: #f5e2b2;
+  --text-muted: #dbc9a6;
+
+  /* ROOT PROPERTIES */
+  --radius: 0.75rem;
+  --spacing: 1.5rem;
+
+/* ===================== FONT SIZES ===================== */
+
+  --font-xs: 0.75rem; /* small labels */
+  --font-sm: 0.875rem; /* secondary text */
+  --font-md: 1rem; /* base text */
+  --font-lg: 1.25rem; /* subtitles */
+  --font-xl: 1.75rem; /* section titles */
+  --font-xxl: 4rem; /* page titles */
+
+  /* Optional Skyrim feel */
+  --font-title: "Cinzel", serif;
+  --font-body: "Segoe UI", sans-serif;
+}
+
+/* ===================== TYPOGRAPHY ===================== */
+
+.text-xs {
+  font-size: var(--font-xs);
+}
+.text-sm {
+  font-size: var(--font-sm);
+}
+.text-md {
+  font-size: var(--font-md);
+}
+.text-lg {
+  font-size: var(--font-lg);
+}
+.text-xl {
+  font-size: var(--font-xl);
+}
+.text-xxl {
+  font-size: var(--font-xxl);
+}
+
+/* Titles */
+.title-main {
+  font-size: var(--font-xxl);
+  font-family: var(--font-title);
+  letter-spacing: 1px;
+}
+
+.title-section {
+  font-size: var(--font-xl);
+  font-family: var(--font-title);
+}
+
+/* Subtext */
+.text-muted-custom {
+  font-size: var(--font-xl);
+  opacity: 0.8;
+}
+
+/* ===================== GLOBAL RESET ===================== */
+body {
+  background: var(--skyrim-dark);
+  color: var(--text-main);
+}
+
+a {
+  text-decoration: none;
+  color: var(--text-main);
+  transition: 0.2s ease;
+}
+
+a:hover {
+  color: var(--skyrim-gold);
+}
+
+/* ===================== LAYOUT ===================== */
+.main-container {
+  background: var(--skyrim-glass);
+  padding: var(--spacing);
+  border-radius: var(--radius);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+}
+
+/* ===================== SECTION TITLES ===================== */
+.section-title {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--skyrim-gold);
+  letter-spacing: 0.5px;
+}
+
+/* ===================== CARDS ===================== */
+.card,
+.dashboard-card {
+  background: var(--skyrim-card);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: var(--radius);
+  transition: all 0.25s ease;
+}
+
+.card:hover,
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+}
+
+/* ===================== BUTTONS ===================== */
+.btn {
+  border-radius: var(--radius);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: transparent;
+  border: 1px solid var(--skyrim-gold);
+  color: var(--skyrim-gold);
+}
+
+.btn-primary:hover {
+  background: var(--skyrim-gold);
+  color: black;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+/* ===================== NAVBAR ===================== */
+.navbar {
+  background: var(--skyrim-glass) !important;
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+/* Brand */
+.navbar-brand {
+  color: var(--skyrim-gold) !important;
+  letter-spacing: 1px;
+}
+
+/* Nav Links */
+.nav-link {
+  color: var(--text-main) !important;
+  position: relative;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+/* Hover Effect */
+.nav-link:hover {
+  color: var(--skyrim-gold) !important;
+  background: rgba(212, 175, 55, 0.1);
+}
+
+/* Underline Animation */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  height: 2px;
+  background: var(--skyrim-gold);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Active Page */
+.nav-link.active {
+  color: var(--skyrim-gold) !important;
+  font-weight: 600;
+}
+
+/* Dropdown */
+.dropdown-menu {
+  background: #121212;
+  border: 1px solid var(--skyrim-gold-soft);
+}
+
+.dropdown-item {
+  color: var(--text-main);
+}
+
+.dropdown-item:hover {
+  background: rgba(212, 175, 55, 0.2);
+  color: #fff;
+}
+
+/* ===================== FOOTER ===================== */
+.site-footer {
+  background: var(--skyrim-glass);
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  color: var(--text-muted);
+}
+
+.site-footer h5,
+.site-footer h6 {
+  color: var(--skyrim-gold);
+}
+
+.site-footer {
+  color: var(--text-muted);
+}
+
+.site-footer a:hover {
+  color: var(--skyrim-gold);
+  text-shadow: 0 0 6px rgba(212, 175, 55, 0.5);
+}
+
+/* ===================== UTILITIES ===================== */
+.shadow-soft {
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+}
+
+.rounded-custom {
+  border-radius: var(--radius);
+}
+
+.text-muted-custom {
+  color: var(--text-muted);
+}
+
+/* ===================== NAVBAR RESPONSIVE ===================== */
+@media (max-width: 768px) {
+  .nav-link {
+    text-align: center;
+    margin: 0.25rem 0;
+  }
+}
+
+/* ===================== TABLE RESPONSIVE ===================== */
+table-responsive {
+ border-radius: var(--radius);
+ overflow: hidden;
+ box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+}
+
+
+/* ===================== SKYRIM TABLE ===================== */
+
+.table-skyrim {
+  width: 100%;
+  background: var(--skyrim-card);
+  color: var(--text-main);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Header */
+.table-skyrim thead {
+  background: rgba(0, 0, 0, 0.92);
+}
+
+.table-skyrim thead th {
+  color: var(--skyrim-gold);
+  font-weight: 600;
+  padding: 0.9rem;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.35);
+  border-right: 1px solid rgba(212, 175, 55, 0.15);
+  letter-spacing: 0.5px;
+}
+
+/* Cells */
+.table-skyrim td {
+  padding: 0.75rem;
+  border-right: 1px solid rgba(212, 175, 55, 0.12);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+}
+
+/* Alternating row colours */
+.table-skyrim tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.table-skyrim tbody tr:nth-child(even) {
+  background: rgba(212, 175, 55, 0.04);
+}
+
+/* Hover effect */
+.table-skyrim tbody tr:hover {
+  background: rgba(212, 175, 55, 0.12);
+  box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.15);
+}
+
+/* Remove last borders */
+.table-skyrim td:last-child,
+.table-skyrim th:last-child {
+  border-right: none;
+}
+
+/* ===================== TABLE FOOTER ===================== */
+
+.table-skyrim tfoot {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.table-skyrim tfoot td {
+  padding: 0.75rem;
+  font-weight: 600;
+  color: var(--skyrim-gold);
+  border-top: 2px solid rgba(212, 175, 55, 0.35);
+}
+
+/* ===================== SKYRIM-THEMED ACTION BUTTONS ===================== */
+
+.skyrim-action-card {
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: var(--radius);
+  transition: all 0.25s ease;
+  text-align: center;
+}
+
+.skyrim-action-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+}
+
+.skyrim-action-card-info {
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px var(--skyrim-info);
+  border-radius: var(--radius);
+  transition: all 0.25s ease;
+  text-align: center;
+}
+
+.skyrim-action-card-info:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--skyrim-info);
+}
+
+/* Shared button style */
+.skyrim-btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: all 0.25s ease;
+}
+
+/* Update (gold) */
+.skyrim-btn-update {
+  border: 1px solid var(--skyrim-gold);
+  color: var(--skyrim-gold);
+  background: transparent;
+}
+
+.skyrim-btn-update:hover {
+  background: var(--skyrim-gold);
+  color: var(--skyrim-dark);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+/* Info (green) */
+.skyrim-btn-create {
+  border: 1px solid var(--skyrim-create);
+  color: var(--skyrim-create);
+  background: transparent;
+}
+
+
+.skyrim-btn-create:hover {
+  background: var(--skyrim-create);
+  color: var(--skyrim-dark);
+  box-shadow: 1px solid var(--skyrim-create-shadow);
+}
+
+/* Info (blue) */
+.skyrim-btn-info {
+  border: 1px solid var(--skyrim-info);
+  color: var(--skyrim-info);
+  background: transparent;
+}
+
+.skyrim-btn-info:hover {
+  background: var(--skyrim-info);
+  color: var(--skyrim-dark);
+  box-shadow: 1px solid var(--skyrim-info-shadow);
+}
+
+/* Delete (red but muted) */
+.skyrim-btn-delete {
+  border: 1px solid var(--skyrim-danger);
+  color: var(--skyrim-danger);
+  background: transparent;
+}
+
+.skyrim-btn-delete:hover {
+  background: var(--skyrim-danger);
+  color: var(--skyrim-dark);
+  box-shadow: 1px solid var(--skyrim-danger-shadow);
+}
+
+/* ===================== SKYRIM-THEMED SMALL BUTTONS ===================== */
+
+.btn-skyrim-sm {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: var(--font-xs);
+  border-radius: 4px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: var(--skyrim-gold);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Hover glow */
+.btn-skyrim-sm:hover {
+  background: rgba(212, 175, 55, 0.15);
+  color: #fff;
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.5);
+}
+
+/* Variants */
+
+/* Primary (gold) */
+.btn-skyrim-sm.primary {
+  border-color: var(--skyrim-gold);
+}
+
+/* Secondary (muted) */
+.btn-skyrim-sm.secondary {
+  border-color: rgba(200, 200, 200, 0.3);
+  color: #ccc;
+}
+
+/* Danger (delete) */
+.btn-skyrim-sm.danger {
+  border-color: #a94442;
+  color: #e57373;
+}
+
+.btn-skyrim-sm.danger:hover {
+  background: #a94442;
+  color: white;
+  box-shadow: 0 0 6px rgba(255, 80, 80, 0.4);
+}
+
+/* ===================== SKYRIM-THEMED FILTER PANEL ===================== */
+
+.skyrim-filter {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+}
+
+/* Labels */
+.skyrim-filter .form-label {
+  color: var(--skyrim-gold);
+  font-size: var(--font-xs);
+  margin-bottom: 0.25rem;
+}
+
+/* Inputs */
+.skyrim-filter .form-select {
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--text-main);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 6px;
+  font-size: var(--font-sm);
+}
+
+/* Focus */
+.skyrim-filter .form-select:focus {
+  border-color: var(--skyrim-gold);
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.3);
+}
+
+/* Button */
+.skyrim-filter .btn {
+  background: transparent;
+  border: 1px solid var(--skyrim-gold);
+  color: var(--skyrim-gold);
+  font-size: var(--font-sm);
+}
+
+.skyrim-filter .btn:hover {
+  background: var(--skyrim-gold);
+  color: black;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+}
+
+/* ===================== SKYRIM-THEMED TITLE SCREEN ===================== */
+
+.skyrim-title-screen {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  /* your background */
+  background: url('../images/skyrim_bg.jpg') center/cover no-repeat;
+}
+
+.skyrim-title-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.6);
+  padding: 3rem;
+  border-radius: 1rem;
+  backdrop-filter: blur(6px);
+}
+
+.skyrim-title-logo {
+  width: 120px;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 8px var(--skyrim-gold));
+  animation: float 3s ease-in-out infinite;
+}
+
+.skyrim-title-main {
+  font-size: var(--font-xxl);
+  letter-spacing: 2px;
+  color: var(--skyrim-gold);
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+  margin-bottom: 0.5rem;
+}
+
+.skyrim-title-sub {
+  font-size: var(--font-md);
+  opacity: 0.8;
+  animation: pulse 2s infinite alternate;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}

@@ -1,0 +1,23 @@
+/**
+ * =========================================================
+ * FILE: background_picture.css
+ * PROJECT: Skyrim Character Combat Optimization System
+ * AUTHOR: Cygnus J. Wiebe
+ * DATE: April 2026
+ * COURSE: INFS 657 - McGill University
+ * =========================================================
+ * DESCRIPTION:
+ * Sets a fixed background image for the entire website, ensuring it covers the viewport and remains centered.
+ * =========================================================
+ */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    background-image: url('/infs_657/skyrim_inventory_optimization/website/assets/images/skyrim_background.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    background-size: cover;
+}
