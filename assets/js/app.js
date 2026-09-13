@@ -282,13 +282,47 @@ export async function getCharacter(uid, cid) {
 export async function createCharacter(uid, { name, raceId }) {
   const existing = await listCharacters(uid);
   const next = existing.reduce((m, c) => Math.max(m, c.characterNumber || 0), 0) + 1;
+  // Seed the build from the race, exactly as character creation does in game.
+  let build = {};
+  try {
+    const bd = await buildData();
+    build = {
+      skills: startingSkills(raceId, bd),
+      perks: {},
+      attributePicks: { health: 0, magicka: 0, stamina: 0 }
+    };
+  } catch (e) {
+    console.warn("Could not seed starting skills:", e);
+  }
+
   const ref = await addDoc(charsCol(uid), {
     name,
     raceId: Number(raceId),
     characterNumber: next,
+    ...build,
     createdAt: serverTimestamp()
   });
   return ref.id;
+}
+
+/** Saves the skills / perks / attribute allocation for one character. */
+export function saveBuild(uid, cid, { skills, perks, attributePicks }) {
+  return updateDoc(charDoc(uid, cid), { skills, perks, attributePicks });
+}
+
+/**
+ * Fills in a build for a character saved before these fields existed, so older
+ * characters open with their race's starting spread rather than blank.
+ */
+export function withDefaultBuild(character, bd) {
+  return {
+    ...character,
+    skills: character.skills && Object.keys(character.skills).length
+      ? character.skills
+      : startingSkills(character.raceId, bd),
+    perks: character.perks || {},
+    attributePicks: character.attributePicks || { health: 0, magicka: 0, stamina: 0 }
+  };
 }
 
 export function updateCharacter(uid, cid, { name, raceId }) {
@@ -448,13 +482,28 @@ function footerHTML() {
         <div class="col-md-4 mb-3">
           <h6 class="fw-bold text-lg">About</h6>
           <p class="small mb-0 text-m">C. J. Wiebe</p>
-          <ul class="list-unstyled text-m mt-2">
+
+          <!-- External links: NOT wrapped in url(). That helper prefixes the site
+               root for internal pages and would mangle a full URL. -->
+          <ul class="footer-links list-unstyled text-m">
             <li>
-              <!-- External link: NOT wrapped in url(). That helper prefixes the
-                   site root for internal pages and would mangle a full URL. -->
-              <a href="https://projects.cjpwiebe-portfolio.ca/"
-                 target="_blank" rel="noopener">
-                Click to Check Out My Portfolio Website
+              <a href="https://projects.cjpwiebe-portfolio.ca/" target="_blank" rel="noopener">
+                Portfolio
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/CJWiebe-Portfolio" target="_blank" rel="noopener">
+                GitHub
+              </a>
+            </li>
+            <li>
+              <a href="https://www.linkedin.com/in/cygnus-j-wiebe" target="_blank" rel="noopener">
+                LinkedIn
+              </a>
+            </li>
+            <li>
+              <a href="https://www.instagram.com/c.j.wiebe/" target="_blank" rel="noopener">
+                Instagram
               </a>
             </li>
           </ul>
@@ -598,4 +647,277 @@ export function setAlert(el, message, kind = "danger") {
     return;
   }
   el.innerHTML = `<div class="alert alert-${kind} text-lg">${esc(message)}</div>`;
+}
+
+/* =========================================================
+   CHARACTER BUILD  (skills, perks, attributes, carry weight)
+
+   The numbers below are Skyrim's own. Every formula is sourced in
+   assets/data/skyrim.json under "sources" — none of it is invented.
+   ========================================================= */
+
+let _build = null;
+
+/** Loads assets/data/skyrim.json once and caches it. */
+export async function buildData() {
+  if (_build) return _build;
+  const res = await fetch(url("assets/data/skyrim.json"));
+  if (!res.ok) throw new Error("Could not load skyrim.json (" + res.status + ")");
+  _build = await res.json();
+  return _build;
+}
+
+/** The skill spread a freshly created character of this race starts with. */
+export function startingSkills(raceId, bd) {
+  const race = bd.races[String(raceId)];
+  return race ? { ...race.startingSkills } : {};
+}
+
+/** Starting attributes. Skyrim gives every race 100/100/100. */
+export function startingAttributes(bd) {
+  const c = bd.constants;
+  return { health: c.startingHealth, magicka: c.startingMagicka, stamina: c.startingStamina };
+}
+
+/**
+ * Character level, derived from skill training exactly as the game does it.
+ *
+ *   a skill reaching level S grants S character XP
+ *   level N -> N+1 costs (N + 3) * 25
+ *
+ * Returns the level plus the progress into the next one, so the UI can show
+ * a bar rather than just a number.
+ */
+export function derivedLevel(skills, raceId, bd) {
+  const c = bd.constants;
+  const start = startingSkills(raceId, bd);
+
+  let xp = 0;
+  for (const [sid, level] of Object.entries(skills)) {
+    const from = start[sid] ?? c.baseSkill;
+    const to = Math.max(from, Number(level) || from);
+    // Sum of every rank gained: (to*(to+1) - from*(from+1)) / 2
+    xp += (to * (to + 1) - from * (from + 1)) / 2 * c.xpPerSkillRank;
+  }
+
+  let level = 1;
+  let needed = c.xpLevelUpBase + c.xpLevelUpMult * level;
+  while (xp >= needed) {
+    xp -= needed;
+    level += 1;
+    needed = c.xpLevelUpBase + c.xpLevelUpMult * level;
+  }
+
+  return { level, xpIntoLevel: Math.round(xp), xpForNextLevel: needed };
+}
+
+/** One perk point and one attribute pick per level gained after the first. */
+export function pointsAvailable(level, perks, attributePicks) {
+  const earned = Math.max(0, level - 1);
+  const perksSpent = Object.values(perks || {}).reduce((s, r) => s + (Number(r) || 0), 0);
+  const picksSpent = (attributePicks?.health || 0) + (attributePicks?.magicka || 0) +
+                     (attributePicks?.stamina || 0);
+  return {
+    earned,
+    perkPointsSpent: perksSpent,
+    perkPointsLeft: earned - perksSpent,
+    attributePicksSpent: picksSpent,
+    attributePicksLeft: earned - picksSpent
+  };
+}
+
+/** Current Health / Magicka / Stamina after level-up allocation. */
+export function attributes(attributePicks, bd) {
+  const c = bd.constants;
+  const p = attributePicks || {};
+  return {
+    health:  c.startingHealth  + c.attributePerLevel * (p.health  || 0),
+    magicka: c.startingMagicka + c.attributePerLevel * (p.magicka || 0),
+    stamina: c.startingStamina + c.attributePerLevel * (p.stamina || 0)
+  };
+}
+
+/** Carry weight: 300 base, plus 5 for every level-up point put into Stamina. */
+export function carryCapacity(attributePicks, bd) {
+  const c = bd.constants;
+  return c.carryWeightBase + c.carryWeightPerStaminaPick * (attributePicks?.stamina || 0);
+}
+
+/** Total ranks taken in one perk, 0 if untaken. */
+export function perkRank(perks, perkId) {
+  return Number(perks?.[perkId] || 0);
+}
+
+/** Is this rank reachable — skill high enough, and prerequisite taken? */
+export function perkAvailable(perk, nextRank, skillLevel, perks, tree) {
+  if (nextRank > perk.ranks) return false;
+  if (skillLevel < perk.req[nextRank - 1]) return false;
+  if (perk.prereq) {
+    const parent = tree.find((p) => p.id === perk.prereq);
+    if (parent && perkRank(perks, perk.prereq) < 1) return false;
+  }
+  return true;
+}
+
+/** Sums a perk effect of one type across a tree, in percent. */
+function effectPct(tree, perks, type) {
+  let total = 0;
+  for (const perk of tree || []) {
+    if (perk.effect?.type !== type) continue;
+    total += (perk.effect.perRank || 0) * perkRank(perks, perk.id);
+  }
+  return total;
+}
+
+function hasEffect(tree, perks, type) {
+  return (tree || []).some((p) => p.effect?.type === type && perkRank(perks, p.id) > 0);
+}
+
+/**
+ * What one weapon actually hits for, given this character.
+ *   damage = base * (1 + 0.005 * skill) * (1 + perk%)
+ */
+export function weaponDamage(item, skills, perks, bd) {
+  const base = Number(item.damage) || 0;
+  if (!base) return null;
+
+  const skillId = bd.classificationSkill[String(item.classification_id)];
+  if (!skillId) return { base, total: base, skillId: null, skillPct: 0, perkPct: 0 };
+
+  const skill = Number(skills?.[skillId] ?? bd.constants.baseSkill);
+  const skillMult = 1 + bd.constants.weaponDamagePerSkillPoint * skill;
+  const perkPct = effectPct(bd.perks[String(skillId)], perks, "weaponDamagePct");
+  const total = base * skillMult * (1 + perkPct / 100);
+
+  return {
+    base,
+    total: Math.round(total * 10) / 10,
+    skillId,
+    skillLevel: skill,
+    skillPct: Math.round((skillMult - 1) * 1000) / 10,
+    perkPct
+  };
+}
+
+/**
+ * What one armour piece is actually worth.
+ *   rating = base * (1 + 0.004 * skill) * (1 + perk%) * (1 + setBonus%)
+ * The set bonus only applies when all four armour slots are the same type.
+ */
+export function armorPieceRating(item, skills, perks, bd, fullSet = false) {
+  const base = Number(item.defence) || 0;
+  if (!base) return null;
+
+  const skillId = bd.classificationSkill[String(item.classification_id)];
+  if (!skillId) return { base, total: base, skillId: null, skillPct: 0, perkPct: 0, setPct: 0 };
+
+  const skill = Number(skills?.[skillId] ?? bd.constants.baseSkill);
+  const skillMult = 1 + bd.constants.armorRatingPerSkillPoint * skill;
+  const tree = bd.perks[String(skillId)];
+  const perkPct = effectPct(tree, perks, "armorRatingPct");
+  const setPct = fullSet ? effectPct(tree, perks, "setBonusPct") : 0;
+  const total = base * skillMult * (1 + perkPct / 100) * (1 + setPct / 100);
+
+  return {
+    base,
+    total: Math.round(total * 10) / 10,
+    skillId,
+    skillLevel: skill,
+    skillPct: Math.round((skillMult - 1) * 1000) / 10,
+    perkPct,
+    setPct
+  };
+}
+
+/**
+ * Damage reduction from a set of worn armour.
+ *   (displayed rating + 25 per worn piece) * 0.12%, capped at 80%.
+ */
+export function damageReduction(displayedRating, piecesWorn, bd) {
+  const c = bd.constants;
+  const hidden = c.hiddenArmorPerPiece * Math.min(piecesWorn, 4);
+  const pct = (displayedRating + hidden) * c.damageReductionPerArmorPoint;
+  return {
+    percent: Math.min(pct, c.maxDamageReduction),
+    capped: pct >= c.maxDamageReduction,
+    ratingForCap: c.armorCapRating
+  };
+}
+
+/**
+ * Everything the character sheet and the inventory page need, in one call.
+ * `inventory` is the rows from listInventory(); `items` the static item list.
+ */
+export function buildSummary({ raceId, skills, perks, attributePicks }, inventory, itemsById, bd) {
+  const lvl = derivedLevel(skills, raceId, bd);
+  const attrs = attributes(attributePicks, bd);
+  const points = pointsAvailable(lvl.level, perks, attributePicks);
+  const capacity = carryCapacity(attributePicks, bd);
+
+  // Which armour slots are filled, and by which type.
+  const slotType = {};
+  let carried = 0;
+  let bestWeapon = null;
+  const armourPieces = [];
+
+  for (const row of inventory || []) {
+    const item = itemsById.get(row.itemId);
+    if (!item) continue;
+    const qty = Number(row.quantity) || 0;
+
+    const skillId = bd.classificationSkill[String(item.classification_id)];
+    const tree = bd.perks[String(skillId)];
+    const weightless = tree && hasEffect(tree, perks, "weightless");
+    if (!weightless) carried += (Number(item.weight) || 0) * qty;
+
+    if (item.defence) {
+      const slot = bd.armorSlots[String(item.category_id)];
+      if (slot && !slotType[slot]) slotType[slot] = skillId;
+      armourPieces.push(item);
+    }
+    if (item.damage) {
+      const d = weaponDamage(item, skills, perks, bd);
+      if (d && (!bestWeapon || d.total > bestWeapon.damage.total)) {
+        bestWeapon = { item, damage: d };
+      }
+    }
+  }
+
+  // A full set means all four slots filled by the same armour skill.
+  const filled = Object.values(slotType);
+  const fullSet = filled.length === 4 && filled.every((s) => s === filled[0]);
+
+  // Best single piece per slot, which is what the character would wear.
+  const worn = {};
+  for (const item of armourPieces) {
+    const slot = bd.armorSlots[String(item.category_id)];
+    if (!slot) continue;
+    const r = armorPieceRating(item, skills, perks, bd, fullSet);
+    if (!r) continue;
+    if (!worn[slot] || r.total > worn[slot].rating.total) worn[slot] = { item, rating: r };
+  }
+
+  const displayed = Object.values(worn).reduce((s, w) => s + w.rating.total, 0);
+  const dr = damageReduction(displayed, Object.keys(worn).length, bd);
+
+  return {
+    level: lvl,
+    attributes: attrs,
+    points,
+    carry: {
+      capacity,
+      carried: Math.round(carried * 100) / 100,
+      remaining: Math.round((capacity - carried) * 100) / 100,
+      overEncumbered: carried > capacity,
+      usedPercent: Math.min(100, Math.round((carried / capacity) * 1000) / 10)
+    },
+    armour: {
+      worn,
+      fullSet,
+      displayedRating: Math.round(displayed * 10) / 10,
+      damageReduction: Math.round(dr.percent * 10) / 10,
+      capped: dr.capped
+    },
+    bestWeapon
+  };
 }

@@ -78,6 +78,9 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
                         </form>
                     </div>
 
+                    <!-- CARRY CAPACITY -->
+                    <div id="carry-panel" class="inset-panel"></div>
+
                     <!-- INVENTORY TOTALS -->
                     <p id="inv-summary" class="text-muted-custom text-lg"></p>
 
@@ -120,7 +123,8 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
     <script>window.SITE_ROOT = "../";</script>
     <script type="module">
         import {
-            renderChrome, requireAuth, refData, effectiveSpeed, fmtWeight, fmtSpeed, getCharacter,
+            renderChrome, requireAuth, refData, buildData, effectiveSpeed, fmtWeight, fmtSpeed,
+            getCharacter, withDefaultBuild, buildSummary,
             listInventory, addInventoryItem, increaseInventoryItem,
             decreaseInventoryItem, deleteInventoryItem,
             halt, esc, friendlyError, setAlert, toast
@@ -137,13 +141,16 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
             await halt();
         }
 
-        const data = await refData();
-        const character = await getCharacter(user.uid, cid);
+        const [data, bd] = await Promise.all([refData(), buildData()]);
+        const rawCharacter = await getCharacter(user.uid, cid);
+        const character = rawCharacter ? withDefaultBuild(rawCharacter, bd) : null;
 
         if (!character) {
             setAlert(alert, "Character not found or access denied.");
             await halt();
         }
+
+        const sheetLink = "read_character.html?id=" + encodeURIComponent(cid);
 
         document.getElementById("char-name").textContent = character.name;
         document.title = character.name + "'s Inventory";
@@ -170,6 +177,7 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
             if (!inventory.length) {
                 tbody.innerHTML = `<tr><td colspan="11">No items in inventory.</td></tr>`;
                 summary.textContent = "";
+                renderCarry();
                 return;
             }
 
@@ -188,6 +196,8 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
             summary.textContent =
                 `${totalItems} item${totalItems === 1 ? "" : "s"} \u00b7 ` +
                 `${totalWeight.toFixed(2)} weight \u00b7 ${totalGold} gold`;
+
+            renderCarry();
 
             tbody.innerHTML = rows.map((it) => `
                 <tr>
@@ -220,6 +230,36 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
             tbody.querySelectorAll("[data-act]").forEach((btn) => {
                 btn.addEventListener("click", () => act(btn));
             });
+        }
+
+        /**
+         * Carrying capacity, which depends on the character's Stamina picks and on
+         * perks like Conditioning that make a whole armour type weightless.
+         */
+        function renderCarry() {
+            const s = buildSummary(
+                { raceId: character.raceId, skills: character.skills,
+                  perks: character.perks, attributePicks: character.attributePicks },
+                inventory, itemsById, bd
+            );
+            const c = s.carry;
+            document.getElementById("carry-panel").innerHTML = `
+                <div class="carry-row">
+                    <span><strong>${c.carried}</strong> / ${c.capacity} carried</span>
+                    <span class="${c.overEncumbered ? "carry-over" : "text-muted-custom"}">
+                        ${c.overEncumbered
+                            ? "Over-encumbered by " + Math.round((c.carried - c.capacity) * 100) / 100
+                            : c.remaining + " to spare"}</span>
+                </div>
+                <div class="meter" role="img"
+                     aria-label="Carrying ${c.carried} of ${c.capacity}, ${c.usedPercent}% full">
+                    <div class="meter-fill ${c.overEncumbered ? "is-over" : ""}"
+                         style="width:${Math.min(100, c.usedPercent)}%"></div>
+                </div>
+                <p class="text-muted-custom text-m">
+                    300 base plus 5 per level-up point in Stamina.
+                    Change that on the <a href="${sheetLink}">character sheet</a>.
+                </p>`;
         }
 
         async function act(btn) {

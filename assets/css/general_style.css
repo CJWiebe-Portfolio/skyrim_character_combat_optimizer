@@ -962,3 +962,258 @@ body { overflow-x: hidden; }
   background: var(--skyrim-danger);
   color: #fff;
 }
+
+/* ---------- footer profile links ----------------------------------------- */
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  margin: 0.6rem 0 0;
+}
+.footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  padding-bottom: 1px;
+}
+.footer-links a:hover {
+  color: var(--skyrim-gold);
+  border-bottom-color: var(--skyrim-gold);
+}
+
+/* ==========================================================================
+   CHARACTER SHEET
+   ========================================================================== */
+
+.sheet-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.sheet-head h1 { margin: 0; }
+.sheet-head p { margin: 0.2rem 0 0; font-size: 1rem; }
+.sheet-head-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+
+.sheet-section {
+  margin-top: 2.25rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+}
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.section-head .panel-title { margin-bottom: 0.4rem; }
+
+.points-left {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--skyrim-gold);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  white-space: nowrap;
+}
+
+/* ---------- the at-a-glance strip ---------- */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.75rem;
+  margin: 1.5rem 0 0;
+}
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.85rem 1rem;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: var(--radius);
+}
+.stat-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.stat-value {
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--skyrim-gold);
+  font-variant-numeric: tabular-nums;
+}
+.stat-foot { font-size: 0.8rem; color: var(--text-muted); opacity: 0.8; }
+
+/* ---------- attributes ---------- */
+.attr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.attr-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: var(--radius);
+}
+
+/* ---------- carry meter ---------- */
+.carry-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+  margin: 0.75rem 0 0.4rem;
+}
+.carry-over { color: var(--skyrim-danger); font-weight: 600; }
+.meter {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  overflow: hidden;
+}
+.meter-fill {
+  height: 100%;
+  background: var(--skyrim-gold);
+  transition: width 0.25s ease;
+}
+.meter-fill.is-over { background: var(--skyrim-danger); }
+@media (prefers-reduced-motion: reduce) { .meter-fill { transition: none; } }
+
+/* ---------- skills ---------- */
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.5rem 1.25rem;
+  margin-top: 1rem;
+}
+.skill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+/* The five skills that actually drive weapon and armour numbers. */
+.skill-row-combat {
+  border-color: rgba(212, 175, 55, 0.22);
+  background: rgba(212, 175, 55, 0.04);
+}
+.skill-name { margin: 0; display: flex; align-items: baseline; gap: 0.45rem; }
+.race-bonus {
+  font-size: 0.72rem;
+  color: var(--skyrim-gold);
+  opacity: 0.85;
+  white-space: nowrap;
+}
+.skill-input {
+  width: 4.5rem;
+  text-align: right;
+  padding: 0.25rem 0.45rem;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-radius: 4px;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- perks ---------- */
+.perk-tree { margin-top: 1.5rem; }
+.perk-tree-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--skyrim-gold);
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0 0 0.6rem;
+}
+.perk-tree-title .text-m { font-size: 0.85rem; }
+.perk-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 0.5rem;
+}
+.perk {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.25);
+}
+.perk.is-taken {
+  border-color: rgba(212, 175, 55, 0.45);
+  background: rgba(212, 175, 55, 0.07);
+}
+.perk-main { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.perk-name { font-weight: 600; }
+.perk-rank {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--skyrim-gold);
+  font-variant-numeric: tabular-nums;
+}
+.perk-desc { font-size: 0.88rem; color: var(--text-muted); }
+.perk-req { font-size: 0.78rem; color: var(--text-muted); opacity: 0.7; }
+
+.cell-strong { font-weight: 700; color: var(--skyrim-gold); font-variant-numeric: tabular-nums; }
+
+.sheet-save {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+}
+.sheet-save .skyrim-btn { display: inline-block; width: auto; }
+.sheet-save .skyrim-btn-update {
+  background: var(--skyrim-gold);
+  color: var(--skyrim-dark);
+  font-weight: 600;
+}
+.sheet-save .skyrim-btn-delete { margin-left: auto; }
+
+/* .tablewrap is the sheet's scroll container for wide tables. Without it the
+   gear tables pushed the whole page sideways on a phone. */
+.tablewrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius);
+  margin-top: 0.6rem;
+}
+
+/* auto-fit tracks keep their minimum even when the container is narrower than
+   it, which overflows on a phone. min() lets the track shrink instead. */
+.stat-strip { grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr)); }
+.attr-grid  { grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr)); }
+.skill-grid { grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); }
+.perk-list  { grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr)); }
+
+@media (max-width: 520px) {
+  .sheet-save .skyrim-btn-delete { margin-left: 0; }
+  .perk { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+  .perk .qty-control { justify-content: flex-end; }
+}
