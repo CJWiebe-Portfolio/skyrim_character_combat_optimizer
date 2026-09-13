@@ -5,8 +5,8 @@ PROJECT: Skyrim Character Combat Optimization System
 AUTHOR: C.J. Wiebe
 =========================================================
 DESCRIPTION:
-Registration page. Creates the Firebase Auth user and their users/{uid}
-profile document in one step.
+Registration. Creates the Auth user and the users/{uid} profile document,
+and sends a verification email.
 =========================================================
 -->
 <!DOCTYPE html>
@@ -34,67 +34,79 @@ profile document in one step.
 <body>
     <div class="d-flex flex-column min-vh-100">
 
+        <!-- Keyboard users land here first and can jump past the navigation. -->
+        <a class="skip-link" href="#main">Skip to main content</a>
+
         <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
         <div id="navbar-slot"></div>
 
         <!-- ===================== MAIN CONTENT ===================== -->
+        <main id="main">
         <div class="container py-5 mt-1 flex-grow-1">
             <div class="main-container p-4">
                 <div class="main-container p-5">
 
-                    <h1 class="section-title title-main text-center">&#10133; Create Account</h1>
-                    <h5 class="text-muted-custom text-center">Register to start building characters and inventories</h5>
-                    <br>
+                    <div class="form-column">
+                        <h1 class="section-title title-main text-center">Create Account</h1>
+                        <p class="text-muted-custom text-center lede">
+                            Register to start building characters and inventories.
+                        </p>
 
-                    <div id="alert-slot"></div>
+                        <div id="alert-slot" aria-live="polite"></div>
 
-                    <form id="signup-form">
+                        <form id="signup-form" novalidate>
 
-                        <div class="mb-3">
-                            <label class="form-label text-lg" for="first_name">First Name</label>
-                            <input id="first_name" type="text" class="form-control text-lg" required>
-                        </div>
+                            <div class="field-row">
+                                <div class="field">
+                                    <label class="form-label text-lg" for="first_name">First name</label>
+                                    <input id="first_name" type="text" class="form-control text-lg"
+                                           required autocomplete="given-name">
+                                </div>
+                                <div class="field">
+                                    <label class="form-label text-lg" for="last_name">Last name</label>
+                                    <input id="last_name" type="text" class="form-control text-lg"
+                                           required autocomplete="family-name">
+                                </div>
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label text-lg" for="last_name">Last Name</label>
-                            <input id="last_name" type="text" class="form-control text-lg" required>
-                        </div>
+                            <div class="field">
+                                <label class="form-label text-lg" for="email">Email</label>
+                                <input id="email" type="email" class="form-control text-lg" required
+                                       autocomplete="email">
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label text-lg" for="email">Email [e.g. email@email.email]</label>
-                            <input id="email" type="email" class="form-control text-lg" required autocomplete="email">
-                        </div>
+                            <div class="field">
+                                <label class="form-label text-lg" for="dob">Date of birth</label>
+                                <input id="dob" type="date" class="form-control text-lg">
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label text-lg" for="dob">Date of Birth</label>
-                            <input id="dob" type="date" class="form-control text-lg">
-                        </div>
+                            <div class="field">
+                                <label class="form-label text-lg" for="password">Password</label>
+                                <input id="password" type="password" class="form-control text-lg" required
+                                       autocomplete="new-password" aria-describedby="pw-hint">
+                                <p class="field-hint" id="pw-hint">At least 8 characters.</p>
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label text-lg" for="password">Password (at least 8 characters)</label>
-                            <input id="password" type="password" class="form-control text-lg" required
-                                   autocomplete="new-password">
-                        </div>
+                            <div class="field">
+                                <label class="form-label text-lg" for="confirm">Confirm password</label>
+                                <input id="confirm" type="password" class="form-control text-lg" required
+                                       autocomplete="new-password">
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label text-lg" for="confirm">Confirm Password</label>
-                            <input id="confirm" type="password" class="form-control text-lg" required
-                                   autocomplete="new-password">
-                        </div>
+                            <div class="form-actions">
+                                <button id="submit-btn" type="submit" class="skyrim-btn skyrim-btn-create text-lg">
+                                    Create Account
+                                </button>
+                                <a href="login.html" class="btn-link-quiet">Back to login</a>
+                            </div>
 
-                        <br>
-                        <div class="d-flex gap-2">
-                            <button id="submit-btn" type="submit" class="skyrim-btn skyrim-btn-create text-lg">
-                                &#128190; Create Account
-                            </button>
-                            <a href="login.html" class="btn btn-primary text-lg">Back to Login</a>
-                        </div>
-
-                    </form>
+                        </form>
+                    </div>
 
                 </div>
             </div>
         </div>
+        </main>
 
         <!-- ===================== FOOTER (rendered by app.js) ===================== -->
         <div id="footer-slot"></div>
@@ -121,13 +133,14 @@ profile document in one step.
             const password = document.getElementById("password").value;
             const confirm  = document.getElementById("confirm").value;
 
-            // Same validation rules the PHP update_account.php applied.
             if (password !== confirm) {
-                setAlert(alert, "Passwords do not match.");
+                setAlert(alert, "The two passwords do not match.");
+                document.getElementById("confirm").focus();
                 return;
             }
             if (password.length < 8) {
                 setAlert(alert, "Password must be at least 8 characters.");
+                document.getElementById("password").focus();
                 return;
             }
 
@@ -140,6 +153,8 @@ profile document in one step.
                     dob:       document.getElementById("dob").value,
                     password
                 });
+                // A verification email goes out during signup; the account page
+                // shows whether it has been confirmed and can send another.
                 window.location.href = url("home.html");
             } catch (err) {
                 setAlert(alert, friendlyError(err));

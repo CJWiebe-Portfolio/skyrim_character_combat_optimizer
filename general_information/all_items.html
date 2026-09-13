@@ -34,10 +34,14 @@ Item data is served statically from assets/data/items.json.
 <body>
     <div class="d-flex flex-column min-vh-100">
 
+        <!-- Keyboard users land here first and can jump past the navigation. -->
+        <a class="skip-link" href="#main">Skip to main content</a>
+
         <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
         <div id="navbar-slot"></div>
 
         <!-- ===================== MAIN CONTENT ===================== -->
+        <main id="main">
         <div class="container py-5 mt-1 flex-grow-1">
             <div class="main-container p-4">
                 <div class="main-container p-5">
@@ -86,28 +90,29 @@ Item data is served statically from assets/data/items.json.
                         </div>
 
                         <div class="col-md-2">
-                            <button type="submit" class="btn btn-warning w-100">Apply</button>
+                            <button type="button" id="f-reset" class="btn btn-warning w-100">Reset</button>
                         </div>
 
                     </form>
 
-                    <p id="item-count" class="text-muted-custom"></p>
+                    <p id="item-count" class="result-count" role="status" aria-live="polite"></p>
+                    <p class="scroll-hint text-muted-custom">Scroll the table sideways to see every column.</p>
 
                     <!-- ========================= DATA TABLE ========================= -->
                     <div class="table-responsive">
                         <table class="table-skyrim text-lg">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Damage</th>
-                                    <th>Speed</th>
-                                    <th>Defence</th>
-                                    <th>Weight</th>
-                                    <th>Gold</th>
-                                    <th>Category</th>
-                                    <th>Classification</th>
-                                    <th>Perk</th>
-                                    <th>Upgrade</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Damage</th>
+                                    <th scope="col">Speed</th>
+                                    <th scope="col">Defence</th>
+                                    <th scope="col">Weight</th>
+                                    <th scope="col">Gold</th>
+                                    <th scope="col">Category</th>
+                                    <th scope="col">Classification</th>
+                                    <th scope="col">Perk</th>
+                                    <th scope="col">Upgrade</th>
                                 </tr>
                             </thead>
                             <tbody id="item-rows">
@@ -119,6 +124,7 @@ Item data is served statically from assets/data/items.json.
                 </div>
             </div>
         </div>
+        </main>
 
         <!-- ===================== FOOTER (rendered by app.js) ===================== -->
         <div id="footer-slot"></div>
@@ -185,7 +191,10 @@ Item data is served statically from assets/data/items.json.
                 });
             }
 
-            count.textContent = rows.length + " item" + (rows.length === 1 ? "" : "s");
+            const total = data.items.length;
+            count.textContent = rows.length === total
+                ? `Showing all ${total} items`
+                : `Showing ${rows.length} of ${total} items`;
 
             tbody.innerHTML = rows.length
                 ? rows.map((it) => `
@@ -204,14 +213,26 @@ Item data is served statically from assets/data/items.json.
                 : `<tr><td colspan="10">No items match that filter.</td></tr>`;
         }
 
-        form.addEventListener("submit", (ev) => {
-            ev.preventDefault();
+        function apply() {
             const q = new URLSearchParams();
             if (fCat.value)  q.set("category", fCat.value);
             if (fSort.value) q.set("sort", fSort.value);
             q.set("order", fOrder.value);
+            // Keep the address bar in step so a filtered view can be linked or reloaded.
             history.replaceState(null, "", "?" + q.toString());
             render();
+        }
+
+        // Apply on change rather than making people find a button.
+        [fCat, fSort, fOrder].forEach((el) => el.addEventListener("change", apply));
+
+        form.addEventListener("submit", (ev) => { ev.preventDefault(); apply(); });
+
+        document.getElementById("f-reset").addEventListener("click", () => {
+            fCat.value = "";
+            fSort.value = "";
+            fOrder.value = "ASC";
+            apply();
         });
 
         render();

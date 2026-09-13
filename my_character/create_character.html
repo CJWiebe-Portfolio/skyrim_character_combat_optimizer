@@ -34,10 +34,14 @@ highest existing number for this account plus one, as the PHP version did.
 <body>
     <div class="d-flex flex-column min-vh-100">
 
+        <!-- Keyboard users land here first and can jump past the navigation. -->
+        <a class="skip-link" href="#main">Skip to main content</a>
+
         <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
         <div id="navbar-slot"></div>
 
         <!-- ===================== MAIN CONTENT ===================== -->
+        <main id="main">
         <div class="container py-5 mt-1 flex-grow-1">
             <div class="main-container p-4">
                 <div class="main-container p-5">
@@ -80,6 +84,7 @@ highest existing number for this account plus one, as the PHP version did.
                 </div>
             </div>
         </div>
+        </main>
 
         <!-- ===================== FOOTER (rendered by app.js) ===================== -->
         <div id="footer-slot"></div>

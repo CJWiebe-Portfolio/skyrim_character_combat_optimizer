@@ -25,7 +25,9 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   updatePassword,
-  updateEmail,
+  verifyBeforeUpdateEmail,
+  sendPasswordResetEmail,
+  sendEmailVerification,
   deleteUser,
   EmailAuthProvider,
   reauthenticateWithCredential
@@ -147,18 +149,66 @@ export const login = (email, password) =>
 
 export const logout = () => signOut(auth);
 
-/** Creates the Auth user and their profile document in one step. */
+/**
+ * Creates the Auth user, their profile document, and sends a verification email.
+ *
+ * If the profile write is rejected (almost always: the Firestore rules in
+ * firestore.rules have not been published), the new Auth user is rolled back,
+ * so you don't end up with an account that can sign in but has no data and
+ * cannot be registered again.
+ */
 export async function signup({ firstName, lastName, email, password, dob }) {
   const cred = await createUserWithEmailAndPassword(auth, email, password);
-  await setDoc(doc(db, "users", cred.user.uid), {
-    firstName,
-    lastName,
-    email,
-    dob: dob || "",
-    role: "user",
-    createdAt: serverTimestamp()
-  });
+
+  try {
+    await setDoc(doc(db, "users", cred.user.uid), {
+      firstName,
+      lastName,
+      email,
+      dob: dob || "",
+      role: "user",
+      createdAt: serverTimestamp()
+    });
+  } catch (err) {
+    try {
+      await deleteUser(cred.user);
+    } catch {
+      // Rollback failed; the caller still sees the original error below.
+    }
+    throw err;
+  }
+
+  // Best effort: a failed verification email must not fail the registration.
+  try {
+    await sendEmailVerification(cred.user);
+  } catch (e) {
+    console.warn("Could not send verification email:", e);
+  }
+
   return cred.user;
+}
+
+/** Re-sends the "confirm your address" email. */
+export function sendVerification(user) {
+  return sendEmailVerification(user);
+}
+
+/** Sends a password reset link. Used by the Forgot password form on the login page. */
+export function resetPassword(email) {
+  return sendPasswordResetEmail(auth, email);
+}
+
+/**
+ * Changes the account email.
+ *
+ * Firebase BLOCKS the old updateEmail() on every project created after
+ * 15 September 2023, because email enumeration protection is on by default.
+ * The supported route is verifyBeforeUpdateEmail: Firebase mails the NEW
+ * address, and the change only lands once that link is clicked. So the address
+ * does not change the moment this resolves — say so in the UI.
+ */
+export function changeEmail(user, newEmail) {
+  return verifyBeforeUpdateEmail(user, newEmail);
 }
 
 /** Firebase requires a recent login before email/password/account changes. */
@@ -167,7 +217,7 @@ export function reauth(user, password) {
   return reauthenticateWithCredential(user, cred);
 }
 
-export { updatePassword, updateEmail, deleteUser };
+export { updatePassword, deleteUser };
 
 /* =========================================================
    PROFILE  (was the `accounts` table)
@@ -177,6 +227,29 @@ export { updatePassword, updateEmail, deleteUser };
 export async function getProfile(uid) {
   const snap = await getDoc(doc(db, "users", uid));
   return snap.exists() ? snap.data() : null;
+}
+
+/**
+ * Returns the profile, creating a minimal one if it is missing.
+ *
+ * A profile can be missing if the account was registered while the Firestore
+ * rules were still denying writes. Rather than showing a blank account page
+ * forever, seed it from what Auth knows and let the user correct it.
+ */
+export async function ensureProfile(user) {
+  const existing = await getProfile(user.uid);
+  if (existing) return existing;
+
+  const seeded = {
+    firstName: (user.email || "").split("@")[0] || "Adventurer",
+    lastName: "",
+    email: user.email || "",
+    dob: "",
+    role: "user",
+    createdAt: serverTimestamp()
+  };
+  await setDoc(doc(db, "users", user.uid), seeded, { merge: true });
+  return seeded;
 }
 
 export function saveProfile(uid, fields) {
@@ -302,7 +375,9 @@ function navbarHTML(user, profile, active) {
              class="d-inline-block align-text-middle">Skyrim Character Combat Optimizer</a>
 
       <button class="navbar-toggler skyrim-toggler" type="button"
-              data-bs-toggle="collapse" data-bs-target="#navbarNav">
+              data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false"
+              aria-label="Toggle navigation menu">
         <span class="navbar-toggler-icon"></span>
       </button>
 
@@ -373,7 +448,16 @@ function footerHTML() {
         <div class="col-md-4 mb-3">
           <h6 class="fw-bold text-lg">About</h6>
           <p class="small mb-0 text-m">C. J. Wiebe</p>
-          <li><a class="dropdown-item" href="${url("https://projects.cjpwiebe-portfolio.ca/")}">Click to Check Out My Portfolio Website</a></li>
+          <ul class="list-unstyled text-m mt-2">
+            <li>
+              <!-- External link: NOT wrapped in url(). That helper prefixes the
+                   site root for internal pages and would mangle a full URL. -->
+              <a href="https://projects.cjpwiebe-portfolio.ca/"
+                 target="_blank" rel="noopener">
+                Click to Check Out My Portfolio Website
+              </a>
+            </li>
+          </ul>
         </div>
 
       </div>
@@ -398,9 +482,10 @@ export async function renderChrome(activePage) {
   let profile = null;
   if (user) {
     try {
-      profile = await getProfile(user.uid);
+      profile = await ensureProfile(user);
     } catch (e) {
       console.warn("Could not load profile:", e);
+      if (e?.code === "permission-denied") showRulesWarning();
     }
   }
 
@@ -421,6 +506,19 @@ export async function renderChrome(activePage) {
   if (CONFIG_IS_PLACEHOLDER) showConfigWarning();
 
   return { user, profile };
+}
+
+function showRulesWarning() {
+  if (document.getElementById("fb-rules-warning")) return;
+  const bar = document.createElement("div");
+  bar.id = "fb-rules-warning";
+  bar.className = "alert alert-danger m-0 rounded-0 text-center";
+  bar.innerHTML =
+    "<strong>Firestore is refusing reads and writes.</strong> " +
+    "The security rules have not been published yet. In the Firebase console open " +
+    "<em>Databases &amp; Storage &rarr; Firestore &rarr; Rules</em>, paste the contents of " +
+    "<code>firestore.rules</code> from this repo, and click <strong>Publish</strong>.";
+  document.body.prepend(bar);
 }
 
 function showConfigWarning() {
@@ -449,9 +547,47 @@ export function friendlyError(err) {
     "auth/requires-recent-login": "Please enter your current password to confirm this change.",
     "auth/operation-not-allowed":
       "Email/password sign-in is not enabled in the Firebase console yet.",
-    "permission-denied": "You do not have permission to do that."
+    "auth/missing-email": "Enter your email address first.",
+    "auth/invalid-new-email": "That new email address is not valid.",
+    "auth/email-change-needs-verification":
+      "Check the new address for a confirmation link to finish the change.",
+    "permission-denied":
+      "Firestore rejected that request. The security rules have not been published yet \u2014 " +
+      "in the Firebase console, open Databases & Storage \u2192 Firestore \u2192 Rules, paste the " +
+      "contents of firestore.rules from this repo, and click Publish.",
+    "unavailable":
+      "Could not reach Firestore. Check your connection, and that a Firestore database " +
+      "has been created for this project."
   };
   return map[code] || err?.message || "Something went wrong.";
+}
+
+/**
+ * Transient confirmation for an action that succeeded.
+ *
+ * Writes used to complete silently, which left people re-clicking Save to check
+ * whether it had worked. Announced politely so screen readers hear it too.
+ */
+export function toast(message, kind = "success") {
+  let host = document.getElementById("toast-host");
+  if (!host) {
+    host = document.createElement("div");
+    host.id = "toast-host";
+    host.className = "toast-host";
+    host.setAttribute("role", "status");
+    host.setAttribute("aria-live", "polite");
+    document.body.appendChild(host);
+  }
+
+  const el = document.createElement("div");
+  el.className = "skyrim-toast skyrim-toast-" + kind;
+  el.textContent = message;
+  host.appendChild(el);
+
+  setTimeout(() => {
+    el.classList.add("is-leaving");
+    setTimeout(() => el.remove(), 400);
+  }, 3200);
 }
 
 /** Small helper for the alert boxes the PHP pages used. */

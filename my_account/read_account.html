@@ -5,7 +5,9 @@ PROJECT: Skyrim Character Combat Optimization System
 AUTHOR: C.J. Wiebe
 =========================================================
 DESCRIPTION:
-Shows the signed-in user's profile from users/{uid} in Firestore.
+The account page: view and edit the profile, change email and password, and
+see whether the address has been verified. Replaces the old separate
+Update Account page.
 =========================================================
 -->
 <!DOCTYPE html>
@@ -33,59 +35,151 @@ Shows the signed-in user's profile from users/{uid} in Firestore.
 <body>
     <div class="d-flex flex-column min-vh-100">
 
+        <!-- Keyboard users land here first and can jump past the navigation. -->
+        <a class="skip-link" href="#main">Skip to main content</a>
+
         <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
         <div id="navbar-slot"></div>
 
         <!-- ===================== MAIN CONTENT ===================== -->
+        <main id="main">
         <div class="container py-5 mt-1 flex-grow-1">
             <div class="main-container p-4">
                 <div class="main-container p-5">
 
-                    <div class="section-title">
-                        <h1 class="section-title title-main text-center">&#129534; Account Information &#129534;</h1>
-                        <h5 class="text-muted-custom text-center">
-                            This is the account information of <span id="acct-email"></span>
-                        </h5>
-                    </div>
+                    <div class="form-column">
 
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <div class="p-3 text-center">
-                                <a href="update_account.html" class="skyrim-btn skyrim-btn-update text-lg">
-                                    &#9999;&#65039; Update Account Information
-                                </a>
+                        <h1 class="section-title title-main text-center">Account Information</h1>
+                        <p class="text-muted-custom text-center lede" id="acct-email">&nbsp;</p>
+
+                        <!-- ===================== VERIFICATION STATE ===================== -->
+                        <div id="verify-panel" class="inset-panel" hidden>
+                            <div class="panel-head">
+                                <span class="status-pill status-warn" id="verify-pill">Email not verified</span>
+                                <button id="resend-btn" type="button" class="skyrim-btn skyrim-btn-update btn-compact">
+                                    Send verification email
+                                </button>
                             </div>
+                            <p class="text-muted-custom text-m" id="verify-note">
+                                Confirming your address keeps you from being locked out if you forget
+                                your password.
+                            </p>
                         </div>
-                        <div class="col-md-6">
-                            <div class="p-3 text-center">
-                                <a href="delete_account.html" class="skyrim-btn skyrim-btn-delete text-lg">
-                                    &#128465;&#65039; Delete Account
-                                </a>
+
+                        <div id="alert-slot" aria-live="polite"></div>
+
+                        <!-- ===================== PROFILE ===================== -->
+                        <form id="profile-form" novalidate>
+                            <fieldset>
+                                <legend class="panel-title">Your details</legend>
+
+                                <div class="field-row">
+                                    <div class="field">
+                                        <label class="form-label" for="first_name">First name</label>
+                                        <input id="first_name" type="text" class="form-control" required
+                                               autocomplete="given-name">
+                                    </div>
+                                    <div class="field">
+                                        <label class="form-label" for="last_name">Last name</label>
+                                        <input id="last_name" type="text" class="form-control" required
+                                               autocomplete="family-name">
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label class="form-label" for="dob">Date of birth</label>
+                                    <input id="dob" type="date" class="form-control">
+                                </div>
+
+                                <div class="form-actions">
+                                    <button id="save-profile" type="submit"
+                                            class="skyrim-btn skyrim-btn-update">Save details</button>
+                                </div>
+                            </fieldset>
+                        </form>
+
+                        <!-- ===================== EMAIL ===================== -->
+                        <form id="email-form" class="inset-panel" novalidate>
+                            <fieldset>
+                                <legend class="panel-title">Email address</legend>
+                                <p class="text-muted-custom text-m">
+                                    Firebase sends a confirmation link to the new address. Your email
+                                    changes once you click that link, not when you press Save.
+                                </p>
+
+                                <div class="field">
+                                    <label class="form-label" for="email">New email address</label>
+                                    <input id="email" type="email" class="form-control" required
+                                           autocomplete="email">
+                                </div>
+
+                                <div class="field">
+                                    <label class="form-label" for="email_password">Current password</label>
+                                    <input id="email_password" type="password" class="form-control"
+                                           autocomplete="current-password" aria-describedby="email-pw-hint">
+                                    <p class="field-hint" id="email-pw-hint">
+                                        Required — Firebase re-checks who you are before changing an address.
+                                    </p>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button id="save-email" type="submit"
+                                            class="skyrim-btn skyrim-btn-update">Send confirmation</button>
+                                </div>
+                            </fieldset>
+                        </form>
+
+                        <!-- ===================== PASSWORD ===================== -->
+                        <form id="password-form" class="inset-panel" novalidate>
+                            <fieldset>
+                                <legend class="panel-title">Password</legend>
+
+                                <div class="field">
+                                    <label class="form-label" for="current_password">Current password</label>
+                                    <input id="current_password" type="password" class="form-control"
+                                           autocomplete="current-password">
+                                </div>
+
+                                <div class="field-row">
+                                    <div class="field">
+                                        <label class="form-label" for="new_password">New password</label>
+                                        <input id="new_password" type="password" class="form-control"
+                                               autocomplete="new-password" aria-describedby="new-pw-hint">
+                                        <p class="field-hint" id="new-pw-hint">At least 8 characters.</p>
+                                    </div>
+                                    <div class="field">
+                                        <label class="form-label" for="confirm_password">Confirm new password</label>
+                                        <input id="confirm_password" type="password" class="form-control"
+                                               autocomplete="new-password">
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button id="save-password" type="submit"
+                                            class="skyrim-btn skyrim-btn-update">Change password</button>
+                                </div>
+                            </fieldset>
+                        </form>
+
+                        <!-- ===================== DANGER ZONE ===================== -->
+                        <div class="danger-zone">
+                            <div>
+                                <h2 class="panel-title">Delete account</h2>
+                                <p class="text-muted-custom text-m">
+                                    Removes your profile, every character, and their inventories. Permanent.
+                                </p>
                             </div>
+                            <a href="delete_account.html" class="skyrim-btn skyrim-btn-delete btn-compact">
+                                Delete account
+                            </a>
                         </div>
-                    </div>
 
-                    <div id="alert-slot"></div>
-
-                    <div class="table-responsive">
-                        <table class="table-skyrim text-lg">
-                            <thead>
-                                <tr>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th>Email</th>
-                                    <th>Date of Birth</th>
-                                </tr>
-                            </thead>
-                            <tbody id="acct-rows">
-                                <tr><td colspan="4">Loading&hellip;</td></tr>
-                            </tbody>
-                        </table>
                     </div>
 
                 </div>
             </div>
         </div>
+        </main>
 
         <!-- ===================== FOOTER (rendered by app.js) ===================== -->
         <div id="footer-slot"></div>
@@ -96,29 +190,163 @@ Shows the signed-in user's profile from users/{uid} in Firestore.
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>window.SITE_ROOT = "../";</script>
     <script type="module">
-        import { renderChrome, requireAuth, ensureProfile, esc, friendlyError, setAlert }
-            from "../assets/js/app.js";
+        import {
+            renderChrome, requireAuth, ensureProfile, saveProfile,
+            reauth, updatePassword, changeEmail, sendVerification,
+            friendlyError, setAlert, toast
+        } from "../assets/js/app.js";
 
         renderChrome("account");
         const user = await requireAuth();
 
-        document.getElementById("acct-email").textContent = user.email;
+        const $ = (id) => document.getElementById(id);
+        const alert = $("alert-slot");
 
-        const tbody = document.getElementById("acct-rows");
+        $("acct-email").textContent = user.email || "";
 
-        try {
-            const p = (await ensureProfile(user)) || {};
-            tbody.innerHTML = `
-                <tr>
-                    <td>${esc(p.firstName || "")}</td>
-                    <td>${esc(p.lastName || "")}</td>
-                    <td>${esc(p.email || user.email)}</td>
-                    <td>${esc(p.dob || "\u2014")}</td>
-                </tr>`;
-        } catch (err) {
-            tbody.innerHTML = `<tr><td colspan="4">\u2014</td></tr>`;
-            setAlert(document.getElementById("alert-slot"), friendlyError(err));
+        /* ---------- verification state ---------- */
+        const verifyPanel = $("verify-panel");
+        const resendBtn   = $("resend-btn");
+
+        if (!user.emailVerified) {
+            verifyPanel.hidden = false;
         }
+
+        resendBtn.addEventListener("click", async () => {
+            resendBtn.disabled = true;
+            try {
+                await sendVerification(user);
+                toast("Verification email sent to " + user.email);
+                $("verify-note").textContent =
+                    "Sent. Click the link in that email, then reload this page.";
+            } catch (err) {
+                setAlert(alert, friendlyError(err));
+                resendBtn.disabled = false;
+            }
+        });
+
+        /* ---------- load the profile into the form ---------- */
+        let profile = {};
+        try {
+            profile = (await ensureProfile(user)) || {};
+        } catch (err) {
+            setAlert(alert, friendlyError(err));
+        }
+
+        $("first_name").value = profile.firstName || "";
+        $("last_name").value  = profile.lastName || "";
+        $("dob").value        = profile.dob || "";
+        $("email").value      = user.email || "";
+
+        /* ---------- details ---------- */
+        $("profile-form").addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            setAlert(alert, "");
+
+            const firstName = $("first_name").value.trim();
+            const lastName  = $("last_name").value.trim();
+
+            if (!firstName || !lastName) {
+                setAlert(alert, "First and last name are both required.");
+                return;
+            }
+
+            const btn = $("save-profile");
+            btn.disabled = true;
+            try {
+                await saveProfile(user.uid, { firstName, lastName, dob: $("dob").value });
+                toast("Details saved");
+                // The navbar shows the first name, so keep it in step.
+                const nav = document.querySelector(".navbar .dropdown-toggle");
+                if (nav) nav.textContent = firstName;
+            } catch (err) {
+                setAlert(alert, friendlyError(err));
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        /* ---------- email ---------- */
+        $("email-form").addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            setAlert(alert, "");
+
+            const newEmail = $("email").value.trim();
+            const password = $("email_password").value;
+
+            if (!newEmail) {
+                setAlert(alert, "Enter the new email address.");
+                return;
+            }
+            if (newEmail === user.email) {
+                setAlert(alert, "That is already your email address.");
+                return;
+            }
+            if (!password) {
+                setAlert(alert, "Enter your current password to confirm this change.");
+                $("email_password").focus();
+                return;
+            }
+
+            const btn = $("save-email");
+            btn.disabled = true;
+            try {
+                await reauth(user, password);
+                await changeEmail(user, newEmail);
+                $("email_password").value = "";
+                setAlert(
+                    alert,
+                    "Confirmation sent to " + newEmail + ". Your address changes once you " +
+                    "click the link in that email — until then you still sign in with " +
+                    user.email + ".",
+                    "success"
+                );
+            } catch (err) {
+                setAlert(alert, friendlyError(err));
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        /* ---------- password ---------- */
+        $("password-form").addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            setAlert(alert, "");
+
+            const current = $("current_password").value;
+            const next    = $("new_password").value;
+            const confirm = $("confirm_password").value;
+
+            if (!current || !next || !confirm) {
+                setAlert(alert, "Fill in all three password fields.");
+                return;
+            }
+            if (next !== confirm) {
+                setAlert(alert, "The two new passwords do not match.");
+                $("confirm_password").focus();
+                return;
+            }
+            if (next.length < 8) {
+                setAlert(alert, "Password must be at least 8 characters.");
+                $("new_password").focus();
+                return;
+            }
+
+            const btn = $("save-password");
+            btn.disabled = true;
+            try {
+                await reauth(user, current);
+                await updatePassword(user, next);
+                $("current_password").value = "";
+                $("new_password").value = "";
+                $("confirm_password").value = "";
+                toast("Password changed");
+            } catch (err) {
+                setAlert(alert, friendlyError(err));
+            } finally {
+                btn.disabled = false;
+            }
+        });
     </script>
 </body>
 

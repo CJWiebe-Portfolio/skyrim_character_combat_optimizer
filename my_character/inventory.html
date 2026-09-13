@@ -34,10 +34,14 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
 <body>
     <div class="d-flex flex-column min-vh-100">
 
+        <!-- Keyboard users land here first and can jump past the navigation. -->
+        <a class="skip-link" href="#main">Skip to main content</a>
+
         <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
         <div id="navbar-slot"></div>
 
         <!-- ===================== MAIN CONTENT ===================== -->
+        <main id="main">
         <div class="container py-5 mt-1 flex-grow-1">
             <div class="main-container p-4">
                 <div class="main-container p-5">
@@ -82,17 +86,17 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
                         <table class="table-skyrim">
                             <thead>
                                 <tr>
-                                    <th>Item</th>
-                                    <th>Damage</th>
-                                    <th>Speed</th>
-                                    <th>Defence</th>
-                                    <th>Weight</th>
-                                    <th>Gold</th>
-                                    <th>Category</th>
-                                    <th>Class</th>
-                                    <th>Perk</th>
-                                    <th>Upgrade</th>
-                                    <th>Qty</th>
+                                    <th scope="col">Item</th>
+                                    <th scope="col">Damage</th>
+                                    <th scope="col">Speed</th>
+                                    <th scope="col">Defence</th>
+                                    <th scope="col">Weight</th>
+                                    <th scope="col">Gold</th>
+                                    <th scope="col">Category</th>
+                                    <th scope="col">Class</th>
+                                    <th scope="col">Perk</th>
+                                    <th scope="col">Upgrade</th>
+                                    <th scope="col">Qty</th>
                                 </tr>
                             </thead>
                             <tbody id="inv-rows">
@@ -104,6 +108,7 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
                 </div>
             </div>
         </div>
+        </main>
 
         <!-- ===================== FOOTER (rendered by app.js) ===================== -->
         <div id="footer-slot"></div>
@@ -118,7 +123,7 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
             renderChrome, requireAuth, refData, effectiveSpeed, fmtWeight, fmtSpeed, getCharacter,
             listInventory, addInventoryItem, increaseInventoryItem,
             decreaseInventoryItem, deleteInventoryItem,
-            halt, esc, friendlyError, setAlert
+            halt, esc, friendlyError, setAlert, toast
         } from "../assets/js/app.js";
 
         renderChrome("characters");
@@ -197,14 +202,17 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
                     <td>${data.perks[it.perk_id] ?? "\u2014"}</td>
                     <td>${data.upgrades[it.item_upgrade] ?? "\u2014"}</td>
                     <td>
-                        <div class="d-flex justify-content-center align-items-center gap-2">
-                            <span class="form-label text-lg">${it.quantity}</span>
-                            <button class="btn btn-sm btn-outline-warning text-m"
-                                    data-act="decrease" data-id="${it.item_id}">&#10134;</button>
-                            <button class="btn btn-sm btn-outline-success text-m"
-                                    data-act="increase" data-id="${it.item_id}">&#10133;</button>
-                            <button class="btn btn-sm btn-outline-danger text-m"
-                                    data-act="delete" data-id="${it.item_id}">&#128465;</button>
+                        <div class="qty-control">
+                            <button class="qty-btn" type="button"
+                                    data-act="decrease" data-id="${it.item_id}"
+                                    aria-label="Remove one ${esc(it.name)}">&minus;</button>
+                            <span class="qty-value" aria-label="${it.quantity} in inventory">${it.quantity}</span>
+                            <button class="qty-btn" type="button"
+                                    data-act="increase" data-id="${it.item_id}"
+                                    aria-label="Add one ${esc(it.name)}">+</button>
+                            <button class="qty-btn qty-btn-danger" type="button"
+                                    data-act="delete" data-id="${it.item_id}"
+                                    aria-label="Remove all ${esc(it.name)} from inventory">Remove</button>
                         </div>
                     </td>
                 </tr>`).join("");
@@ -217,8 +225,9 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
         async function act(btn) {
             const { act: action, id } = btn.dataset;
             const itemId = Number(id);
+            const itemName = itemsById.get(itemId)?.name || "this item";
 
-            if (action === "delete" && !confirm("Delete item?")) return;
+            if (action === "delete" && !confirm("Remove all " + itemName + " from this inventory?")) return;
 
             setAlert(alert, "");
             btn.disabled = true;
@@ -231,6 +240,7 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
                     await deleteInventoryItem(user.uid, cid, itemId);
                 }
                 await reload();
+                if (action === "delete") toast(itemName + " removed");
             } catch (err) {
                 setAlert(alert, friendlyError(err));
                 btn.disabled = false;
@@ -252,6 +262,8 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
             try {
                 await addInventoryItem(user.uid, cid, itemId, qty);
                 await reload();
+                const added = itemsById.get(itemId)?.name || "Item";
+                toast(qty > 1 ? `${qty} × ${added} added` : `${added} added`);
             } catch (err) {
                 setAlert(alert, friendlyError(err));
             }

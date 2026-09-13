@@ -5,8 +5,8 @@ PROJECT: Skyrim Character Combat Optimization System
 AUTHOR: C.J. Wiebe
 =========================================================
 DESCRIPTION:
-Deletes the user's characters, inventories, profile document and Firebase Auth
-user, in that order.
+Deletes the user's characters, inventories, profile document and Auth user,
+in that order, after re-authenticating.
 =========================================================
 -->
 <!DOCTYPE html>
@@ -34,42 +34,57 @@ user, in that order.
 <body>
     <div class="d-flex flex-column min-vh-100">
 
+        <!-- Keyboard users land here first and can jump past the navigation. -->
+        <a class="skip-link" href="#main">Skip to main content</a>
+
         <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
         <div id="navbar-slot"></div>
 
         <!-- ===================== MAIN CONTENT ===================== -->
+        <main id="main">
         <div class="container py-5 mt-1 flex-grow-1">
             <div class="main-container p-4">
                 <div class="main-container p-5">
 
-                    <h1 class="section-title text-center">You are about to delete your account?</h1>
-                    <h5 class="text-muted-custom text-center">There is no return from this action! &#128553;</h5>
-                    <br>
+                    <div class="form-column">
+                        <h1 class="section-title title-main text-center">Delete your account</h1>
+                        <p class="text-muted-custom text-center lede">
+                            This cannot be undone.
+                        </p>
 
-                    <div id="alert-slot"></div>
-
-                    <form id="delete-form">
-
-                        <div class="mb-3 col-md-6">
-                            <label class="form-label text-lg" for="password">
-                                Confirm your password to continue
-                            </label>
-                            <input id="password" type="password" class="form-control text-lg" required
-                                   autocomplete="current-password">
+                        <div class="inset-panel inset-danger">
+                            <h2 class="panel-title">What gets deleted</h2>
+                            <ul class="plain-list text-muted-custom text-m">
+                                <li id="del-chars">Your characters and their inventories</li>
+                                <li>Your profile details</li>
+                                <li>Your sign-in, so this email can register again from scratch</li>
+                            </ul>
                         </div>
 
-                        <div class="d-flex gap-2">
-                            <button id="submit-btn" type="submit" class="skyrim-btn skyrim-btn-delete text-xl">
-                                &#128465;&#65039; I accept my fate and wish to delete the account. &#128465;&#65039;
-                            </button>
-                            <a href="read_account.html" class="btn btn-primary text-lg">Cancel</a>
-                        </div>
+                        <div id="alert-slot" aria-live="polite"></div>
 
-                    </form>
+                        <form id="delete-form" novalidate>
+                            <div class="field">
+                                <label class="form-label" for="password">
+                                    Type your password to confirm
+                                </label>
+                                <input id="password" type="password" class="form-control" required
+                                       autocomplete="current-password">
+                            </div>
+
+                            <div class="form-actions">
+                                <button id="submit-btn" type="submit" class="skyrim-btn skyrim-btn-delete">
+                                    Permanently delete my account
+                                </button>
+                                <a href="read_account.html" class="btn-link-quiet">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
 
                 </div>
             </div>
         </div>
+        </main>
 
         <!-- ===================== FOOTER (rendered by app.js) ===================== -->
         <div id="footer-slot"></div>
@@ -89,17 +104,27 @@ user, in that order.
         renderChrome("account");
         const user = await requireAuth();
 
-        const form  = document.getElementById("delete-form");
-        const btn   = document.getElementById("submit-btn");
         const alert = document.getElementById("alert-slot");
+        const btn   = document.getElementById("submit-btn");
 
-        form.addEventListener("submit", async (ev) => {
+        // Say how much is actually at stake, rather than a generic warning.
+        let characters = [];
+        try {
+            characters = await listCharacters(user.uid);
+            document.getElementById("del-chars").textContent =
+                characters.length
+                    ? characters.length + " character" + (characters.length === 1 ? "" : "s") +
+                      " and their inventories: " + characters.map((c) => c.name).join(", ")
+                    : "You have no characters saved";
+        } catch {
+            // Non-fatal: the generic wording already in the page stands.
+        }
+
+        document.getElementById("delete-form").addEventListener("submit", async (ev) => {
             ev.preventDefault();
             setAlert(alert, "");
 
-            if (!confirm("This permanently deletes your account, characters and inventories. Continue?")) {
-                return;
-            }
+            if (!confirm("Delete your account and all of its data? This cannot be undone.")) return;
 
             btn.disabled = true;
             try {
@@ -108,7 +133,6 @@ user, in that order.
 
                 // Clear the user's own data first: once the Auth user is gone, the
                 // security rules no longer let anyone touch these documents.
-                const characters = await listCharacters(user.uid);
                 for (const c of characters) {
                     await deleteCharacter(user.uid, c.id);
                 }
