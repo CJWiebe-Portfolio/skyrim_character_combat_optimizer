@@ -299,7 +299,7 @@ function navbarHTML(user, profile, active) {
 
       <a class="navbar-brand d-flex align-items-center gap-2 font-title" href="${url("home.html")}">
         <img src="${url("assets/images/skyrim_icon.png")}" alt="Skyrim Logo" width="40" height="40"
-             class="d-inline-block align-text-middle">Skyrim Optimizer</a>
+             class="d-inline-block align-text-middle">Skyrim Character Combat Optimizer</a>
 
       <button class="navbar-toggler skyrim-toggler" type="button"
               data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -356,7 +356,7 @@ function footerHTML() {
       <div class="row text-center text-md-start">
 
         <div class="col-md-4 mb-3">
-          <h5 class="fw-bold text-lg">&#9876;&#65039; Skyrim Optimizer</h5>
+          <h5 class="fw-bold text-lg">Skyrim Character Combat Optimizer</h5>
           <p class="small mb-0 text-m">
             Combat Optimization System for analyzing builds, gear, and efficiency.
           </p>
@@ -372,7 +372,8 @@ function footerHTML() {
 
         <div class="col-md-4 mb-3">
           <h6 class="fw-bold text-lg">About</h6>
-          <p class="small mb-0 text-m">C.J. Wiebe</p>
+          <p class="small mb-0 text-m">C. J. Wiebe</p>
+          <li><a class="dropdown-item" href="${url("https://projects.cjpwiebe-portfolio.ca/")}">Click to Check Out My Portfolio Website</a></li>
         </div>
 
       </div>
@@ -380,7 +381,7 @@ function footerHTML() {
       <hr class="border-light">
 
       <div class="text-center text-lg">
-        ${now.getFullYear()} - Skyrim Combat Optimization System
+        ${now.getFullYear()} - Skyrim Character Combat Optimizer
         <p class="small">Version 1.0 &middot; Build ${build}</p>
       </div>
     </div>
