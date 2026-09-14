@@ -10,291 +10,396 @@ they all do to the gear in this character's inventory. Every formula is
 Skyrim's own — see "sources" in assets/data/skyrim.json.
 =========================================================
 -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- ===================== PAGE TITLE ===================== -->
     <title>Character Sheet</title>
 
     <!-- ===================== FAVICON ===================== -->
-    <link rel="icon" type="image/png" href="../assets/images/skyrim_icon.png">
+    <link rel="icon" type="image/png" href="../assets/images/skyrim_icon.png" />
 
     <!-- ===================== CSS ===================== -->
     <!-- =========== BOOTSTRAP =========== -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <!-- =========== GENERAL STYLES =========== -->
-    <link rel="stylesheet" href="../assets/css/general_style.css">
+    <link rel="stylesheet" href="../assets/css/general_style.css" />
     <!-- =========== BACKGROUND =========== -->
-    <link rel="stylesheet" href="../assets/css/background_picture.css">
-</head>
+    <link rel="stylesheet" href="../assets/css/background_picture.css" />
+  </head>
 
-<body>
+  <body>
     <div class="d-flex flex-column min-vh-100">
+      <!-- Keyboard users land here first and can jump past the navigation. -->
+      <a class="skip-link" href="#main">Skip to main content</a>
 
-        <!-- Keyboard users land here first and can jump past the navigation. -->
-        <a class="skip-link" href="#main">Skip to main content</a>
+      <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
+      <div id="navbar-slot"></div>
 
-        <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
-        <div id="navbar-slot"></div>
-
-        <!-- ===================== MAIN CONTENT ===================== -->
-        <main id="main">
+      <!-- ===================== MAIN CONTENT ===================== -->
+      <main id="main">
         <div class="container py-5 mt-1 flex-grow-1">
-            <div class="main-container p-4">
-                <div class="main-container p-5">
-
-                    <div class="sheet-head">
-                        <div>
-                            <h1 class="title-main" id="char-name">&nbsp;</h1>
-                            <p class="text-muted-custom" id="char-sub">&nbsp;</p>
-                        </div>
-                        <div class="sheet-head-actions">
-                            <a id="inv-link" href="#inventory" class="skyrim-btn skyrim-btn-info btn-compact">Inventory</a>
-                            <a id="spell-link" href="#spells" class="skyrim-btn skyrim-btn-info btn-compact">Spells</a>
-                            <a id="edit-link" href="#" class="skyrim-btn skyrim-btn-update btn-compact">Rename</a>
-                            <a href="characters.html" class="btn-link-quiet">All characters</a>
-                        </div>
-                    </div>
-
-                    <div id="alert-slot" aria-live="polite"></div>
-
-                    <!-- ===================== AT A GLANCE ===================== -->
-                    <div class="stat-strip" id="stat-strip"></div>
-
-                    <!-- ===================== ATTRIBUTES ===================== -->
-                    <section class="sheet-section">
-                        <div class="section-head">
-                            <h2 class="panel-title">Health, Magicka and Stamina</h2>
-                            <span class="points-left" id="attr-points">&nbsp;</span>
-                        </div>
-                        <p class="text-muted-custom text-m">
-                            Every character starts at 100 in each. Each level-up gives one pick worth
-                            +10 &mdash; and each point spent on Stamina also adds +5 carry weight.
-                        </p>
-                        <div class="attr-grid" id="attr-grid"></div>
-                    </section>
-
-                    <!-- ===================== CARRY CAPACITY ===================== -->
-                    <section class="sheet-section">
-                        <h2 class="panel-title">Carrying capacity</h2>
-                        <div id="carry-panel"></div>
-                    </section>
-
-                    <!-- ===================== SKILLS ===================== -->
-                    <section class="sheet-section">
-                        <div class="section-head">
-                            <h2 class="panel-title">Skills</h2>
-                            <button id="reset-skills" type="button" class="btn-link-quiet">
-                                Reset to racial starting values
-                            </button>
-                        </div>
-                        <p class="text-muted-custom text-m" id="skill-note">&nbsp;</p>
-                        <div class="skill-grid" id="skill-grid"></div>
-                    </section>
-
-                    <!-- ===================== PERKS ===================== -->
-                    <section class="sheet-section">
-                        <div class="section-head">
-                            <h2 class="panel-title">Perks</h2>
-                            <span class="points-left" id="perk-points">&nbsp;</span>
-                        </div>
-                        <p class="text-muted-custom text-m" id="perk-note">&nbsp;</p>
-                        <div id="perk-trees"></div>
-                    </section>
-
-                    <!-- ===================== INVENTORY ===================== -->
-                    <section class="sheet-section" id="inventory">
-                        <div class="section-head">
-                            <h2 class="panel-title">Inventory</h2>
-                            <span class="points-left" id="inv-summary">&nbsp;</span>
-                        </div>
-                        <p class="text-muted-custom text-m">
-                            Everything this character is carrying. Weight counts against the
-                            carrying capacity above, and the best pieces here are what the
-                            numbers below are worked out from.
-                        </p>
-
-                        <!-- ---------- add an item ---------- -->
-                        <form id="add-form" class="inv-add">
-                            <div class="inv-add-item">
-                                <label class="form-label" for="add-item">Item</label>
-                                <select id="add-item" class="form-select"></select>
-                            </div>
-                            <div class="inv-add-qty">
-                                <label class="form-label" for="add-qty">Qty</label>
-                                <input id="add-qty" type="number" value="1" min="1" class="form-control">
-                            </div>
-                            <button type="submit" class="skyrim-btn skyrim-btn-create btn-compact">
-                                Add item
-                            </button>
-                        </form>
-
-                        <!-- ---------- what's carried ---------- -->
-                        <div id="inv-panel"></div>
-                    </section>
-
-                    <!-- ===================== SPELLS ===================== -->
-                    <section class="sheet-section" id="spells">
-                        <div class="section-head">
-                            <h2 class="panel-title">Spells</h2>
-                            <span class="points-left" id="spell-summary">&nbsp;</span>
-                        </div>
-                        <p class="text-muted-custom text-m">
-                            This character's spellbook, sorted by school of magic. In Skyrim,
-                            raising a magic skill does not make its spells hit harder &mdash; it
-                            makes them cheaper. Damage comes from the Augmented Flames, Frost
-                            and Shock perks instead, so both numbers below move with the build.
-                        </p>
-
-                        <!-- ---------- learn a spell ---------- -->
-                        <form id="add-spell-form" class="spell-add">
-                            <div class="spell-add-pick">
-                                <label class="form-label" for="add-spell">Spell</label>
-                                <select id="add-spell" class="form-select"></select>
-                            </div>
-                            <button type="submit" class="skyrim-btn skyrim-btn-create btn-compact">
-                                Learn spell
-                            </button>
-                        </form>
-
-                        <!-- ---------- what's known ---------- -->
-                        <div class="spell-stats" id="spell-stats"></div>
-                        <div id="spell-panel"></div>
-                    </section>
-
-                    <!-- ===================== EFFECT ON GEAR ===================== -->
-                    <section class="sheet-section">
-                        <h2 class="panel-title">What this does to your gear</h2>
-                        <p class="text-muted-custom text-m">
-                            Taken from this character's inventory, using the same formulas the game uses.
-                        </p>
-                        <div id="gear-effect"></div>
-                    </section>
-
-                    <div class="sheet-save">
-                        <button id="save-build" type="button" class="skyrim-btn skyrim-btn-update">
-                            Save build
-                        </button>
-                        <span id="dirty-flag" class="text-muted-custom text-m"></span>
-                        <button id="delete-btn" type="button" class="skyrim-btn skyrim-btn-delete btn-compact">
-                            Delete character
-                        </button>
-                    </div>
-
+          <div class="main-container p-4">
+            <div class="main-container p-5">
+              <div class="sheet-head">
+                <div>
+                  <h1 class="title-main" id="char-name">&nbsp;</h1>
+                  <p class="text-muted-custom" id="char-sub">&nbsp;</p>
                 </div>
+                <div class="sheet-head-actions">
+                  <a
+                    id="inv-link"
+                    href="#inventory"
+                    class="skyrim-btn skyrim-btn-info btn-compact"
+                    >Inventory</a
+                  >
+                  <a
+                    id="spell-link"
+                    href="#spells"
+                    class="skyrim-btn skyrim-btn-info btn-compact"
+                    >Spells</a
+                  >
+                  <a
+                    id="edit-link"
+                    href="#"
+                    class="skyrim-btn skyrim-btn-update btn-compact"
+                    >Rename</a
+                  >
+                  <a href="characters.html" class="btn-link-quiet"
+                    >All characters</a
+                  >
+                </div>
+              </div>
+
+              <div id="alert-slot" aria-live="polite"></div>
+
+              <!-- ===================== AT A GLANCE ===================== -->
+              <div class="stat-strip" id="stat-strip"></div>
+
+              <!-- ===================== ATTRIBUTES ===================== -->
+              <section class="sheet-section">
+                <div class="section-head">
+                  <h2 class="panel-title">Health, Magicka and Stamina</h2>
+                  <span class="points-left" id="attr-points">&nbsp;</span>
+                </div>
+                <p class="text-muted-custom text-m">
+                  Every character starts at 100 health, magicka, and stamina in
+                  each. Each level-up gives one pick worth +10; and each point
+                  spent on Stamina also adds +5 carry weight.
+                </p>
+                <div class="attr-grid" id="attr-grid"></div>
+              </section>
+
+              <!-- ===================== CARRY CAPACITY ===================== -->
+              <section class="sheet-section">
+                <h2 class="panel-title">Carrying capacity</h2>
+                <div id="carry-panel"></div>
+              </section>
+
+              <!-- ===================== SKILLS ===================== -->
+              <section class="sheet-section">
+                <div class="section-head">
+                  <h2 class="panel-title">Skills</h2>
+                  <button
+                    id="reset-skills"
+                    type="button"
+                    class="btn-link-quiet"
+                  >
+                    Reset to racial starting values
+                  </button>
+                </div>
+                <p class="text-muted-custom text-m" id="skill-note">&nbsp;</p>
+                <div class="skill-grid" id="skill-grid"></div>
+              </section>
+
+              <!-- ===================== PERKS ===================== -->
+              <section class="sheet-section">
+                <div class="section-head">
+                  <h2 class="panel-title">Perks</h2>
+                  <span class="points-left" id="perk-points">&nbsp;</span>
+                </div>
+                <p class="text-muted-custom text-m" id="perk-note">&nbsp;</p>
+                <div id="perk-trees"></div>
+              </section>
+
+              <!-- ===================== INVENTORY ===================== -->
+              <section class="sheet-section" id="inventory">
+                <div class="section-head">
+                  <h2 class="panel-title">Inventory</h2>
+                  <span class="points-left" id="inv-summary">&nbsp;</span>
+                </div>
+                <p class="text-muted-custom text-m">
+                  Everything this character is carrying. Weight counts against
+                  the carrying capacity above, and the best pieces here are what
+                  the numbers below are worked out from.
+                </p>
+
+                <!-- ---------- add an item ---------- -->
+                <form id="add-form" class="inv-add">
+                  <div class="inv-add-item">
+                    <label class="form-label" for="add-item">Item</label>
+                    <select id="add-item" class="form-select"></select>
+                  </div>
+                  <div class="inv-add-qty">
+                    <label class="form-label" for="add-qty">Qty</label>
+                    <input
+                      id="add-qty"
+                      type="number"
+                      value="1"
+                      min="1"
+                      class="form-control"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    class="skyrim-btn skyrim-btn-create btn-compact"
+                  >
+                    Add item
+                  </button>
+                </form>
+
+                <!-- ---------- what's carried ---------- -->
+                <div id="inv-panel"></div>
+              </section>
+
+              <!-- ===================== SPELLS ===================== -->
+              <section class="sheet-section" id="spells">
+                <div class="section-head">
+                  <h2 class="panel-title">Spells</h2>
+                  <span class="points-left" id="spell-summary">&nbsp;</span>
+                </div>
+                <p class="text-muted-custom text-m">
+                  This character's spellbook, sorted by school of magic. In
+                  Skyrim, raising a magic skill does not make its spells hit
+                  harder &mdash; it makes them cheaper. Damage comes from the
+                  Augmented Flames, Frost and Shock perks instead, so both
+                  numbers below move with the build.
+                </p>
+
+                <!-- ---------- learn a spell ---------- -->
+                <form id="add-spell-form" class="spell-add">
+                  <div class="spell-add-pick">
+                    <label class="form-label" for="add-spell">Spell</label>
+                    <select id="add-spell" class="form-select"></select>
+                  </div>
+                  <button
+                    type="submit"
+                    class="skyrim-btn skyrim-btn-create btn-compact"
+                  >
+                    Learn spell
+                  </button>
+                </form>
+
+                <!-- ---------- what's known ---------- -->
+                <div class="spell-stats" id="spell-stats"></div>
+                <div id="spell-panel"></div>
+              </section>
+
+              <!-- ===================== EFFECT ON GEAR ===================== -->
+              <section class="sheet-section">
+                <h2 class="panel-title">What this does to your gear</h2>
+                <p class="text-muted-custom text-m">
+                  Taken from this character's inventory, using the same formulas
+                  the game uses.
+                </p>
+                <div id="gear-effect"></div>
+              </section>
+
+              <div class="sheet-save">
+                <button
+                  id="save-build"
+                  type="button"
+                  class="skyrim-btn skyrim-btn-update"
+                >
+                  Save build
+                </button>
+                <span id="dirty-flag" class="text-muted-custom text-m"></span>
+                <button
+                  id="delete-btn"
+                  type="button"
+                  class="skyrim-btn skyrim-btn-delete btn-compact"
+                >
+                  Delete character
+                </button>
+              </div>
             </div>
+          </div>
         </div>
-        </main>
+      </main>
 
-        <!-- ===================== FOOTER (rendered by app.js) ===================== -->
-        <div id="footer-slot"></div>
-
+      <!-- ===================== FOOTER (rendered by app.js) ===================== -->
+      <div id="footer-slot"></div>
     </div>
 
     <!-- ===================== SCRIPTS ===================== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>window.SITE_ROOT = "../";</script>
+    <script>
+      window.SITE_ROOT = "../";
+    </script>
     <script type="module">
-        import {
-            renderChrome, requireAuth, refData, buildData, spellData,
-            getCharacter, deleteCharacter, saveBuild, withDefaultBuild,
-            listInventory, addInventoryItem, increaseInventoryItem,
-            decreaseInventoryItem, deleteInventoryItem,
-            listSpellbook, learnSpell, forgetSpell, spellCost, spellDamage,
-            effectiveSpeed, fmtWeight, fmtSpeed,
-            derivedLevel, attributes, pointsAvailable, carryCapacity,
-            perkRank, perkAvailable, buildSummary, startingSkills, weaponDamage,
-            halt, esc, friendlyError, setAlert, toast
-        } from "../assets/js/app.js";
+      import {
+        renderChrome,
+        requireAuth,
+        refData,
+        buildData,
+        spellData,
+        getCharacter,
+        deleteCharacter,
+        saveBuild,
+        withDefaultBuild,
+        listInventory,
+        addInventoryItem,
+        increaseInventoryItem,
+        decreaseInventoryItem,
+        deleteInventoryItem,
+        listSpellbook,
+        learnSpell,
+        forgetSpell,
+        spellCost,
+        spellDamage,
+        effectiveSpeed,
+        fmtWeight,
+        fmtSpeed,
+        derivedLevel,
+        attributes,
+        pointsAvailable,
+        carryCapacity,
+        perkRank,
+        perkAvailable,
+        buildSummary,
+        startingSkills,
+        weaponDamage,
+        halt,
+        esc,
+        friendlyError,
+        setAlert,
+        toast,
+      } from "../assets/js/app.js";
 
-        renderChrome("characters");
-        const user = await requireAuth();
+      renderChrome("characters");
+      const user = await requireAuth();
 
-        const $ = (id) => document.getElementById(id);
-        const alert = $("alert-slot");
-        const id = new URLSearchParams(location.search).get("id");
+      const $ = (id) => document.getElementById(id);
+      const alert = $("alert-slot");
+      const id = new URLSearchParams(location.search).get("id");
 
-        if (!id) { setAlert(alert, "Invalid character ID."); await halt(); }
+      if (!id) {
+        setAlert(alert, "Invalid character ID.");
+        await halt();
+      }
 
-        const [data, bd, sd] = await Promise.all([refData(), buildData(), spellData()]);
-        const raw = await getCharacter(user.uid, id);
-        if (!raw) { setAlert(alert, "Character not found or access denied."); await halt(); }
+      const [data, bd, sd] = await Promise.all([
+        refData(),
+        buildData(),
+        spellData(),
+      ]);
+      const raw = await getCharacter(user.uid, id);
+      if (!raw) {
+        setAlert(alert, "Character not found or access denied.");
+        await halt();
+      }
 
-        // Characters created before skills existed open with their racial spread.
-        const character = withDefaultBuild(raw, bd);
-        let skills = { ...character.skills };
-        let perks = { ...character.perks };
-        let picks = { ...character.attributePicks };
-        let dirty = false;
+      // Characters created before skills existed open with their racial spread.
+      const character = withDefaultBuild(raw, bd);
+      let skills = { ...character.skills };
+      let perks = { ...character.perks };
+      let picks = { ...character.attributePicks };
+      let dirty = false;
 
-        const itemsById = new Map(data.items.map((i) => [i.item_id, i]));
-        let inventory = [];
-        try { inventory = await listInventory(user.uid, id); } catch { /* shown as empty */ }
+      const itemsById = new Map(data.items.map((i) => [i.item_id, i]));
+      let inventory = [];
+      try {
+        inventory = await listInventory(user.uid, id);
+      } catch {
+        /* shown as empty */
+      }
 
-        const spellsById = new Map(sd.spells.map((s) => [s.id, s]));
-        const tierOrder = (t) => sd.tiers[t]?.order ?? 99;
-        let known = new Set();
-        try { known = new Set(await listSpellbook(user.uid, id)); } catch { /* shown as empty */ }
+      const spellsById = new Map(sd.spells.map((s) => [s.id, s]));
+      const tierOrder = (t) => sd.tiers[t]?.order ?? 99;
+      let known = new Set();
+      try {
+        known = new Set(await listSpellbook(user.uid, id));
+      } catch {
+        /* shown as empty */
+      }
 
-        $("char-name").textContent = character.name;
-        $("char-sub").textContent = (data.races[character.raceId] ?? "Unknown") +
-            " \u00b7 character " + (character.characterNumber ?? "?");
-        $("edit-link").href = "update_character.html?id=" + encodeURIComponent(id);
-        if (new URLSearchParams(location.search).get("saved")) toast("Character updated");
+      $("char-name").textContent = character.name;
+      $("char-sub").textContent =
+        (data.races[character.raceId] ?? "Unknown") +
+        " \u00b7 character " +
+        (character.characterNumber ?? "?");
+      $("edit-link").href =
+        "update_character.html?id=" + encodeURIComponent(id);
+      if (new URLSearchParams(location.search).get("saved"))
+        toast("Character updated");
 
-        const pct = (n) => (n >= 0 ? "+" : "") + n + "%";
-        const dash = (v) => (v === null || v === undefined ? "—" : v);
+      const pct = (n) => (n >= 0 ? "+" : "") + n + "%";
+      const dash = (v) => (v === null || v === undefined ? "—" : v);
 
-        /* ---- the item picker is built once; re-rendering it would lose the choice ---- */
-        const picker = $("add-item");
-        [...data.items]
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .forEach((i) => {
-                const opt = document.createElement("option");
-                opt.value = i.item_id;
-                opt.textContent = i.name;
-                picker.appendChild(opt);
-            });
-
-        /* ---- the spell picker is likewise built once, grouped by school ---- */
-        const spellPicker = $("add-spell");
-        sd.schoolOrder.forEach((sid) => {
-            const group = document.createElement("optgroup");
-            group.label = sd.schools[sid].name;
-            sd.spells
-                .filter((s) => String(s.skillId) === sid)
-                .sort((a, b) => tierOrder(a.tier) - tierOrder(b.tier) || a.name.localeCompare(b.name))
-                .forEach((s) => {
-                    const opt = document.createElement("option");
-                    opt.value = s.id;
-                    opt.textContent = s.name + " \u00b7 " + sd.tiers[s.tier].name +
-                        (s.dlc ? " (" + s.dlc + ")" : "");
-                    group.appendChild(opt);
-                });
-            spellPicker.appendChild(group);
+      /* ---- the item picker is built once; re-rendering it would lose the choice ---- */
+      const picker = $("add-item");
+      [...data.items]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .forEach((i) => {
+          const opt = document.createElement("option");
+          opt.value = i.item_id;
+          opt.textContent = i.name;
+          picker.appendChild(opt);
         });
 
-        function markDirty() {
-            dirty = true;
-            $("dirty-flag").textContent = "Unsaved changes";
-        }
+      /* ---- the spell picker is likewise built once, grouped by school ---- */
+      const spellPicker = $("add-spell");
+      sd.schoolOrder.forEach((sid) => {
+        const group = document.createElement("optgroup");
+        group.label = sd.schools[sid].name;
+        sd.spells
+          .filter((s) => String(s.skillId) === sid)
+          .sort(
+            (a, b) =>
+              tierOrder(a.tier) - tierOrder(b.tier) ||
+              a.name.localeCompare(b.name),
+          )
+          .forEach((s) => {
+            const opt = document.createElement("option");
+            opt.value = s.id;
+            opt.textContent =
+              s.name +
+              " \u00b7 " +
+              sd.tiers[s.tier].name +
+              (s.dlc ? " (" + s.dlc + ")" : "");
+            group.appendChild(opt);
+          });
+        spellPicker.appendChild(group);
+      });
 
-        /* ================= render ================= */
-        function render() {
-            const knownSpells = [...known].map((sid) => spellsById.get(sid)).filter(Boolean);
-            const summary = buildSummary(
-                { raceId: character.raceId, skills, perks, attributePicks: picks },
-                inventory, itemsById, bd, knownSpells
-            );
-            const { level, points } = summary;
-            const attrs = summary.attributes;
+      function markDirty() {
+        dirty = true;
+        $("dirty-flag").textContent = "Unsaved changes";
+      }
 
-            /* ---- at a glance ---- */
-            $("stat-strip").innerHTML = `
+      /* ================= render ================= */
+      function render() {
+        const knownSpells = [...known]
+          .map((sid) => spellsById.get(sid))
+          .filter(Boolean);
+        const summary = buildSummary(
+          { raceId: character.raceId, skills, perks, attributePicks: picks },
+          inventory,
+          itemsById,
+          bd,
+          knownSpells,
+        );
+        const { level, points } = summary;
+        const attrs = summary.attributes;
+
+        /* ---- at a glance ---- */
+        $("stat-strip").innerHTML = `
                 <div class="stat-tile"><span class="stat-label">Level</span>
                     <span class="stat-value">${level.level}</span>
                     <span class="stat-foot">${level.xpIntoLevel} / ${level.xpForNextLevel} xp</span></div>
@@ -307,11 +412,14 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                 <div class="stat-tile"><span class="stat-label">Armor rating</span>
                     <span class="stat-value">${summary.armour.displayedRating}</span>
                     <span class="stat-foot">${summary.armour.damageReduction}% damage reduction${
-                        summary.armour.capped ? " (capped)" : ""}</span></div>`;
+                      summary.armour.capped ? " (capped)" : ""
+                    }</span></div>`;
 
-            /* ---- attributes ---- */
-            $("attr-points").textContent = points.attributePicksLeft + " to spend";
-            $("attr-grid").innerHTML = ["health", "magicka", "stamina"].map((k) => `
+        /* ---- attributes ---- */
+        $("attr-points").textContent = points.attributePicksLeft + " to spend";
+        $("attr-grid").innerHTML = ["health", "magicka", "stamina"]
+          .map(
+            (k) => `
                 <div class="attr-card">
                     <span class="stat-label">${k[0].toUpperCase() + k.slice(1)}</span>
                     <span class="stat-value">${attrs[k]}</span>
@@ -325,17 +433,22 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                                 ${points.attributePicksLeft > 0 ? "" : "disabled"}>+</button>
                     </div>
                     ${k === "stamina" ? `<span class="stat-foot">+${picks.stamina * 5} carry weight</span>` : ""}
-                </div>`).join("");
+                </div>`,
+          )
+          .join("");
 
-            /* ---- carry capacity ---- */
-            const c = summary.carry;
-            $("carry-panel").innerHTML = `
+        /* ---- carry capacity ---- */
+        const c = summary.carry;
+        $("carry-panel").innerHTML = `
                 <div class="carry-row">
                     <span>${c.carried} / ${c.capacity}</span>
                     <span class="${c.overEncumbered ? "carry-over" : "text-muted-custom"}">
-                        ${c.overEncumbered
-                            ? "Over-encumbered by " + Math.round((c.carried - c.capacity) * 100) / 100
-                            : c.remaining + " to spare"}</span>
+                        ${
+                          c.overEncumbered
+                            ? "Over-encumbered by " +
+                              Math.round((c.carried - c.capacity) * 100) / 100
+                            : c.remaining + " to spare"
+                        }</span>
                 </div>
                 <div class="meter" role="img"
                      aria-label="Carrying ${c.carried} of ${c.capacity}, ${c.usedPercent}% full">
@@ -347,58 +460,93 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                     ${c.capacity > 300 ? "Stamina has added " + (c.capacity - 300) + "." : ""}
                 </p>`;
 
-            /* ---- skills ---- */
-            const start = startingSkills(character.raceId, bd);
-            $("skill-note").textContent =
-                "Starting values come from your race. Raising a skill raises your level, " +
-                "which is what earns perk points and attribute picks.";
-            $("skill-grid").innerHTML = Object.entries(bd.skills).map(([sid, name]) => {
-                const v = Number(skills[sid] ?? bd.constants.baseSkill);
-                const base = start[sid] ?? bd.constants.baseSkill;
-                const bonus = base - bd.constants.baseSkill;
-                const governs = Object.entries(bd.classificationSkill)
-                    .some(([, gsid]) => String(gsid) === sid);
-                return `
+        /* ---- skills ---- */
+        const start = startingSkills(character.raceId, bd);
+        $("skill-note").textContent =
+          "Starting values come from your race. Raising a skill raises your level, " +
+          "which is what earns perk points and attribute picks.";
+        $("skill-grid").innerHTML = Object.entries(bd.skills)
+          .map(([sid, name]) => {
+            const v = Number(skills[sid] ?? bd.constants.baseSkill);
+            const base = start[sid] ?? bd.constants.baseSkill;
+            const bonus = base - bd.constants.baseSkill;
+            const governs = Object.entries(bd.classificationSkill).some(
+              ([, gsid]) => String(gsid) === sid,
+            );
+            return `
                 <div class="skill-row${governs ? " skill-row-combat" : ""}">
                     <label class="skill-name" for="skill-${sid}">${name}${
-                        bonus ? `<span class="race-bonus">+${bonus} racial</span>` : ""}</label>
+                      bonus
+                        ? `<span class="race-bonus">+${bonus} racial</span>`
+                        : ""
+                    }</label>
                     <input id="skill-${sid}" class="skill-input" type="number"
                            min="${bd.constants.skillMin}" max="${bd.constants.skillMax}"
                            value="${v}" data-skill="${sid}">
                 </div>`;
-            }).join("");
+          })
+          .join("");
 
-            /* ---- perks ---- */
-            $("perk-points").textContent = points.perkPointsLeft + " perk point" +
-                (points.perkPointsLeft === 1 ? "" : "s") + " to spend";
-            $("perk-note").innerHTML =
-                "A perk needs the skill level shown, and its prerequisite taken first. " +
-                "Trees still to be added: " + esc(bd.perkTreesPending.join(", ")) + ".";
+        /* ---- perks ---- */
+        $("perk-points").textContent =
+          points.perkPointsLeft +
+          " perk point" +
+          (points.perkPointsLeft === 1 ? "" : "s") +
+          " to spend";
+        $("perk-note").innerHTML =
+          "A perk needs the skill level shown, and its prerequisite taken first. " +
+          "Trees still to be added: " +
+          esc(bd.perkTreesPending.join(", ")) +
+          ".";
 
-            $("perk-trees").innerHTML = Object.entries(bd.perks).map(([sid, tree]) => {
-                const skillLevel = Number(skills[sid] ?? bd.constants.baseSkill);
-                return `
+        $("perk-trees").innerHTML = Object.entries(bd.perks)
+          .map(([sid, tree]) => {
+            const skillLevel = Number(skills[sid] ?? bd.constants.baseSkill);
+            return `
                 <div class="perk-tree">
                     <h3 class="perk-tree-title">${bd.skills[sid]}
                         <span class="text-muted-custom text-m">skill ${skillLevel}</span></h3>
                     <div class="perk-list">
-                    ${tree.map((perk) => {
+                    ${tree
+                      .map((perk) => {
                         const rank = perkRank(perks, perk.id);
-                        const canAdd = perkAvailable(perk, rank + 1, skillLevel, perks, tree)
-                            && points.perkPointsLeft > 0;
-                        const nextReq = rank < perk.ranks ? perk.req[rank] : null;
+                        const canAdd =
+                          perkAvailable(
+                            perk,
+                            rank + 1,
+                            skillLevel,
+                            perks,
+                            tree,
+                          ) && points.perkPointsLeft > 0;
+                        const nextReq =
+                          rank < perk.ranks ? perk.req[rank] : null;
                         const value = perk.effect?.perRank
-                            ? perk.effect.perRank * Math.max(rank, 1) : null;
+                          ? perk.effect.perRank * Math.max(rank, 1)
+                          : null;
                         return `
                         <div class="perk ${rank ? "is-taken" : ""}">
                             <div class="perk-main">
                                 <span class="perk-name">${esc(perk.name)}${
-                                    perk.ranks > 1 ? ` <span class="perk-rank">${rank}/${perk.ranks}</span>` : ""}</span>
+                                  perk.ranks > 1
+                                    ? ` <span class="perk-rank">${rank}/${perk.ranks}</span>`
+                                    : ""
+                                }</span>
                                 <span class="perk-desc">${esc(perk.desc.replace("{v}", value ?? ""))}</span>
                                 <span class="perk-req">${
-                                    rank >= perk.ranks ? "Fully taken"
-                                    : "Needs " + bd.skills[sid] + " " + nextReq +
-                                      (perk.prereq ? " and " + esc(tree.find(p=>p.id===perk.prereq)?.name || "") : "")
+                                  rank >= perk.ranks
+                                    ? "Fully taken"
+                                    : "Needs " +
+                                      bd.skills[sid] +
+                                      " " +
+                                      nextReq +
+                                      (perk.prereq
+                                        ? " and " +
+                                          esc(
+                                            tree.find(
+                                              (p) => p.id === perk.prereq,
+                                            )?.name || "",
+                                          )
+                                        : "")
                                 }</span>
                             </div>
                             <div class="qty-control">
@@ -410,25 +558,30 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                                         ${canAdd ? "" : "disabled"}>+</button>
                             </div>
                         </div>`;
-                    }).join("")}
+                      })
+                      .join("")}
                     </div>
                 </div>`;
-            }).join("");
+          })
+          .join("");
 
-            /* ---- inventory ---- */
-            renderInventory();
+        /* ---- inventory ---- */
+        renderInventory();
 
-            /* ---- spells ---- */
-            renderSpells(summary);
+        /* ---- spells ---- */
+        renderSpells(summary);
 
-            /* ---- effect on gear ---- */
-            const worn = Object.entries(summary.armour.worn);
-            const bw = summary.bestWeapon;
-            $("gear-effect").innerHTML = (!worn.length && !bw)
-                ? `<p class="text-muted-custom">Nothing in this character's inventory yet.
+        /* ---- effect on gear ---- */
+        const worn = Object.entries(summary.armour.worn);
+        const bw = summary.bestWeapon;
+        $("gear-effect").innerHTML =
+          !worn.length && !bw
+            ? `<p class="text-muted-custom">Nothing in this character's inventory yet.
                      <a href="#inventory">Add some gear</a> and its numbers appear here.</p>`
-                : `
-                ${bw ? `
+            : `
+                ${
+                  bw
+                    ? `
                 <h3 class="perk-tree-title">Best weapon</h3>
                 <div class="tablewrap"><table class="table-skyrim">
                     <thead><tr><th scope="col">Weapon</th><th scope="col">Base</th>
@@ -440,9 +593,13 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                         <td>${pct(bw.damage.skillPct)} <span class="text-muted-custom">(${bd.skills[bw.damage.skillId]} ${bw.damage.skillLevel})</span></td>
                         <td>${pct(bw.damage.perkPct)}</td>
                         <td class="cell-strong">${bw.damage.total}</td>
-                    </tr></tbody></table></div>` : ""}
+                    </tr></tbody></table></div>`
+                    : ""
+                }
 
-                ${worn.length ? `
+                ${
+                  worn.length
+                    ? `
                 <h3 class="perk-tree-title">Armour worn
                     ${summary.armour.fullSet ? '<span class="status-pill status-good">Full matched set</span>' : ""}</h3>
                 <div class="tablewrap"><table class="table-skyrim">
@@ -450,52 +607,72 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                         <th scope="col">Base</th><th scope="col">Skill</th>
                         <th scope="col">Perks</th><th scope="col">Set</th>
                         <th scope="col">Effective</th></tr></thead>
-                    <tbody>${worn.map(([slot, w]) => `
+                    <tbody>${worn
+                      .map(
+                        ([slot, w]) => `
                         <tr><td>${slot}</td><td>${esc(w.item.name)}</td>
                             <td>${w.rating.base}</td>
                             <td>${pct(w.rating.skillPct)}</td>
                             <td>${pct(w.rating.perkPct)}</td>
                             <td>${w.rating.setPct ? pct(w.rating.setPct) : "\u2014"}</td>
-                            <td class="cell-strong">${w.rating.total}</td></tr>`).join("")}
+                            <td class="cell-strong">${w.rating.total}</td></tr>`,
+                      )
+                      .join("")}
                     </tbody></table></div>
                 <p class="text-muted-custom text-m">
                     Total ${summary.armour.displayedRating} armor, plus 25 hidden per worn piece,
                     giving <strong>${summary.armour.damageReduction}%</strong> damage reduction.
-                    ${summary.armour.capped
+                    ${
+                      summary.armour.capped
                         ? "That is the 80% cap."
-                        : "The cap is 80%, reached at " + bd.constants.armorCapRating + " armor."}
-                </p>` : ""}`;
+                        : "The cap is 80%, reached at " +
+                          bd.constants.armorCapRating +
+                          " armor."
+                    }
+                </p>`
+                    : ""
+                }`;
 
-            wire();
+        wire();
+      }
+
+      /* ================= inventory ================= */
+      function renderInventory() {
+        if (!inventory.length) {
+          $("inv-summary").textContent = "empty";
+          $("inv-panel").innerHTML =
+            `<p class="text-muted-custom">Nothing carried yet. Add something above.</p>`;
+          return;
         }
 
-        /* ================= inventory ================= */
-        function renderInventory() {
-            if (!inventory.length) {
-                $("inv-summary").textContent = "empty";
-                $("inv-panel").innerHTML =
-                    `<p class="text-muted-custom">Nothing carried yet. Add something above.</p>`;
-                return;
-            }
+        const rows = inventory
+          .map((row) => {
+            const item = itemsById.get(row.itemId);
+            if (!item) return null;
+            return {
+              ...item,
+              speed: effectiveSpeed(item, data),
+              quantity: row.quantity,
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => a.name.localeCompare(b.name));
 
-            const rows = inventory
-                .map((row) => {
-                    const item = itemsById.get(row.itemId);
-                    if (!item) return null;
-                    return { ...item, speed: effectiveSpeed(item, data), quantity: row.quantity };
-                })
-                .filter(Boolean)
-                .sort((a, b) => a.name.localeCompare(b.name));
+        const totalWeight = rows.reduce(
+          (s, r) => s + (r.weight || 0) * r.quantity,
+          0,
+        );
+        const totalGold = rows.reduce(
+          (s, r) => s + (r.gold_value || 0) * r.quantity,
+          0,
+        );
+        const totalItems = rows.reduce((s, r) => s + r.quantity, 0);
 
-            const totalWeight = rows.reduce((s, r) => s + (r.weight || 0) * r.quantity, 0);
-            const totalGold   = rows.reduce((s, r) => s + (r.gold_value || 0) * r.quantity, 0);
-            const totalItems  = rows.reduce((s, r) => s + r.quantity, 0);
+        $("inv-summary").textContent =
+          `${totalItems} item${totalItems === 1 ? "" : "s"} · ` +
+          `${totalWeight.toFixed(2)} weight · ${totalGold} gold`;
 
-            $("inv-summary").textContent =
-                `${totalItems} item${totalItems === 1 ? "" : "s"} · ` +
-                `${totalWeight.toFixed(2)} weight · ${totalGold} gold`;
-
-            $("inv-panel").innerHTML = `
+        $("inv-panel").innerHTML = `
                 <div class="tablewrap"><table class="table-skyrim">
                     <thead><tr>
                         <th scope="col">Item</th><th scope="col">Damage</th>
@@ -505,7 +682,9 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                         <th scope="col">Perk</th><th scope="col">Upgrade</th>
                         <th scope="col">Qty</th>
                     </tr></thead>
-                    <tbody>${rows.map((it) => `
+                    <tbody>${rows
+                      .map(
+                        (it) => `
                         <tr>
                             <td>${esc(it.name)}</td>
                             <td>${dash(it.damage)}</td>
@@ -532,55 +711,62 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                                             aria-label="Remove all ${esc(it.name)} from inventory">Remove</button>
                                 </div>
                             </td>
-                        </tr>`).join("")}
+                        </tr>`,
+                      )
+                      .join("")}
                     </tbody></table></div>`;
+      }
+
+      /* ================= spells ================= */
+      function renderSpells(summary) {
+        const s = summary.spells;
+
+        /* Already-known spells stay in the list but go dim, so the picker
+               keeps its grouping rather than shrinking as you learn things. */
+        let movedSelection = false;
+        [...spellPicker.options].forEach((opt) => {
+          opt.disabled = known.has(opt.value);
+          if (opt.disabled && opt.selected) movedSelection = true;
+        });
+        if (movedSelection) {
+          const next = [...spellPicker.options].find((o) => !o.disabled);
+          spellPicker.value = next ? next.value : "";
         }
 
+        $("spell-summary").textContent = s.count
+          ? s.count + " spell" + (s.count === 1 ? "" : "s") + " known"
+          : "none known";
 
-        /* ================= spells ================= */
-        function renderSpells(summary) {
-            const s = summary.spells;
-
-            /* Already-known spells stay in the list but go dim, so the picker
-               keeps its grouping rather than shrinking as you learn things. */
-            let movedSelection = false;
-            [...spellPicker.options].forEach((opt) => {
-                opt.disabled = known.has(opt.value);
-                if (opt.disabled && opt.selected) movedSelection = true;
-            });
-            if (movedSelection) {
-                const next = [...spellPicker.options].find((o) => !o.disabled);
-                spellPicker.value = next ? next.value : "";
-            }
-
-            $("spell-summary").textContent = s.count
-                ? s.count + " spell" + (s.count === 1 ? "" : "s") + " known"
-                : "none known";
-
-            const best = s.bestSpell;
-            $("spell-stats").innerHTML = `
+        const best = s.bestSpell;
+        $("spell-stats").innerHTML = `
                 <div class="stat-tile"><span class="stat-label">Spells known</span>
                     <span class="stat-value">${s.count}</span>
                     <span class="stat-foot">of ${sd.spells.length} in the game</span></div>
                 <div class="stat-tile"><span class="stat-label">Hardest hitting</span>
                     <span class="stat-value">${best ? best.damage.total : "—"}</span>
-                    <span class="stat-foot">${best
+                    <span class="stat-foot">${
+                      best
                         ? esc(best.spell.name) + " per " + best.damage.per
-                        : "no damage spell known"}</span></div>
+                        : "no damage spell known"
+                    }</span></div>
                 <div class="stat-tile"><span class="stat-label">Average cast</span>
                     <span class="stat-value">${s.averageCost ?? "—"}</span>
                     <span class="stat-foot">magicka, after skill and perks</span></div>`;
 
-            $("spell-panel").innerHTML = sd.schoolOrder.map((sid) => {
-                const school = sd.schools[sid];
-                const all = sd.spells.filter((sp) => String(sp.skillId) === sid);
-                const mine = all
-                    .filter((sp) => known.has(sp.id))
-                    .sort((a, b) => tierOrder(a.tier) - tierOrder(b.tier)
-                        || a.name.localeCompare(b.name));
-                const skillLevel = Number(skills[sid] ?? bd.constants.baseSkill);
+        $("spell-panel").innerHTML = sd.schoolOrder
+          .map((sid) => {
+            const school = sd.schools[sid];
+            const all = sd.spells.filter((sp) => String(sp.skillId) === sid);
+            const mine = all
+              .filter((sp) => known.has(sp.id))
+              .sort(
+                (a, b) =>
+                  tierOrder(a.tier) - tierOrder(b.tier) ||
+                  a.name.localeCompare(b.name),
+              );
+            const skillLevel = Number(skills[sid] ?? bd.constants.baseSkill);
 
-                return `
+            return `
                 <div class="school-block">
                     <div class="school-head">
                         <h3>${esc(school.name)}
@@ -588,47 +774,72 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                         <span class="school-count">${mine.length} of ${all.length} known</span>
                     </div>
                     <p class="school-blurb">${esc(school.blurb)}</p>
-                    ${mine.length ? spellTable(mine, skillLevel)
-                        : `<p class="spell-empty">Nothing from this school yet.</p>`}
+                    ${
+                      mine.length
+                        ? spellTable(mine, skillLevel)
+                        : `<p class="spell-empty">Nothing from this school yet.</p>`
+                    }
                 </div>`;
-            }).join("");
-        }
+          })
+          .join("");
+      }
 
-        /** One school's known spells, with what they cost and hit for right now. */
-        function spellTable(list, skillLevel) {
-            return `
+      /** One school's known spells, with what they cost and hit for right now. */
+      function spellTable(list, skillLevel) {
+        return `
                 <div class="tablewrap"><table class="table-skyrim">
                     <thead><tr>
                         <th scope="col">Spell</th><th scope="col">Tier</th>
                         <th scope="col">Magicka</th><th scope="col">Damage</th>
                         <th scope="col">What it does</th><th scope="col"></th>
                     </tr></thead>
-                    <tbody>${list.map((sp) => {
+                    <tbody>${list
+                      .map((sp) => {
                         const cost = spellCost(sp, skills, perks, bd);
                         const dmg = spellDamage(sp, perks, bd);
                         const tier = sd.tiers[sp.tier];
                         const untaught = skillLevel < tier.trainingLevel;
-                        const per = (v, p) => v + (p === "second" ? "/sec" : "");
+                        const per = (v, p) =>
+                          v + (p === "second" ? "/sec" : "");
 
                         return `
                         <tr>
-                            <td>${esc(sp.name)}${sp.dlc
-                                ? `<span class="spell-dlc">${esc(sp.dlc)}</span>` : ""}</td>
+                            <td>${esc(sp.name)}${
+                              sp.dlc
+                                ? `<span class="spell-dlc">${esc(sp.dlc)}</span>`
+                                : ""
+                            }</td>
                             <td><span class="spell-tier${sp.tier === "master" ? " spell-tier-master" : ""}${
-                                untaught ? " spell-locked" : ""}"
-                                title="${untaught
-                                    ? "Needs " + tier.name + " training at skill " + tier.trainingLevel
-                                    : tier.name + " level"}">${tier.name}</span></td>
-                            <td>${cost
-                                ? `<span class="${cost.halved ? "cost-halved" : ""}">${
-                                    per(cost.total, cost.per)}</span>
+                              untaught ? " spell-locked" : ""
+                            }"
+                                title="${
+                                  untaught
+                                    ? "Needs " +
+                                      tier.name +
+                                      " training at skill " +
+                                      tier.trainingLevel
+                                    : tier.name + " level"
+                                }">${tier.name}</span></td>
+                            <td>${
+                              cost
+                                ? `<span class="${cost.halved ? "cost-halved" : ""}">${per(
+                                    cost.total,
+                                    cost.per,
+                                  )}</span>
                                    <span class="cost-note"> base ${cost.base}, ${
-                                    cost.skillPct}%${cost.halved ? ", halved" : ""}</span>`
-                                : `<span class="text-muted-custom" title="No source published a base cost for this DLC spell">—</span>`}</td>
-                            <td>${dmg
+                                     cost.skillPct
+                                   }%${cost.halved ? ", halved" : ""}</span>`
+                                : `<span class="text-muted-custom" title="No source published a base cost for this DLC spell">—</span>`
+                            }</td>
+                            <td>${
+                              dmg
                                 ? `<span class="cell-strong">${per(dmg.total, dmg.per)}</span>${
-                                    dmg.perkPct ? ` <span class="text-muted-custom">(+${dmg.perkPct}%)</span>` : ""}`
-                                : "—"}</td>
+                                    dmg.perkPct
+                                      ? ` <span class="text-muted-custom">(+${dmg.perkPct}%)</span>`
+                                      : ""
+                                  }`
+                                : "—"
+                            }</td>
                             <td class="text-muted-custom">${esc(sp.effect)}</td>
                             <td>
                                 <div class="qty-control">
@@ -638,171 +849,221 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                                 </div>
                             </td>
                         </tr>`;
-                    }).join("")}
+                      })
+                      .join("")}
                     </tbody></table></div>`;
-        }
+      }
 
-        async function reloadSpells() {
-            known = new Set(await listSpellbook(user.uid, id));
-            render();
-        }
-
-        $("add-spell-form").addEventListener("submit", async (ev) => {
-            ev.preventDefault();
-            setAlert(alert, "");
-
-            const spellId = spellPicker.value;
-            if (!spellId) return;
-            if (known.has(spellId)) return;
-
-            try {
-                await learnSpell(user.uid, id, spellId);
-                await reloadSpells();
-                toast((spellsById.get(spellId)?.name || "Spell") + " learned");
-            } catch (err) {
-                setAlert(alert, friendlyError(err));
-            }
-        });
-
-        /** Add / remove / delete one inventory row, then redraw the whole sheet. */
-        async function inventoryAction(btn) {
-            const { act: action, id: rawId } = btn.dataset;
-            const itemId = Number(rawId);
-            const itemName = itemsById.get(itemId)?.name || "this item";
-
-            if (action === "delete" &&
-                !confirm("Remove all " + itemName + " from this inventory?")) return;
-
-            setAlert(alert, "");
-            btn.disabled = true;
-            try {
-                if (action === "increase")      await increaseInventoryItem(user.uid, id, itemId);
-                else if (action === "decrease") await decreaseInventoryItem(user.uid, id, itemId);
-                else if (action === "delete")   await deleteInventoryItem(user.uid, id, itemId);
-                await reloadInventory();
-                if (action === "delete") toast(itemName + " removed");
-            } catch (err) {
-                setAlert(alert, friendlyError(err));
-                btn.disabled = false;
-            }
-        }
-
-        async function reloadInventory() {
-            inventory = await listInventory(user.uid, id);
-            render();
-        }
-
-        $("add-form").addEventListener("submit", async (ev) => {
-            ev.preventDefault();
-            setAlert(alert, "");
-
-            const itemId = Number(picker.value);
-            const qty = Math.max(1, Number($("add-qty").value) || 1);
-
-            try {
-                await addInventoryItem(user.uid, id, itemId, qty);
-                await reloadInventory();
-                const added = itemsById.get(itemId)?.name || "Item";
-                toast(qty > 1 ? `${qty} × ${added} added` : `${added} added`);
-            } catch (err) {
-                setAlert(alert, friendlyError(err));
-            }
-        });
-
-        /* ================= interaction ================= */
-        function wire() {
-            $("inv-panel").querySelectorAll("[data-act]").forEach((b) =>
-                b.addEventListener("click", () => inventoryAction(b)));
-
-            $("spell-panel").querySelectorAll("[data-spell]").forEach((b) =>
-                b.addEventListener("click", async () => {
-                    const spellId = b.dataset.spell;
-                    const name = spellsById.get(spellId)?.name || "this spell";
-                    setAlert(alert, "");
-                    b.disabled = true;
-                    try {
-                        await forgetSpell(user.uid, id, spellId);
-                        await reloadSpells();
-                        toast(name + " forgotten");
-                    } catch (err) {
-                        setAlert(alert, friendlyError(err));
-                        b.disabled = false;
-                    }
-                }));
-
-            $("attr-grid").querySelectorAll("[data-attr]").forEach((b) =>
-                b.addEventListener("click", () => {
-                    const k = b.dataset.attr, d = Number(b.dataset.dir);
-                    const next = (picks[k] || 0) + d;
-                    if (next < 0) return;
-                    picks[k] = next;
-                    markDirty(); render();
-                }));
-
-            $("perk-trees").querySelectorAll("[data-perk]").forEach((b) =>
-                b.addEventListener("click", () => {
-                    const pid = b.dataset.perk, d = Number(b.dataset.dir);
-                    const next = (perks[pid] || 0) + d;
-                    if (next < 0) return;
-                    if (next === 0) delete perks[pid]; else perks[pid] = next;
-                    markDirty(); render();
-                }));
-
-            $("skill-grid").querySelectorAll(".skill-input").forEach((input) =>
-                input.addEventListener("change", () => {
-                    const sid = input.dataset.skill;
-                    let v = Math.round(Number(input.value));
-                    if (!Number.isFinite(v)) v = bd.constants.baseSkill;
-                    v = Math.min(bd.constants.skillMax, Math.max(bd.constants.skillMin, v));
-                    skills[sid] = v;
-                    markDirty(); render();
-                    // Keep focus where the user was typing.
-                    const again = document.getElementById("skill-" + sid);
-                    if (again) { again.focus(); again.select(); }
-                }));
-        }
-
-        $("reset-skills").addEventListener("click", () => {
-            if (!confirm("Reset every skill to this character's racial starting values?")) return;
-            skills = startingSkills(character.raceId, bd);
-            markDirty(); render();
-        });
-
-        $("save-build").addEventListener("click", async () => {
-            const btn = $("save-build");
-            btn.disabled = true;
-            setAlert(alert, "");
-            try {
-                await saveBuild(user.uid, id, { skills, perks, attributePicks: picks });
-                dirty = false;
-                $("dirty-flag").textContent = "";
-                toast("Build saved");
-            } catch (err) {
-                setAlert(alert, friendlyError(err));
-            } finally {
-                btn.disabled = false;
-            }
-        });
-
-        $("delete-btn").addEventListener("click", async () => {
-            if (!confirm("Delete " + character.name + ", their inventory and their spellbook?")) return;
-            try {
-                await deleteCharacter(user.uid, id);
-                window.location.href = "characters.html";
-            } catch (err) {
-                setAlert(alert, friendlyError(err));
-            }
-        });
-
-        // Don't let unsaved skill and perk work vanish on a stray navigation.
-        window.addEventListener("beforeunload", (ev) => {
-            if (!dirty) return;
-            ev.preventDefault();
-            ev.returnValue = "";
-        });
-
+      async function reloadSpells() {
+        known = new Set(await listSpellbook(user.uid, id));
         render();
-    </script>
-</body>
+      }
 
+      $("add-spell-form").addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+        setAlert(alert, "");
+
+        const spellId = spellPicker.value;
+        if (!spellId) return;
+        if (known.has(spellId)) return;
+
+        try {
+          await learnSpell(user.uid, id, spellId);
+          await reloadSpells();
+          toast((spellsById.get(spellId)?.name || "Spell") + " learned");
+        } catch (err) {
+          setAlert(alert, friendlyError(err));
+        }
+      });
+
+      /** Add / remove / delete one inventory row, then redraw the whole sheet. */
+      async function inventoryAction(btn) {
+        const { act: action, id: rawId } = btn.dataset;
+        const itemId = Number(rawId);
+        const itemName = itemsById.get(itemId)?.name || "this item";
+
+        if (
+          action === "delete" &&
+          !confirm("Remove all " + itemName + " from this inventory?")
+        )
+          return;
+
+        setAlert(alert, "");
+        btn.disabled = true;
+        try {
+          if (action === "increase")
+            await increaseInventoryItem(user.uid, id, itemId);
+          else if (action === "decrease")
+            await decreaseInventoryItem(user.uid, id, itemId);
+          else if (action === "delete")
+            await deleteInventoryItem(user.uid, id, itemId);
+          await reloadInventory();
+          if (action === "delete") toast(itemName + " removed");
+        } catch (err) {
+          setAlert(alert, friendlyError(err));
+          btn.disabled = false;
+        }
+      }
+
+      async function reloadInventory() {
+        inventory = await listInventory(user.uid, id);
+        render();
+      }
+
+      $("add-form").addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+        setAlert(alert, "");
+
+        const itemId = Number(picker.value);
+        const qty = Math.max(1, Number($("add-qty").value) || 1);
+
+        try {
+          await addInventoryItem(user.uid, id, itemId, qty);
+          await reloadInventory();
+          const added = itemsById.get(itemId)?.name || "Item";
+          toast(qty > 1 ? `${qty} × ${added} added` : `${added} added`);
+        } catch (err) {
+          setAlert(alert, friendlyError(err));
+        }
+      });
+
+      /* ================= interaction ================= */
+      function wire() {
+        $("inv-panel")
+          .querySelectorAll("[data-act]")
+          .forEach((b) =>
+            b.addEventListener("click", () => inventoryAction(b)),
+          );
+
+        $("spell-panel")
+          .querySelectorAll("[data-spell]")
+          .forEach((b) =>
+            b.addEventListener("click", async () => {
+              const spellId = b.dataset.spell;
+              const name = spellsById.get(spellId)?.name || "this spell";
+              setAlert(alert, "");
+              b.disabled = true;
+              try {
+                await forgetSpell(user.uid, id, spellId);
+                await reloadSpells();
+                toast(name + " forgotten");
+              } catch (err) {
+                setAlert(alert, friendlyError(err));
+                b.disabled = false;
+              }
+            }),
+          );
+
+        $("attr-grid")
+          .querySelectorAll("[data-attr]")
+          .forEach((b) =>
+            b.addEventListener("click", () => {
+              const k = b.dataset.attr,
+                d = Number(b.dataset.dir);
+              const next = (picks[k] || 0) + d;
+              if (next < 0) return;
+              picks[k] = next;
+              markDirty();
+              render();
+            }),
+          );
+
+        $("perk-trees")
+          .querySelectorAll("[data-perk]")
+          .forEach((b) =>
+            b.addEventListener("click", () => {
+              const pid = b.dataset.perk,
+                d = Number(b.dataset.dir);
+              const next = (perks[pid] || 0) + d;
+              if (next < 0) return;
+              if (next === 0) delete perks[pid];
+              else perks[pid] = next;
+              markDirty();
+              render();
+            }),
+          );
+
+        $("skill-grid")
+          .querySelectorAll(".skill-input")
+          .forEach((input) =>
+            input.addEventListener("change", () => {
+              const sid = input.dataset.skill;
+              let v = Math.round(Number(input.value));
+              if (!Number.isFinite(v)) v = bd.constants.baseSkill;
+              v = Math.min(
+                bd.constants.skillMax,
+                Math.max(bd.constants.skillMin, v),
+              );
+              skills[sid] = v;
+              markDirty();
+              render();
+              // Keep focus where the user was typing.
+              const again = document.getElementById("skill-" + sid);
+              if (again) {
+                again.focus();
+                again.select();
+              }
+            }),
+          );
+      }
+
+      $("reset-skills").addEventListener("click", () => {
+        if (
+          !confirm(
+            "Reset every skill to this character's racial starting values?",
+          )
+        )
+          return;
+        skills = startingSkills(character.raceId, bd);
+        markDirty();
+        render();
+      });
+
+      $("save-build").addEventListener("click", async () => {
+        const btn = $("save-build");
+        btn.disabled = true;
+        setAlert(alert, "");
+        try {
+          await saveBuild(user.uid, id, {
+            skills,
+            perks,
+            attributePicks: picks,
+          });
+          dirty = false;
+          $("dirty-flag").textContent = "";
+          toast("Build saved");
+        } catch (err) {
+          setAlert(alert, friendlyError(err));
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      $("delete-btn").addEventListener("click", async () => {
+        if (
+          !confirm(
+            "Delete " +
+              character.name +
+              ", their inventory and their spellbook?",
+          )
+        )
+          return;
+        try {
+          await deleteCharacter(user.uid, id);
+          window.location.href = "characters.html";
+        } catch (err) {
+          setAlert(alert, friendlyError(err));
+        }
+      });
+
+      // Don't let unsaved skill and perk work vanish on a stray navigation.
+      window.addEventListener("beforeunload", (ev) => {
+        if (!dirty) return;
+        ev.preventDefault();
+        ev.returnValue = "";
+      });
+
+      render();
+    </script>
+  </body>
 </html>
