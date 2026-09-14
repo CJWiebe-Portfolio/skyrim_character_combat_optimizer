@@ -11,507 +11,760 @@ Firestore shape: users/{uid} plus characters, inventory and
 spellbook beneath it.
 =========================================================
 -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- ===================== PAGE TITLE ===================== -->
     <title>Privacy Policy</title>
-    <meta name="description" content="What the Skyrim Character Combat Optimizer collects, where it is stored, and how to delete it.">
+    <meta
+      name="description"
+      content="What the Skyrim Character Combat Optimizer collects, where it is stored, and how to delete it."
+    />
 
     <!-- ===================== FAVICON ===================== -->
-    <link rel="icon" type="image/png" href="../assets/images/skyrim_icon.png">
+    <link rel="icon" type="image/png" href="../assets/images/skyrim_icon.png" />
 
     <!-- ===================== CSS ===================== -->
     <!-- =========== BOOTSTRAP =========== -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <!-- =========== GENERAL STYLES =========== -->
-    <link rel="stylesheet" href="../assets/css/general_style.css">
+    <link rel="stylesheet" href="../assets/css/general_style.css" />
     <!-- =========== BACKGROUND =========== -->
-    <link rel="stylesheet" href="../assets/css/background_picture.css">
-</head>
+    <link rel="stylesheet" href="../assets/css/background_picture.css" />
+  </head>
 
-<body>
+  <body>
     <div class="d-flex flex-column min-vh-100">
+      <!-- Keyboard users land here first and can jump past the navigation. -->
+      <a class="skip-link" href="#main">Skip to main content</a>
 
-        <!-- Keyboard users land here first and can jump past the navigation. -->
-        <a class="skip-link" href="#main">Skip to main content</a>
+      <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
+      <div id="navbar-slot"></div>
 
-        <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
-        <div id="navbar-slot"></div>
-
-        <!-- ===================== MAIN CONTENT ===================== -->
-        <main id="main">
+      <!-- ===================== MAIN CONTENT ===================== -->
+      <main id="main">
         <div class="container py-5 mt-1 flex-grow-1">
-            <div class="main-container p-4">
-                <div class="main-container legal-panel legal-body">
+          <div class="main-container p-4">
+            <div class="main-container legal-panel legal-body">
+              <!-- ===================== HEADER ===================== -->
+              <header class="text-center">
+                <h1 class="section-title title-main">
+                  &#128274; Privacy Policy &#128274;
+                </h1>
+                <p class="text-muted-custom ref-lede">
+                  This Site collects as little information as it can get away
+                  with: enough to sign you in and to hand your characters back
+                  to you on your next visit. Here is exactly what that means.
+                </p>
+                <p class="legal-meta">
+                  <span>Effective September 14, 2026</span>
+                  <span>Last updated September 14, 2026</span>
+                </p>
+              </header>
 
-                    <!-- ===================== HEADER ===================== -->
-                    <header class="text-center">
-                        <h1 class="section-title title-main">&#128274; Privacy Policy &#128274;</h1>
-                        <p class="text-muted-custom ref-lede">
-                            This Site collects as little as it can get away with: enough to sign you in
-                            and to hand your characters back to you on your next visit. Here is exactly
-                            what that means.
-                        </p>
-                        <p class="legal-meta">
-                            <span>Effective September 14, 2026</span>
-                            <span>Last updated September 14, 2026</span>
-                        </p>
-                    </header>
+              <nav class="ref-jump" aria-label="Sections of this policy">
+                <a href="#summary">Summary</a>
+                <a href="#collect">What We Collect</a>
+                <a href="#not-collect">What We Don't</a>
+                <a href="#use">How It's Used</a>
+                <a href="#basis">Consent</a>
+                <a href="#where">Where It Lives</a>
+                <a href="#storage">Cookies</a>
+                <a href="#sharing">Sharing</a>
+                <a href="#retention">Retention</a>
+                <a href="#rights">Your Rights</a>
+                <a href="#security">Security</a>
+                <a href="#children">Children</a>
+                <a href="#contact">Contact</a>
+              </nav>
 
-                    <nav class="ref-jump" aria-label="Sections of this policy">
-                        <a href="#summary">Summary</a>
-                        <a href="#collect">What We Collect</a>
-                        <a href="#not-collect">What We Don't</a>
-                        <a href="#use">How It's Used</a>
-                        <a href="#basis">Consent</a>
-                        <a href="#where">Where It Lives</a>
-                        <a href="#storage">Cookies</a>
-                        <a href="#sharing">Sharing</a>
-                        <a href="#retention">Retention</a>
-                        <a href="#rights">Your Rights</a>
-                        <a href="#security">Security</a>
-                        <a href="#children">Children</a>
-                        <a href="#contact">Contact</a>
-                    </nav>
+              <!-- ===================== 1. SUMMARY ===================== -->
+              <section
+                id="summary"
+                class="sheet-section legal-section"
+                aria-labelledby="summary-title"
+              >
+                <h2 id="summary-title" class="panel-title">
+                  The Short Version
+                </h2>
 
-                    <!-- ===================== 1. SUMMARY ===================== -->
-                    <section id="summary" class="sheet-section legal-section" aria-labelledby="summary-title">
-                        <h2 id="summary-title" class="panel-title">The Short Version</h2>
+                <p>
+                  The Skyrim Character Combat Optimizer (the &ldquo;Site&rdquo;)
+                  is a free personal project operated by C.&nbsp;J.&nbsp;Wiebe,
+                  who is the party responsible for the personal information
+                  described here. This policy explains what the Site collects,
+                  why, where it is stored, and what you can do about it.
+                </p>
 
-                        <p>
-                            The Skyrim Character Combat Optimizer (the &ldquo;Site&rdquo;) is a free personal
-                            project operated by C.&nbsp;J.&nbsp;Wiebe, who is the party responsible for the
-                            personal information described here. This policy explains what the Site collects,
-                            why, where it is stored, and what you can do about it.
-                        </p>
-
-                        <div class="legal-note">
-                            <ul class="mb-0">
-                                <li>You can browse the item tables, the home page and the references list without an account, and without giving us anything.</li>
-                                <li>An account stores your name, email, optional date of birth, and the characters you build.</li>
-                                <li>There is no advertising, no analytics, no tracking pixels, and nothing is sold or shared for marketing.</li>
-                                <li>Your data lives in Google Firebase. You can delete all of it yourself, at any time, from your account page.</li>
-                            </ul>
-                        </div>
-
-                        <p>
-                            This policy is written with Canada's <em>Personal Information Protection and
-                            Electronic Documents Act</em> (PIPEDA) in mind. Because the Site is reachable from
-                            anywhere, sections&nbsp;5 and&nbsp;10 also cover visitors in the United Kingdom and
-                            the European Economic Area.
-                        </p>
-                    </section>
-
-                    <!-- ===================== 2. WHAT WE COLLECT ===================== -->
-                    <section id="collect" class="sheet-section legal-section" aria-labelledby="collect-title">
-                        <h2 id="collect-title" class="panel-title">What We Collect</h2>
-
-                        <h3>Information you give us when you register</h3>
-                        <table class="legal-table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Information</th>
-                                    <th scope="col">Required?</th>
-                                    <th scope="col">Why we have it</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th scope="row">First and last name</th>
-                                    <td>Yes</td>
-                                    <td>Addresses you by name in the navigation bar and on your account page.</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Email address</th>
-                                    <td>Yes</td>
-                                    <td>Identifies your account, signs you in, and receives password resets and email-change confirmations.</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Date of birth</th>
-                                    <td>Optional</td>
-                                    <td>Shown on your account page, and supports the 13-and-over minimum in our Terms. You may leave it blank.</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Password</th>
-                                    <td>Yes</td>
-                                    <td>Handled entirely by Firebase Authentication. It is never stored by this Site, and we cannot read it.</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Account created date</th>
-                                    <td>Automatic</td>
-                                    <td>Recorded when the account is made; shown on your account page.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <h3>Information you create while using the Site</h3>
-                        <p>
-                            Everything below is stored under your own account, is visible only to you, and exists
-                            solely so your work is still there when you come back:
-                        </p>
-                        <ul>
-                            <li><strong>Characters</strong> &mdash; name, race, level, skills, attribute choices and selected perks;</li>
-                            <li><strong>Inventory</strong> &mdash; which items each character carries, their quantities and upgrade levels, and what is equipped;</li>
-                            <li><strong>Spellbook</strong> &mdash; which spells each character has learned.</li>
-                        </ul>
-
-                        <h3>Information collected automatically</h3>
-                        <p>
-                            The Site itself runs no analytics and sets no tracking cookies. However, the
-                            companies that host and serve it keep their own operational records, which typically
-                            include your IP address, browser type and the time of a request:
-                        </p>
-                        <ul>
-                            <li><strong>GitHub Pages</strong> serves the pages, images and data files;</li>
-                            <li><strong>Google Firebase</strong> handles sign-in and database requests, and keeps sign-in security records such as the date of your last login;</li>
-                            <li><strong>jsDelivr</strong> serves the Bootstrap stylesheet and script.</li>
-                        </ul>
-                        <p>
-                            These records are held by those companies under their own privacy policies, linked in
-                            section&nbsp;6. We do not receive, request or have access to them.
-                        </p>
-                    </section>
-
-                    <!-- ===================== 3. WHAT WE DON'T COLLECT ===================== -->
-                    <section id="not-collect" class="sheet-section legal-section" aria-labelledby="not-collect-title">
-                        <h2 id="not-collect-title" class="panel-title">What We Do Not Collect</h2>
-
-                        <p>Stating this plainly, because the absence is the point:</p>
-                        <ul>
-                            <li><strong>No payment information.</strong> The Site is free and has no payment feature of any kind.</li>
-                            <li><strong>No analytics.</strong> No Google Analytics, no tracking pixels, no heatmaps, no session recording.</li>
-                            <li><strong>No advertising.</strong> No ad networks, no advertising identifiers, no behavioural profiles.</li>
-                            <li><strong>No address, phone number or government identifier.</strong> None of these is asked for or stored.</li>
-                            <li><strong>No location data.</strong> The Site does not request geolocation.</li>
-                            <li><strong>No contacts, files or device data</strong> beyond what your browser sends with an ordinary web request.</li>
-                            <li><strong>No sensitive categories.</strong> We do not ask about health, beliefs, or any similar category, and you should not enter them into a character name or other free-text field.</li>
-                        </ul>
-                    </section>
-
-                    <!-- ===================== 4. HOW IT'S USED ===================== -->
-                    <section id="use" class="sheet-section legal-section" aria-labelledby="use-title">
-                        <h2 id="use-title" class="panel-title">How Your Information Is Used</h2>
-
-                        <p>Your information is used only to run the Site:</p>
-                        <ul>
-                            <li>To create your account and sign you in;</li>
-                            <li>To save your characters, inventories and spellbooks, and show them back to you;</li>
-                            <li>To run the combat calculations on the character data you enter;</li>
-                            <li>To let you update your profile, email address or password;</li>
-                            <li>To send transactional email that Firebase generates on your request &mdash; a password reset, or a confirmation of an email change;</li>
-                            <li>To keep the Site secure and to enforce our <a href="terms.html">Terms and Conditions</a>;</li>
-                            <li>To respond when you contact us.</li>
-                        </ul>
-
-                        <p>
-                            Your information is <strong>never</strong> used for advertising, sold or rented, used
-                            to build a profile of you, or shared with anyone for their own purposes. We do not
-                            send marketing email &mdash; there is no mailing list.
-                        </p>
-                        <p>
-                            No automated decision-making with legal or similarly significant effects is carried
-                            out. The Site's calculations operate on fictional game statistics, not on you.
-                        </p>
-                    </section>
-
-                    <!-- ===================== 5. CONSENT ===================== -->
-                    <section id="basis" class="sheet-section legal-section" aria-labelledby="basis-title">
-                        <h2 id="basis-title" class="panel-title">Consent</h2>
-
-                        <p>
-                            Under PIPEDA we rely on your consent. You give it by creating an account and entering
-                            information, having had this policy available to you beforehand. Because the
-                            information involved is limited and the purposes are the obvious ones, that consent
-                            is implied by your use of the Site &mdash; but it is yours to withdraw.
-                        </p>
-                        <p>
-                            You may withdraw consent at any time by deleting your account, which removes the
-                            information described in section&nbsp;2. The practical consequence is simply that the
-                            Site can no longer sign you in or keep your characters.
-                        </p>
-                        <p>
-                            For visitors in the UK or EEA, the lawful bases are performance of a contract
-                            (providing the account you asked for) and legitimate interests (keeping the Site
-                            secure and working).
-                        </p>
-                    </section>
-
-                    <!-- ===================== 6. WHERE IT LIVES ===================== -->
-                    <section id="where" class="sheet-section legal-section" aria-labelledby="where-title">
-                        <h2 id="where-title" class="panel-title">Where Your Information Is Stored</h2>
-
-                        <p>
-                            The Site is a static website with no server of its own. It uses third-party services
-                            as processors, each handling only what its function requires:
-                        </p>
-
-                        <table class="legal-table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Service</th>
-                                    <th scope="col">Role</th>
-                                    <th scope="col">What it handles</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th scope="row">Firebase Authentication<br><span class="text-sm">Google LLC</span></th>
-                                    <td>Sign-in</td>
-                                    <td>Email address, password (hashed by Google &mdash; never visible to us), and sign-in security records.</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Cloud Firestore<br><span class="text-sm">Google LLC</span></th>
-                                    <td>Database</td>
-                                    <td>Your profile document and every character, inventory and spellbook beneath it.</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">GitHub Pages<br><span class="text-sm">GitHub, Inc.</span></th>
-                                    <td>Hosting</td>
-                                    <td>The HTML, CSS, JavaScript, images and static game data. No account data passes through it.</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">jsDelivr</th>
-                                    <td>Asset delivery</td>
-                                    <td>The Bootstrap stylesheet and script only. No account data is sent to it.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <div class="legal-note">
-                            <strong>Your data is stored outside Canada.</strong> Google and GitHub operate
-                            servers in the United States and elsewhere, and your information is processed on
-                            them. While it is there, it may be accessible to the courts, law enforcement and
-                            national security authorities of those countries under their own laws. By using the
-                            Site, you consent to this transfer.
-                        </div>
-
-                        <p>Their privacy policies:</p>
-                        <ul class="plain-list">
-                            <li><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">Firebase &mdash; Privacy and Security</a></li>
-                            <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a></li>
-                            <li><a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub Privacy Statement</a></li>
-                        </ul>
-                    </section>
-
-                    <!-- ===================== 7. COOKIES ===================== -->
-                    <section id="storage" class="sheet-section legal-section" aria-labelledby="storage-title">
-                        <h2 id="storage-title" class="panel-title">Cookies and Browser Storage</h2>
-
-                        <p>
-                            The Site sets no advertising or analytics cookies, and there is nothing to opt out of
-                            on that front.
-                        </p>
-                        <p>
-                            Firebase Authentication does store a sign-in token in your browser's local storage
-                            and IndexedDB. That is what keeps you signed in between page loads and visits; it is
-                            strictly necessary for the Site to work and cannot be turned off while still having
-                            an account. It stays on your device, and is not readable by other websites.
-                        </p>
-                        <p>
-                            Signing out, or clearing your browser's site data, removes it. Blocking storage for
-                            this Site entirely will prevent sign-in from working &mdash; the reference pages will
-                            still be readable.
-                        </p>
-                    </section>
-
-                    <!-- ===================== 8. SHARING ===================== -->
-                    <section id="sharing" class="sheet-section legal-section" aria-labelledby="sharing-title">
-                        <h2 id="sharing-title" class="panel-title">Sharing and Disclosure</h2>
-
-                        <p>
-                            We do not sell, rent or trade your personal information. It is disclosed only in
-                            these circumstances:
-                        </p>
-                        <ul>
-                            <li>
-                                <strong>To the service providers in section&nbsp;6</strong>, and only as needed
-                                for them to host the Site and store your data on our behalf;
-                            </li>
-                            <li>
-                                <strong>Where the law requires it</strong> &mdash; a valid court order, subpoena
-                                or other lawful demand;
-                            </li>
-                            <li>
-                                <strong>To protect rights and safety</strong> &mdash; where disclosure is
-                                necessary to investigate a suspected breach of our Terms, fraud, or a threat to
-                                the security of the Site or its users;
-                            </li>
-                            <li>
-                                <strong>With your consent</strong>, for any other purpose you agree to.
-                            </li>
-                        </ul>
-                        <p>
-                            Other users cannot see your account or your characters. The security rules published
-                            to Firestore permit a signed-in user to read and write only the documents beneath
-                            their own account, and nothing else.
-                        </p>
-                    </section>
-
-                    <!-- ===================== 9. RETENTION ===================== -->
-                    <section id="retention" class="sheet-section legal-section" aria-labelledby="retention-title">
-                        <h2 id="retention-title" class="panel-title">How Long It Is Kept</h2>
-
-                        <p>
-                            Your information is kept for as long as your account exists. There is no automatic
-                            expiry, and nothing is archived after deletion.
-                        </p>
-
-                        <h3>Deleting your account</h3>
-                        <p>
-                            Go to <strong>My Account &rarr; Delete Account</strong>. The deletion runs in this
-                            order, and all of it is permanent:
-                        </p>
-                        <ol>
-                            <li>Every character's inventory and spellbook;</li>
-                            <li>Every character;</li>
-                            <li>Your profile document &mdash; name, email and date of birth;</li>
-                            <li>Your Firebase Authentication user, including your stored password hash.</li>
-                        </ol>
-                        <p>
-                            You can also delete a single character, or clear an inventory, without closing your
-                            account.
-                        </p>
-                        <p>
-                            After deletion the information is gone from the live database and is not recoverable
-                            &mdash; by you or by us. Residual copies may persist briefly in Google's routine
-                            infrastructure backups before being overwritten on their own schedule, and
-                            operational logs held by the providers in section&nbsp;6 age out under their
-                            retention policies.
-                        </p>
-                    </section>
-
-                    <!-- ===================== 10. YOUR RIGHTS ===================== -->
-                    <section id="rights" class="sheet-section legal-section" aria-labelledby="rights-title">
-                        <h2 id="rights-title" class="panel-title">Your Rights</h2>
-
-                        <p>
-                            Most of these you can exercise yourself, immediately, without asking us:
-                        </p>
-                        <ul>
-                            <li>
-                                <strong>Access</strong> &mdash; everything we hold about you is displayed on your
-                                account and character pages. For a copy in another form, write to us.
-                            </li>
-                            <li>
-                                <strong>Correction</strong> &mdash; update your name, date of birth or email from
-                                <strong>My Account &rarr; Update Account</strong>.
-                            </li>
-                            <li>
-                                <strong>Deletion</strong> &mdash; delete individual characters, or the whole
-                                account, as described in section&nbsp;9.
-                            </li>
-                            <li>
-                                <strong>Withdraw consent</strong> &mdash; by deleting your account.
-                            </li>
-                            <li>
-                                <strong>Complain</strong> &mdash; if we have not handled your information
-                                properly, contact us first so we can put it right. You may also complain to the
-                                <a href="https://www.priv.gc.ca/" target="_blank" rel="noopener">Office of the
-                                Privacy Commissioner of Canada</a>.
-                            </li>
-                        </ul>
-
-                        <h3>If you are in the UK or EEA</h3>
-                        <p>
-                            You additionally have the rights to data portability, to restrict or object to
-                            processing, and to lodge a complaint with your national supervisory authority. Write
-                            to the address in section&nbsp;13 to exercise any of them.
-                        </p>
-                        <p>
-                            We will respond to any request within 30 days. We may need to confirm you control the
-                            account's email address before acting on it.
-                        </p>
-                    </section>
-
-                    <!-- ===================== 11. SECURITY ===================== -->
-                    <section id="security" class="sheet-section legal-section" aria-labelledby="security-title">
-                        <h2 id="security-title" class="panel-title">Security</h2>
-
-                        <p>Reasonable safeguards are in place for a project of this size:</p>
-                        <ul>
-                            <li>All traffic is served over HTTPS;</li>
-                            <li>Passwords are handled and hashed by Firebase Authentication. They never reach this Site's code, and neither we nor anyone else can read them;</li>
-                            <li>Firestore security rules enforce, on Google's servers, that a signed-in user may reach only their own data &mdash; the browser cannot talk its way around them;</li>
-                            <li>Changing your email or password requires re-entering your current password first;</li>
-                            <li>The Site holds no server of its own and no credentials that could be stolen from one.</li>
-                        </ul>
-
-                        <div class="legal-note">
-                            No system is perfectly secure. This is a personal project maintained by one person,
-                            not a service with a security team behind it. Please use a password unique to this
-                            Site, and do not store anything sensitive in a character name or other free-text
-                            field.
-                        </div>
-
-                        <p>
-                            If you discover a vulnerability, please report it to the address in
-                            section&nbsp;13 rather than disclosing it publicly.
-                        </p>
-                    </section>
-
-                    <!-- ===================== 12. CHILDREN ===================== -->
-                    <section id="children" class="sheet-section legal-section" aria-labelledby="children-title">
-                        <h2 id="children-title" class="panel-title">Children's Privacy</h2>
-
-                        <p>
-                            The Site is not directed at children under 13, and an account requires you to be at
-                            least 13 years old. We do not knowingly collect personal information from anyone
-                            younger.
-                        </p>
-                        <p>
-                            If you are a parent or guardian and believe a child under 13 has created an account,
-                            contact us at the address below and we will delete the account and its data.
-                        </p>
-                    </section>
-
-                    <!-- ===================== 13. CHANGES AND CONTACT ===================== -->
-                    <section id="contact" class="sheet-section legal-section" aria-labelledby="contact-title">
-                        <h2 id="contact-title" class="panel-title">Changes and Contact</h2>
-
-                        <p>
-                            This policy may be updated as the Site changes. The &ldquo;Last updated&rdquo; date
-                            at the top of this page reflects the current version, and a material change will be
-                            flagged on the Site. Continuing to use the Site after a change means you accept the
-                            revised policy.
-                        </p>
-
-                        <h3>Contact</h3>
-                        <p>
-                            For any question about this policy, or to make a request about your information:
-                        </p>
-                        <ul class="plain-list">
-                            <li>C.&nbsp;J.&nbsp;Wiebe &mdash; Privacy Contact</li>
-                            <li><a href="mailto:cjpwiebe@gmail.com">cjpwiebe@gmail.com</a></li>
-                            <li>Ontario, Canada</li>
-                        </ul>
-                        <p class="mt-3">
-                            See also the <a href="terms.html">Terms and Conditions</a>, which govern use of the
-                            Site.
-                        </p>
-                    </section>
-
+                <div class="legal-note">
+                  <ul class="mb-0">
+                    <li>
+                      You can browse the item tables, the home page and the
+                      references list without an account, and without giving us
+                      anything.
+                    </li>
+                    <li>
+                      An account stores your name, email, optional date of
+                      birth, and the characters you build.
+                    </li>
+                    <li>
+                      There is no advertising, no analytics, no tracking pixels,
+                      and nothing is sold or shared for marketing.
+                    </li>
+                    <li>
+                      Your data lives in Google Firebase. You can delete all of
+                      it yourself, at any time, from your account page.
+                    </li>
+                  </ul>
                 </div>
+
+                <p>
+                  This policy is written with Canada's
+                  <em
+                    >Personal Information Protection and Electronic Documents
+                    Act</em
+                  >
+                  (PIPEDA) in mind. Because the Site is reachable from anywhere.
+                </p>
+              </section>
+
+              <!-- ===================== 2. WHAT WE COLLECT ===================== -->
+              <section
+                id="collect"
+                class="sheet-section legal-section"
+                aria-labelledby="collect-title"
+              >
+                <h2 id="collect-title" class="panel-title">What We Collect</h2>
+
+                <h3>Information you give us when you register</h3>
+                <table class="legal-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Information</th>
+                      <th scope="col">Required?</th>
+                      <th scope="col">Why we have it</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">First and last name</th>
+                      <td>Yes</td>
+                      <td>
+                        Addresses you by name in the navigation bar and on your
+                        account page.
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Email address</th>
+                      <td>Yes</td>
+                      <td>
+                        Identifies your account, signs you in, and receives
+                        password resets and email-change confirmations.
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Date of birth</th>
+                      <td>Optional</td>
+                      <td>
+                        Shown on your account page, and supports the 13-and-over
+                        minimum in our Terms. You may leave it blank.
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Password</th>
+                      <td>Yes</td>
+                      <td>
+                        Handled entirely by Firebase Authentication. It is never
+                        stored by this Site, and we cannot read it.
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Account created date</th>
+                      <td>Automatic</td>
+                      <td>
+                        Recorded when the account is made; shown on your account
+                        page.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h3>Information you create while using the Site</h3>
+                <p>
+                  Everything below is stored under your own account, is visible
+                  only to you, and exists solely so your work is still there
+                  when you come back:
+                </p>
+                <ul>
+                  <li>
+                    <strong>Characters</strong> &mdash; name, race, level,
+                    skills, attribute choices and selected perks;
+                  </li>
+                  <li>
+                    <strong>Inventory</strong> &mdash; which items each
+                    character carries, their quantities and upgrade levels, and
+                    what is equipped;
+                  </li>
+                  <li>
+                    <strong>Spellbook</strong> &mdash; which spells each
+                    character has learned.
+                  </li>
+                </ul>
+
+                <h3>Information collected automatically</h3>
+                <p>
+                  The Site itself runs no analytics and sets no tracking
+                  cookies. However, the companies that host and serve it keep
+                  their own operational records, which typically include your IP
+                  address, browser type and the time of a request:
+                </p>
+                <ul>
+                  <li>
+                    <strong>GitHub Pages</strong> serves the pages, images and
+                    data files;
+                  </li>
+                  <li>
+                    <strong>Google Firebase</strong> handles sign-in and
+                    database requests, and keeps sign-in security records such
+                    as the date of your last login;
+                  </li>
+                  <li>
+                    <strong>jsDelivr</strong> serves the Bootstrap stylesheet
+                    and script.
+                  </li>
+                </ul>
+                <p>
+                  These records are held by those companies under their own
+                  privacy policies, linked in section&nbsp;6. We do not receive,
+                  request or have access to them.
+                </p>
+              </section>
+
+              <!-- ===================== 3. WHAT WE DON'T COLLECT ===================== -->
+              <section
+                id="not-collect"
+                class="sheet-section legal-section"
+                aria-labelledby="not-collect-title"
+              >
+                <h2 id="not-collect-title" class="panel-title">
+                  What We Do Not Collect
+                </h2>
+
+                <ul>
+                  <li>
+                    <strong>No payment information.</strong> The Site is free
+                    and has no payment feature of any kind.
+                  </li>
+                  <li>
+                    <strong>No analytics.</strong> No Google Analytics, no
+                    tracking pixels, no heatmaps, no session recording.
+                  </li>
+                  <li>
+                    <strong>No advertising.</strong> No ad networks, no
+                    advertising identifiers, no behavioural profiles.
+                  </li>
+                  <li>
+                    <strong
+                      >No address, phone number or government
+                      identifier.</strong
+                    >
+                    None of these is asked for or stored.
+                  </li>
+                  <li>
+                    <strong>No location data.</strong> The Site does not request
+                    geolocation.
+                  </li>
+                  <li>
+                    <strong>No contacts, files or device data</strong> beyond
+                    what your browser sends with an ordinary web request.
+                  </li>
+                  <li>
+                    <strong>No sensitive categories.</strong> We do not ask
+                    about health, beliefs, or any similar category, and you
+                    should not enter them into a character name or other
+                    free-text field.
+                  </li>
+                </ul>
+              </section>
+
+              <!-- ===================== 4. HOW IT'S USED ===================== -->
+              <section
+                id="use"
+                class="sheet-section legal-section"
+                aria-labelledby="use-title"
+              >
+                <h2 id="use-title" class="panel-title">
+                  How Your Information Is Used
+                </h2>
+
+                <ul>
+                  <li>To create your account and sign you in;</li>
+                  <li>
+                    To save your characters, inventories and spellbooks, and
+                    show them back to you;
+                  </li>
+                  <li>
+                    To run the combat calculations on the character data you
+                    enter;
+                  </li>
+                  <li>
+                    To let you update your profile, email address or password;
+                  </li>
+                  <li>
+                    To send transactional email that Firebase generates on your
+                    request &mdash; a password reset, or a confirmation of an
+                    email change;
+                  </li>
+                  <li>
+                    To keep the Site secure and to enforce our
+                    <a href="terms.html">Terms and Conditions</a>;
+                  </li>
+                  <li>To respond when you contact us.</li>
+                </ul>
+
+                <p>
+                  Your information is <strong>never</strong> used for
+                  advertising, sold or rented, used to build a profile of you,
+                  or shared with anyone for their own purposes. We do not send
+                  marketing email &mdash; there is no mailing list.
+                </p>
+                <p>
+                  No automated decision-making with legal or similarly
+                  significant effects is carried out. The Site's calculations
+                  operate on fictional game statistics, not on you.
+                </p>
+              </section>
+
+              <!-- ===================== 5. CONSENT ===================== -->
+              <section
+                id="basis"
+                class="sheet-section legal-section"
+                aria-labelledby="basis-title"
+              >
+                <h2 id="basis-title" class="panel-title">Consent</h2>
+
+                <p>
+                  Under PIPEDA we rely on your consent. You give it by creating
+                  an account and entering information, having had this policy
+                  available to you beforehand. Because the information involved
+                  is limited and the purposes are the obvious ones, that consent
+                  is implied by your use of the Site &mdash; but it is yours to
+                  withdraw.
+                </p>
+                <p>
+                  You may withdraw consent at any time by deleting your account,
+                  which removes the information described in section&nbsp;2. The
+                  practical consequence is simply that the Site can no longer
+                  sign you in or keep your characters.
+                </p>
+              </section>
+
+              <!-- ===================== 6. WHERE IT LIVES ===================== -->
+              <section
+                id="where"
+                class="sheet-section legal-section"
+                aria-labelledby="where-title"
+              >
+                <h2 id="where-title" class="panel-title">
+                  Where Your Information Is Stored
+                </h2>
+
+                <p>
+                  The Site is a static website with no server of its own. It
+                  uses third-party services as processors, each handling only
+                  what its function requires:
+                </p>
+
+                <table class="legal-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Service</th>
+                      <th scope="col">Role</th>
+                      <th scope="col">What it handles</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">
+                        Firebase Authentication<br /><span class="text-sm"
+                          >Google LLC</span
+                        >
+                      </th>
+                      <td>Sign-in</td>
+                      <td>
+                        Email address, password (hashed by Google &mdash; never
+                        visible to us), and sign-in security records.
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        Cloud Firestore<br /><span class="text-sm"
+                          >Google LLC</span
+                        >
+                      </th>
+                      <td>Database</td>
+                      <td>
+                        Your profile document and every character, inventory and
+                        spellbook beneath it.
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">
+                        GitHub Pages<br /><span class="text-sm"
+                          >GitHub, Inc.</span
+                        >
+                      </th>
+                      <td>Hosting</td>
+                      <td>
+                        The HTML, CSS, JavaScript, images and static game data.
+                        No account data passes through it.
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">jsDelivr</th>
+                      <td>Asset delivery</td>
+                      <td>
+                        The Bootstrap stylesheet and script only. No account
+                        data is sent to it.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="legal-note">
+                  <strong>Your data is stored outside Canada.</strong> Google
+                  and GitHub operate servers in the United States and elsewhere,
+                  and your information is processed on them. While it is there,
+                  it may be accessible to the courts, law enforcement and
+                  national security authorities of those countries under their
+                  own laws. By using the Site, you consent to this transfer.
+                </div>
+
+                <p>Their privacy policies:</p>
+                <ul class="plain-list">
+                  <li>
+                    <a
+                      href="https://firebase.google.com/support/privacy"
+                      target="_blank"
+                      rel="noopener"
+                      >Firebase &mdash; Privacy and Security</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="https://policies.google.com/privacy"
+                      target="_blank"
+                      rel="noopener"
+                      >Google Privacy Policy</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
+                      target="_blank"
+                      rel="noopener"
+                      >GitHub Privacy Statement</a
+                    >
+                  </li>
+                </ul>
+              </section>
+
+              <!-- ===================== 7. COOKIES ===================== -->
+              <section
+                id="storage"
+                class="sheet-section legal-section"
+                aria-labelledby="storage-title"
+              >
+                <h2 id="storage-title" class="panel-title">
+                  Cookies and Browser Storage
+                </h2>
+
+                <p>
+                  The Site sets no advertising or analytics cookies, and there
+                  is nothing to opt out of on that front.
+                </p>
+                <p>
+                  Firebase Authentication does store a sign-in token in your
+                  browser's local storage and IndexedDB. That is what keeps you
+                  signed in between page loads and visits; it is strictly
+                  necessary for the Site to work and cannot be turned off while
+                  still having an account. It stays on your device, and is not
+                  readable by other websites.
+                </p>
+                <p>
+                  Signing out, or clearing your browser's site data, removes it.
+                  Blocking storage for this Site entirely will prevent sign-in
+                  from working &mdash; the reference pages will still be
+                  readable.
+                </p>
+              </section>
+
+              <!-- ===================== 8. SHARING ===================== -->
+              <section
+                id="sharing"
+                class="sheet-section legal-section"
+                aria-labelledby="sharing-title"
+              >
+                <h2 id="sharing-title" class="panel-title">
+                  Sharing and Disclosure
+                </h2>
+
+                <p>
+                  We do not sell, rent or trade your personal information. It is
+                  disclosed only in these circumstances:
+                </p>
+                <ul>
+                  <li>
+                    <strong>To the service providers in section&nbsp;6</strong>,
+                    and only as needed for them to host the Site and store your
+                    data on our behalf;
+                  </li>
+                  <li>
+                    <strong>Where the law requires it</strong> &mdash; a valid
+                    court order, subpoena or other lawful demand;
+                  </li>
+                  <li>
+                    <strong>To protect rights and safety</strong> &mdash; where
+                    disclosure is necessary to investigate a suspected breach of
+                    our Terms, fraud, or a threat to the security of the Site or
+                    its users;
+                  </li>
+                  <li>
+                    <strong>With your consent</strong>, for any other purpose
+                    you agree to.
+                  </li>
+                </ul>
+                <p>
+                  Other users cannot see your account or your characters. The
+                  security rules published to Firestore permit a signed-in user
+                  to read and write only the documents beneath their own
+                  account, and nothing else.
+                </p>
+              </section>
+
+              <!-- ===================== 9. RETENTION ===================== -->
+              <section
+                id="retention"
+                class="sheet-section legal-section"
+                aria-labelledby="retention-title"
+              >
+                <h2 id="retention-title" class="panel-title">
+                  How Long It Is Kept
+                </h2>
+
+                <p>
+                  Your information is kept for as long as your account exists.
+                  There is no automatic expiry, and nothing is archived after
+                  deletion.
+                </p>
+
+                <h3>Deleting your account</h3>
+                <p>
+                  Go to <strong>My Account &rarr; Delete Account</strong>. The
+                  deletion runs in this order, and all of it is permanent:
+                </p>
+                <ol>
+                  <li>Every character's inventory and spellbook;</li>
+                  <li>Every character;</li>
+                  <li>
+                    Your profile document &mdash; name, email and date of birth;
+                  </li>
+                  <li>
+                    Your Firebase Authentication user, including your stored
+                    password hash.
+                  </li>
+                </ol>
+                <p>
+                  You can also delete a single character, or clear an inventory,
+                  without closing your account.
+                </p>
+                <p>
+                  After deletion the information is gone from the live database
+                  and is not recoverable &mdash; by you or by us. Residual
+                  copies may persist briefly in Google's routine infrastructure
+                  backups before being overwritten on their own schedule, and
+                  operational logs held by the providers in section&nbsp;6 age
+                  out under their retention policies.
+                </p>
+              </section>
+
+              <!-- ===================== 10. YOUR RIGHTS ===================== -->
+              <section
+                id="rights"
+                class="sheet-section legal-section"
+                aria-labelledby="rights-title"
+              >
+                <h2 id="rights-title" class="panel-title">Your Rights</h2>
+
+                <p>
+                  Most of these you can exercise yourself, immediately, without
+                  asking us:
+                </p>
+                <ul>
+                  <li>
+                    <strong>Access</strong> &mdash; everything we hold about you
+                    is displayed on your account and character pages. For a copy
+                    in another form, write to us.
+                  </li>
+                  <li>
+                    <strong>Correction</strong> &mdash; update your name, date
+                    of birth or email from
+                    <strong>My Account &rarr; Update Account</strong>.
+                  </li>
+                  <li>
+                    <strong>Deletion</strong> &mdash; delete individual
+                    characters, or the whole account, as described in
+                    section&nbsp;9.
+                  </li>
+                  <li>
+                    <strong>Withdraw consent</strong> &mdash; by deleting your
+                    account.
+                  </li>
+                  <li>
+                    <strong>Complain</strong> &mdash; if we have not handled
+                    your information properly, contact us first so we can put it
+                    right. You may also complain to the
+                    <a
+                      href="https://www.priv.gc.ca/"
+                      target="_blank"
+                      rel="noopener"
+                      >Office of the Privacy Commissioner of Canada</a
+                    >.
+                  </li>
+                </ul>
+                <p>
+                  We will respond to any request within 30 days. We may need to
+                  confirm you control the account's email address before acting
+                  on it.
+                </p>
+              </section>
+
+              <!-- ===================== 11. SECURITY ===================== -->
+              <section
+                id="security"
+                class="sheet-section legal-section"
+                aria-labelledby="security-title"
+              >
+                <h2 id="security-title" class="panel-title">Security</h2>
+
+                <p>
+                  Reasonable safeguards are in place for a project of this size:
+                </p>
+                <ul>
+                  <li>All traffic is served over HTTPS;</li>
+                  <li>
+                    Passwords are handled and hashed by Firebase Authentication.
+                    They never reach this Site's code, and neither we nor anyone
+                    else can read them;
+                  </li>
+                  <li>
+                    Firestore security rules enforce, on Google's servers, that
+                    a signed-in user may reach only their own data &mdash; the
+                    browser cannot talk its way around them;
+                  </li>
+                  <li>
+                    Changing your email or password requires re-entering your
+                    current password first;
+                  </li>
+                  <li>
+                    The Site holds no server of its own and no credentials that
+                    could be stolen from one.
+                  </li>
+                </ul>
+
+                <div class="legal-note">
+                  No system is perfectly secure. This is a personal project
+                  maintained by one person, not a service with a security team
+                  behind it. Please use a password unique to this Site, and do
+                  not store anything sensitive in a character name or other
+                  free-text field.
+                </div>
+
+                <p>
+                  If you discover a vulnerability, please report it to the
+                  address in section&nbsp;13 rather than disclosing it publicly.
+                </p>
+              </section>
+
+              <!-- ===================== 12. CHILDREN ===================== -->
+              <section
+                id="children"
+                class="sheet-section legal-section"
+                aria-labelledby="children-title"
+              >
+                <h2 id="children-title" class="panel-title">
+                  Children's Privacy
+                </h2>
+
+                <p>
+                  The Site is not directed at children under 13, and an account
+                  requires you to be at least 13 years old. We do not knowingly
+                  collect personal information from anyone younger.
+                </p>
+                <p>
+                  If you are a parent or guardian and believe a child under 13
+                  has created an account, contact us at the address below and we
+                  will delete the account and its data.
+                </p>
+              </section>
+
+              <!-- ===================== 13. CHANGES AND CONTACT ===================== -->
+              <section
+                id="contact"
+                class="sheet-section legal-section"
+                aria-labelledby="contact-title"
+              >
+                <h2 id="contact-title" class="panel-title">
+                  Changes and Contact
+                </h2>
+
+                <p>
+                  This policy may be updated as the Site changes. The
+                  &ldquo;Last updated&rdquo; date at the top of this page
+                  reflects the current version, and a material change will be
+                  flagged on the Site. Continuing to use the Site after a change
+                  means you accept the revised policy.
+                </p>
+
+                <h3>Contact</h3>
+                <p>
+                  For any question about this policy, or to make a request about
+                  your information:
+                </p>
+                <ul class="plain-list">
+                  <li>C.&nbsp;J.&nbsp;Wiebe &mdash; Privacy Contact</li>
+                  <li>
+                    <a href="mailto:cjpwiebe@gmail.com">cjpwiebe@gmail.com</a>
+                  </li>
+                </ul>
+                <p class="mt-3">
+                  See also the <a href="terms.html">Terms and Conditions</a>,
+                  which govern use of the Site.
+                </p>
+              </section>
             </div>
+          </div>
         </div>
-        </main>
+      </main>
 
-        <!-- ===================== FOOTER (rendered by app.js) ===================== -->
-        <div id="footer-slot"></div>
-
+      <!-- ===================== FOOTER (rendered by app.js) ===================== -->
+      <div id="footer-slot"></div>
     </div>
 
     <!-- ===================== SCRIPTS ===================== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>window.SITE_ROOT = "../";</script>
-    <script type="module">
-        import { renderChrome } from "../assets/js/app.js";
-        renderChrome("privacy");
+    <script>
+      window.SITE_ROOT = "../";
     </script>
-</body>
-
+    <script type="module">
+      import { renderChrome } from "../assets/js/app.js";
+      renderChrome("privacy");
+    </script>
+  </body>
 </html>
