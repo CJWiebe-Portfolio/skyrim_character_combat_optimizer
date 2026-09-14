@@ -5,7 +5,8 @@ PROJECT: Skyrim Character Combat Optimization System
 AUTHOR: C.J. Wiebe
 =========================================================
 DESCRIPTION:
-Lists the sources used by the project.
+Lists the sources used by the project, grouped by the kind
+of source so a reader can find one without reading the lot.
 =========================================================
 -->
 <!DOCTYPE html>
@@ -45,47 +46,207 @@ Lists the sources used by the project.
             <div class="main-container p-4">
                 <div class="main-container p-5">
 
-                    <h1 class="section-title title-main text-center">&#128218; References &#128218;</h1>
-                    <h5 class="text-muted-custom text-center">
-                        This project would not be possible without the contributions of the Skyrim community.
-                    </h5>
-                    <br>
-                    <p class="text-muted-custom text-lg">
-                        Howard, Todd. The Elder Scrolls V: Skyrim. 2011; Bethesda Softworks.
-                        <a href="https://elderscrolls.bethesda.net/en/skyrim10" target="_blank" rel="noopener">https://elderscrolls.bethesda.net/en/skyrim10</a>
-                    </p>
-                    <p class="text-muted-custom text-lg">
-                        Elmartian. &ldquo;Skyrim Weapons Dataset.&rdquo; Kaggle. Accessed March 1, 2026.
-                        <a href="https://www.kaggle.com/datasets/elmartini/skyrim-weapons-dataset" target="_blank" rel="noopener">https://www.kaggle.com/datasets/elmartini/skyrim-weapons-dataset</a>
-                    </p>
-                    <p class="text-muted-custom text-lg">
-                        Edmilson Silva. &ldquo;The Elder Scrolls Skyrim - Armor.&rdquo; Accessed March 1, 2026.
-                        <a href="https://www.kaggle.com/datasets/sc0v1n0/the-elder-scroll-skyrim-armor" target="_blank" rel="noopener">https://www.kaggle.com/datasets/sc0v1n0/the-elder-scroll-skyrim-armor</a>
-                    </p>
-                    <p class="text-muted-custom text-lg">
-                        &ldquo;Skyrim Races + Base Stats.&rdquo; Accessed March 1, 2026.
-                        <a href="https://www.kaggle.com/datasets/stephenofarrell/skyrim-races-base-stats" target="_blank" rel="noopener">https://www.kaggle.com/datasets/stephenofarrell/skyrim-races-base-stats</a>
-                    </p>
-                    <p class="text-muted-custom text-lg">
-                        &ldquo;The Elder Scrolls V: Skyrim - UESP Wiki - The Unofficial Elder Scrolls Pages.&rdquo; Accessed March 1, 2026.
-                        <a href="https://en.uesp.net/wiki/Skyrim:Skyrim" target="_blank" rel="noopener">https://en.uesp.net/wiki/Skyrim:Skyrim</a>
-                    </p>
-                    <p class="text-muted-custom text-lg">
-                        &ldquo;Skyrim Desktop Backgrounds - Wallpaper Cave.&rdquo; Accessed March 1, 2026.
-                        <a href="https://wallpapercave.com/skyrim-desktop-backgrounds" target="_blank" rel="noopener">https://wallpapercave.com/skyrim-desktop-backgrounds</a>
-                    </p>
-                    <p class="text-muted-custom text-lg">
-                        contributors, Mark Otto, Jacob Thornton, and Bootstrap. &ldquo;Bootstrap.&rdquo; Accessed March 1, 2026.
-                        <a href="https://getbootstrap.com/" target="_blank" rel="noopener">https://getbootstrap.com/</a>
-                    </p>
-                    <p class="text-muted-custom text-lg">
-                        &ldquo;W3Schools Online Web Tutorials.&rdquo; Accessed March 1, 2026.
-                        <a href="https://www.w3schools.com/" target="_blank" rel="noopener">https://www.w3schools.com/</a>
-                    </p>
-                    <p class="text-muted-custom text-lg">
-                        Google. &ldquo;Firebase Documentation.&rdquo; Accessed 2026.
-                        <a href="https://firebase.google.com/docs" target="_blank" rel="noopener">https://firebase.google.com/docs</a>
-                    </p>
+                    <!-- ===================== HEADER ===================== -->
+                    <header class="text-center">
+                        <h1 class="section-title title-main">&#128218; References &#128218;</h1>
+                        <p class="text-muted-custom ref-lede">
+                            This project would not be possible without the contributions of the
+                            Skyrim community. Every source below fed either the data, the rules,
+                            or the look of the optimizer.
+                        </p>
+                    </header>
+
+                    <!-- Five groups is enough that jumping beats scrolling. -->
+                    <nav class="ref-jump" aria-label="Reference categories">
+                        <a href="#ref-game">The Game</a>
+                        <a href="#ref-wikis">Wikis</a>
+                        <a href="#ref-data">Datasets</a>
+                        <a href="#ref-build">Frameworks &amp; Docs</a>
+                        <a href="#ref-art">Art &amp; Assets</a>
+                    </nav>
+
+                    <!-- ===================== THE GAME ===================== -->
+                    <section id="ref-game" class="sheet-section ref-group" aria-labelledby="ref-game-title">
+                        <h2 id="ref-game-title" class="panel-title">The Game</h2>
+                        <p class="ref-group-note">The source of every stat, perk and item in this project.</p>
+
+                        <div class="ref-grid">
+                            <article class="ref-card">
+                                <span class="ref-kind">Video Game</span>
+                                <h3 class="ref-title">The Elder Scrolls V: Skyrim</h3>
+                                <p class="ref-byline">Howard, Todd &mdash; Bethesda Softworks</p>
+                                <p class="ref-meta">Released 2011</p>
+                                <a class="ref-link" href="https://elderscrolls.bethesda.net/en/skyrim10" target="_blank" rel="noopener">
+                                    <span>elderscrolls.bethesda.net</span>
+                                </a>
+                            </article>
+                        </div>
+                    </section>
+
+                    <!-- ===================== WIKIS ===================== -->
+                    <section id="ref-wikis" class="sheet-section ref-group" aria-labelledby="ref-wikis-title">
+                        <h2 id="ref-wikis-title" class="panel-title">Wikis &amp; Community Knowledge</h2>
+                        <p class="ref-group-note">
+                            Used to confirm damage values, perk requirements and race bonuses that
+                            the raw datasets leave out.
+                        </p>
+
+                        <div class="ref-grid">
+                            <article class="ref-card">
+                                <span class="ref-kind">Wiki</span>
+                                <h3 class="ref-title">UESP &mdash; The Unofficial Elder Scrolls Pages</h3>
+                                <p class="ref-byline">&ldquo;The Elder Scrolls V: Skyrim.&rdquo; UESP Wiki</p>
+                                <p class="ref-meta">Accessed March 1, 2026</p>
+                                <a class="ref-link" href="https://en.uesp.net/wiki/Skyrim:Skyrim" target="_blank" rel="noopener">
+                                    <span>en.uesp.net</span>
+                                </a>
+                            </article>
+
+                            <article class="ref-card">
+                                <span class="ref-kind">Wiki</span>
+                                <h3 class="ref-title">The Elder Scrolls Wiki</h3>
+                                <p class="ref-byline">Elder Scrolls Wiki contributors &mdash; Fandom</p>
+                                <p class="ref-meta">Accessed September 14, 2026</p>
+                                <a class="ref-link" href="https://elderscrolls.fandom.com/wiki/The_Elder_Scrolls_Wiki" target="_blank" rel="noopener">
+                                    <span>elderscrolls.fandom.com</span>
+                                </a>
+                            </article>
+
+                            <article class="ref-card">
+                                <span class="ref-kind">Wiki</span>
+                                <h3 class="ref-title">Magic School Perk Trees</h3>
+                                <p class="ref-byline">&ldquo;Destruction, Restoration, Alteration, Conjuration, Illusion (Skyrim).&rdquo; Fandom</p>
+                                <p class="ref-meta">Accessed September 14, 2026 &mdash; perk ranks, requirements and prerequisites</p>
+                                <a class="ref-link" href="https://elderscrolls.fandom.com/wiki/Destruction_(Skyrim)" target="_blank" rel="noopener">
+                                    <span>elderscrolls.fandom.com</span>
+                                </a>
+                            </article>
+
+                            <article class="ref-card">
+                                <span class="ref-kind">Guide</span>
+                                <h3 class="ref-title">Skyrim Magic &mdash; Spells by School</h3>
+                                <p class="ref-byline">Carl &mdash; Carl&rsquo;s Guides</p>
+                                <p class="ref-meta">Accessed September 14, 2026 &mdash; spell costs, tiers and effects</p>
+                                <a class="ref-link" href="https://www.carlsguides.com/skyrim/magic/" target="_blank" rel="noopener">
+                                    <span>carlsguides.com</span>
+                                </a>
+                            </article>
+
+                            <article class="ref-card">
+                                <span class="ref-kind">Community</span>
+                                <h3 class="ref-title">Magicka Cost Level Scaling</h3>
+                                <p class="ref-byline">Nexus Mods</p>
+                                <p class="ref-meta">Accessed September 14, 2026 &mdash; the vanilla spell-cost multiplier, 1 &minus; (skill / 400)^0.65</p>
+                                <a class="ref-link" href="https://www.nexusmods.com/skyrimspecialedition/mods/21557" target="_blank" rel="noopener">
+                                    <span>nexusmods.com</span>
+                                </a>
+                            </article>
+                        </div>
+                    </section>
+
+                    <!-- ===================== DATASETS ===================== -->
+                    <section id="ref-data" class="sheet-section ref-group" aria-labelledby="ref-data-title">
+                        <h2 id="ref-data-title" class="panel-title">Datasets</h2>
+                        <p class="ref-group-note">The item and race tables the optimizer calculates against.</p>
+
+                        <div class="ref-grid">
+                            <article class="ref-card">
+                                <span class="ref-kind">Dataset</span>
+                                <h3 class="ref-title">Skyrim Weapons Dataset</h3>
+                                <p class="ref-byline">Elmartian &mdash; Kaggle</p>
+                                <p class="ref-meta">Accessed March 1, 2026</p>
+                                <a class="ref-link" href="https://www.kaggle.com/datasets/elmartini/skyrim-weapons-dataset" target="_blank" rel="noopener">
+                                    <span>kaggle.com</span>
+                                </a>
+                            </article>
+
+                            <article class="ref-card">
+                                <span class="ref-kind">Dataset</span>
+                                <h3 class="ref-title">The Elder Scrolls Skyrim &mdash; Armor</h3>
+                                <p class="ref-byline">Edmilson Silva &mdash; Kaggle</p>
+                                <p class="ref-meta">Accessed March 1, 2026</p>
+                                <a class="ref-link" href="https://www.kaggle.com/datasets/sc0v1n0/the-elder-scroll-skyrim-armor" target="_blank" rel="noopener">
+                                    <span>kaggle.com</span>
+                                </a>
+                            </article>
+
+                            <article class="ref-card">
+                                <span class="ref-kind">Dataset</span>
+                                <h3 class="ref-title">Skyrim Races + Base Stats</h3>
+                                <p class="ref-byline">Stephen O&rsquo;Farrell &mdash; Kaggle</p>
+                                <p class="ref-meta">Accessed March 1, 2026</p>
+                                <a class="ref-link" href="https://www.kaggle.com/datasets/stephenofarrell/skyrim-races-base-stats" target="_blank" rel="noopener">
+                                    <span>kaggle.com</span>
+                                </a>
+                            </article>
+
+                            <article class="ref-card">
+                                <span class="ref-kind">Dataset</span>
+                                <h3 class="ref-title">Skyrim &mdash; Table of Spells</h3>
+                                <p class="ref-byline">The Organized Gamer</p>
+                                <p class="ref-meta">Accessed September 14, 2026 &mdash; the Dawnguard and Dragonborn spell roster</p>
+                                <a class="ref-link" href="https://www.theorganizedgamer.com/the-elder-scrolls-v-skyrim/spells/" target="_blank" rel="noopener">
+                                    <span>theorganizedgamer.com</span>
+                                </a>
+                            </article>
+                        </div>
+                    </section>
+
+                    <!-- ===================== FRAMEWORKS & DOCS ===================== -->
+                    <section id="ref-build" class="sheet-section ref-group" aria-labelledby="ref-build-title">
+                        <h2 id="ref-build-title" class="panel-title">Frameworks &amp; Documentation</h2>
+                        <p class="ref-group-note">What the site itself is built on.</p>
+
+                        <div class="ref-grid">
+                            <article class="ref-card">
+                                <span class="ref-kind">Framework</span>
+                                <h3 class="ref-title">Bootstrap</h3>
+                                <p class="ref-byline">Mark Otto, Jacob Thornton and Bootstrap contributors</p>
+                                <p class="ref-meta">Accessed March 1, 2026</p>
+                                <a class="ref-link" href="https://getbootstrap.com/" target="_blank" rel="noopener">
+                                    <span>getbootstrap.com</span>
+                                </a>
+                            </article>
+
+                            <article class="ref-card">
+                                <span class="ref-kind">Documentation</span>
+                                <h3 class="ref-title">Firebase Documentation</h3>
+                                <p class="ref-byline">Google</p>
+                                <p class="ref-meta">Accessed 2026</p>
+                                <a class="ref-link" href="https://firebase.google.com/docs" target="_blank" rel="noopener">
+                                    <span>firebase.google.com</span>
+                                </a>
+                            </article>
+
+                            <article class="ref-card">
+                                <span class="ref-kind">Tutorials</span>
+                                <h3 class="ref-title">W3Schools Online Web Tutorials</h3>
+                                <p class="ref-byline">W3Schools</p>
+                                <p class="ref-meta">Accessed March 1, 2026</p>
+                                <a class="ref-link" href="https://www.w3schools.com/" target="_blank" rel="noopener">
+                                    <span>w3schools.com</span>
+                                </a>
+                            </article>
+                        </div>
+                    </section>
+
+                    <!-- ===================== ART & ASSETS ===================== -->
+                    <section id="ref-art" class="sheet-section ref-group" aria-labelledby="ref-art-title">
+                        <h2 id="ref-art-title" class="panel-title">Art &amp; Assets</h2>
+                        <p class="ref-group-note">Backgrounds and imagery used across the site.</p>
+
+                        <div class="ref-grid">
+                            <article class="ref-card">
+                                <span class="ref-kind">Imagery</span>
+                                <h3 class="ref-title">Skyrim Desktop Backgrounds</h3>
+                                <p class="ref-byline">Wallpaper Cave</p>
+                                <p class="ref-meta">Accessed March 1, 2026</p>
+                                <a class="ref-link" href="https://wallpapercave.com/skyrim-desktop-backgrounds" target="_blank" rel="noopener">
+                                    <span>wallpapercave.com</span>
+                                </a>
+                            </article>
+                        </div>
+                    </section>
 
                 </div>
             </div>

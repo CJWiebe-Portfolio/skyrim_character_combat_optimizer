@@ -16,6 +16,7 @@ hostable on GitHub Pages, with Firebase standing in for the self-hosted MySQL da
 | `accounts` table | Firebase Auth users + `users/{uid}` in Firestore |
 | `character` table | `users/{uid}/characters/{characterId}` |
 | `inventory_item` table | `users/{uid}/characters/{characterId}/inventory/{itemId}` |
+| (new) spellbook | `users/{uid}/characters/{characterId}/spellbook/{spellId}` |
 | `item`, `category`, `perk`, `race`, … tables | `assets/data/items.json` (static, read-only) |
 | `header.php` / `navbar.php` / `footer.php` | `renderChrome()` in `assets/js/app.js` |
 | `BASE_URL` in `config.php` | `window.SITE_ROOT`, set by each page |
@@ -158,6 +159,8 @@ assets/
   js/app.js                     Firebase init, auth, Firestore access, shared navbar/footer
   js/firebase-config.js         >>> your Firebase credentials go here <<<
   data/items.json               Item, category, perk, race and upgrade reference data
+  data/skyrim.json              Races, skills, perk trees and every build formula
+  data/spells.json              All 111 spells, by school of magic, with costs and effects
 
 backup/                         The original PHP project, untouched
 ```
@@ -176,3 +179,6 @@ backup/                         The original PHP project, untouched
 - **The `character_skill` table** in the original SQL dump was empty and unused by any
   page, so it has no equivalent here.
 - **Item data is read-only.** To change an item, edit `assets/data/items.json` and push.
+- **Spell data is read-only too**, in `assets/data/spells.json`. The 19 Dawnguard and
+  Dragonborn spells are listed with school and tier but no base magicka cost, because no
+  source consulted published one; the sheet shows a dash rather than a guessed number.

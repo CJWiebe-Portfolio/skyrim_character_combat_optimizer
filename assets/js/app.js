@@ -329,11 +329,15 @@ export function updateCharacter(uid, cid, { name, raceId }) {
   return updateDoc(charDoc(uid, cid), { name, raceId: Number(raceId) });
 }
 
-/** Deletes the character and every inventory row underneath it. */
+/** Deletes the character and every inventory and spellbook row underneath it. */
 export async function deleteCharacter(uid, cid) {
-  const inv = await getDocs(collection(db, "users", uid, "characters", cid, "inventory"));
+  const [inv, spells] = await Promise.all([
+    getDocs(collection(db, "users", uid, "characters", cid, "inventory")),
+    getDocs(collection(db, "users", uid, "characters", cid, "spellbook"))
+  ]);
   const batch = writeBatch(db);
   inv.docs.forEach((d) => batch.delete(d.ref));
+  spells.docs.forEach((d) => batch.delete(d.ref));
   batch.delete(charDoc(uid, cid));
   await batch.commit();
 }
@@ -383,6 +387,43 @@ export async function decreaseInventoryItem(uid, cid, itemId) {
 
 export function deleteInventoryItem(uid, cid, itemId) {
   return deleteDoc(invDoc(uid, cid, itemId));
+}
+
+/* =========================================================
+   SPELLBOOK
+   users/{uid}/characters/{characterId}/spellbook/{spellId}
+   Same shape as inventory, but a spell is either known or not —
+   there is no quantity, so the document id alone carries the fact.
+   ========================================================= */
+
+const spellCol = (uid, cid) => collection(db, "users", uid, "characters", cid, "spellbook");
+const spellDoc = (uid, cid, spellId) =>
+  doc(db, "users", uid, "characters", cid, "spellbook", String(spellId));
+
+export async function listSpellbook(uid, cid) {
+  const snap = await getDocs(spellCol(uid, cid));
+  return snap.docs.map((d) => d.id);
+}
+
+export function learnSpell(uid, cid, spellId) {
+  return setDoc(spellDoc(uid, cid, spellId), { spellId: String(spellId) });
+}
+
+export function forgetSpell(uid, cid, spellId) {
+  return deleteDoc(spellDoc(uid, cid, spellId));
+}
+
+/** Learns several at once — used by "learn every spell in this school". */
+export async function learnSpells(uid, cid, spellIds) {
+  const batch = writeBatch(db);
+  spellIds.forEach((sid) => batch.set(spellDoc(uid, cid, sid), { spellId: String(sid) }));
+  await batch.commit();
+}
+
+export async function forgetSpells(uid, cid, spellIds) {
+  const batch = writeBatch(db);
+  spellIds.forEach((sid) => batch.delete(spellDoc(uid, cid, sid)));
+  await batch.commit();
 }
 
 /* =========================================================
@@ -667,6 +708,17 @@ export async function buildData() {
   return _build;
 }
 
+let _spells = null;
+
+/** Loads assets/data/spells.json once and caches it. */
+export async function spellData() {
+  if (_spells) return _spells;
+  const res = await fetch(url("assets/data/spells.json"));
+  if (!res.ok) throw new Error("Could not load spells.json (" + res.status + ")");
+  _spells = await res.json();
+  return _spells;
+}
+
 /** The skill spread a freshly created character of this race starts with. */
 export function startingSkills(raceId, bd) {
   const race = bd.races[String(raceId)];
@@ -844,11 +896,95 @@ export function damageReduction(displayedRating, piecesWorn, bd) {
   };
 }
 
+/* ---------------------------------------------------------
+   SPELLS
+
+   Two things are true in Skyrim and both matter here:
+
+   1. Raising a magic skill does NOT make its spells hit harder. It makes
+      them cheaper. The skill multiplier below is the vanilla one,
+      1 - (skill/400)^0.65 — about -12% at skill 15 and -41% at skill 100.
+   2. Damage comes from perks instead: Augmented Flames / Frost / Shock,
+      +25% per rank, to that element only.
+
+   The half-cost perks (Novice / Apprentice / ... Destruction) halve the
+   cost of spells of that tier in that school, on top of the skill scaling.
+   --------------------------------------------------------- */
+
+/** The vanilla skill multiplier on spell cost: 1 at skill 0, 0.594 at 100. */
+export function spellCostSkillMultiplier(skillLevel, bd) {
+  const c = bd.constants;
+  const s = Math.max(0, Number(skillLevel) || 0);
+  return 1 - Math.pow(s / c.spellCostSkillDivisor, c.spellCostSkillExponent);
+}
+
+/** Is the half-cost perk for this spell's tier and school taken? */
+export function spellHalfCostTaken(spell, perks, bd) {
+  const tree = bd.perks[String(spell.skillId)] || [];
+  return tree.some(
+    (p) => p.effect?.type === "spellCostHalf" &&
+           p.effect.tier === spell.tier &&
+           perkRank(perks, p.id) > 0
+  );
+}
+
+/**
+ * What one spell actually costs this character to cast.
+ *   cost = base * (1 - (skill/400)^0.65) * (half-cost perk ? 0.5 : 1)
+ * Returns null for the DLC spells whose base cost no source published.
+ */
+export function spellCost(spell, skills, perks, bd) {
+  // null, not zero: the DLC spells whose base cost no source published.
+  if (spell.cost === null || spell.cost === undefined || spell.cost === "") return null;
+  const base = Number(spell.cost);
+  if (!Number.isFinite(base)) return null;
+
+  const skill = Number(skills?.[spell.skillId] ?? bd.constants.baseSkill);
+  const skillMult = spellCostSkillMultiplier(skill, bd);
+  const halved = spellHalfCostTaken(spell, perks, bd);
+  const perkMult = halved ? bd.constants.spellCostHalfPerkMult : 1;
+
+  return {
+    base,
+    skillLevel: skill,
+    skillPct: -Math.round((1 - skillMult) * 1000) / 10,
+    halved,
+    total: Math.round(base * skillMult * perkMult),
+    per: spell.costPer || "cast"
+  };
+}
+
+/**
+ * What one spell actually hits for. Skill does nothing here — only the
+ * Augmented perk for that element does.
+ */
+export function spellDamage(spell, perks, bd) {
+  const base = Number(spell.damage);
+  if (!Number.isFinite(base) || !base) return null;
+
+  const tree = bd.perks[String(spell.skillId)] || [];
+  let perkPct = 0;
+  for (const perk of tree) {
+    if (perk.effect?.type !== "spellDamagePct") continue;
+    if (perk.effect.element !== spell.element) continue;
+    perkPct += (perk.effect.perRank || 0) * perkRank(perks, perk.id);
+  }
+
+  return {
+    base,
+    perkPct,
+    total: Math.round(base * (1 + perkPct / 100) * 10) / 10,
+    per: spell.damagePer || "hit"
+  };
+}
+
 /**
  * Everything the character sheet and the inventory page need, in one call.
  * `inventory` is the rows from listInventory(); `items` the static item list.
  */
-export function buildSummary({ raceId, skills, perks, attributePicks }, inventory, itemsById, bd) {
+export function buildSummary(
+  { raceId, skills, perks, attributePicks }, inventory, itemsById, bd, knownSpells
+) {
   const lvl = derivedLevel(skills, raceId, bd);
   const attrs = attributes(attributePicks, bd);
   const points = pointsAvailable(lvl.level, perks, attributePicks);
@@ -918,6 +1054,39 @@ export function buildSummary({ raceId, skills, perks, attributePicks }, inventor
       damageReduction: Math.round(dr.percent * 10) / 10,
       capped: dr.capped
     },
-    bestWeapon
+    bestWeapon,
+    spells: spellSummary(knownSpells, skills, perks, bd)
+  };
+}
+
+/**
+ * The known-spell side of the summary: how many per school, the cheapest
+ * thing this character can still cast, and the hardest-hitting one.
+ */
+export function spellSummary(knownSpells, skills, perks, bd) {
+  const known = knownSpells || [];
+  const bySchool = {};
+  let bestSpell = null;
+  let totalCost = 0;
+  let priced = 0;
+
+  for (const spell of known) {
+    const sid = String(spell.skillId);
+    const cost = spellCost(spell, skills, perks, bd);
+    const damage = spellDamage(spell, perks, bd);
+
+    bySchool[sid] = (bySchool[sid] || 0) + 1;
+    if (cost) { totalCost += cost.total; priced += 1; }
+
+    if (damage && (!bestSpell || damage.total > bestSpell.damage.total)) {
+      bestSpell = { spell, damage, cost };
+    }
+  }
+
+  return {
+    count: known.length,
+    bySchool,
+    bestSpell,
+    averageCost: priced ? Math.round(totalCost / priced) : null
   };
 }

@@ -1384,3 +1384,441 @@ body { overflow-x: hidden; }
 .inv-add-item { flex: 1 1 18rem; min-width: 0; }
 .inv-add-qty  { flex: 0 0 6rem; }
 .inv-add .skyrim-btn { display: inline-block; width: auto; }
+
+/* ==========================================================================
+   REFERENCES PAGE
+   ========================================================================== */
+
+/* The lede sits under the title and stays narrow so it reads as one thought. */
+.ref-lede {
+  max-width: 60ch;
+  margin: 0.75rem auto 0;
+  text-align: center;
+}
+
+/* Jump chips: five groups is enough that scanning beats scrolling. */
+.ref-jump {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1.75rem 0 0.5rem;
+}
+.ref-jump a {
+  padding: 0.3rem 0.85rem;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.25);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.ref-jump a:hover,
+.ref-jump a:focus-visible {
+  color: var(--skyrim-gold);
+  border-color: var(--skyrim-gold);
+}
+
+/* Each group is a titled band, matching the character sheet's section rhythm. */
+.ref-group { scroll-margin-top: 5rem; }
+.ref-group-note {
+  margin: 0 0 1.1rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+
+.ref-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(21rem, 100%), 1fr));
+  gap: 1.1rem;
+}
+
+.ref-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1.15rem 1.25rem 1.2rem;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: var(--radius);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.ref-card:hover {
+  border-color: rgba(212, 175, 55, 0.45);
+  transform: translateY(-2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ref-card { transition: none; }
+  .ref-card:hover { transform: none; }
+}
+
+/* A quiet uppercase tag tells you what kind of source this is at a glance. */
+.ref-kind {
+  align-self: flex-start;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 4px;
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ref-title {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  line-height: 1.25;
+  color: var(--skyrim-gold);
+  overflow-wrap: anywhere;
+}
+
+.ref-byline {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--text-main);
+}
+
+.ref-meta {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
+/* The link is the card's one action, pinned to the bottom so cards align. */
+.ref-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--skyrim-gold);
+  overflow-wrap: anywhere;
+}
+.ref-link span { border-bottom: 1px solid rgba(212, 175, 55, 0.35); }
+.ref-link:hover span,
+.ref-link:focus-visible span { border-bottom-color: var(--skyrim-gold); }
+.ref-link::after {
+  content: "\2197";
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+
+/* ==========================================================================
+   HOME PAGE  (appended 2026-09-14)
+   The landing page used to be two buttons on an empty field. It now has to
+   explain what the site is, so it needs a hero, a numbered sequence, and a
+   row of destinations. Nothing above this block was edited.
+   ========================================================================== */
+
+/* ---------- hero ---------------------------------------------------------- */
+.home-hero {
+  text-align: center;
+  max-width: 46rem;
+  margin: 0 auto 3rem;
+}
+
+/* A quiet line above the title, so the h1 can be the name of the tool
+   rather than the name of the game plus the name of the tool. */
+.home-eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--skyrim-gold-soft);
+}
+
+.home-hero .title-main { margin: 0; }
+
+.home-lede {
+  margin: 1.1rem auto 0;
+  max-width: 40rem;
+  font-size: clamp(1.02rem, 0.95rem + 0.35vw, 1.2rem);
+  line-height: 1.6;
+  color: var(--text-main);
+  text-wrap: pretty;
+}
+
+.home-cta { margin-top: 1.9rem; }
+
+.home-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+/* .skyrim-btn is a full-width block by design; here the actions sit side by
+   side, so they size to their text like every other inline action. */
+.home-cta .skyrim-btn {
+  display: inline-block;
+  width: auto;
+  padding: 0.55rem 1.4rem;
+  font-size: 1rem;
+}
+
+/* The site's convention: the one primary action is filled gold, whatever its
+   colour class; everything beside it stays outlined. */
+.home-cta .home-cta-primary {
+  background: var(--skyrim-gold);
+  border-color: var(--skyrim-gold);
+  color: var(--skyrim-dark);
+  font-weight: 600;
+}
+.home-cta .home-cta-primary:hover {
+  background: #ffd84d;
+  border-color: #ffd84d;
+  color: var(--skyrim-dark);
+}
+
+.home-welcome {
+  margin: 0 0 0.9rem;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.home-cta-aside {
+  margin: 0.9rem 0 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+.home-cta-aside a { color: var(--skyrim-gold); }
+
+.home-byline {
+  margin: 1.6rem 0 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
+/* ---------- sections ------------------------------------------------------ */
+.home-section { margin-top: 2.75rem; }
+.home-section > .panel-title { margin-bottom: 1.1rem; }
+
+/* ---------- the four steps ------------------------------------------------ */
+.step-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  gap: 1.1rem;
+  counter-reset: none;
+}
+
+.step {
+  position: relative;
+  padding: 1.15rem 1.25rem 1.25rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: var(--radius);
+}
+
+/* The number is decoration — the reading order already carries the sequence,
+   because the list is an <ol>. */
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  margin-bottom: 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  font-family: var(--font-title);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--skyrim-gold);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.step-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.step-body {
+  margin: 0;
+  font-size: 0.93rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* ---------- destination tiles --------------------------------------------- */
+.home-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
+  gap: 1.1rem;
+}
+
+/* The whole tile is the link, so there is no small target to hunt for. */
+.home-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.2rem 1.3rem 1.3rem;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.home-tile:hover,
+.home-tile:focus-visible {
+  border-color: rgba(212, 175, 55, 0.45);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.home-tile-meta {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--skyrim-gold-soft);
+}
+
+.home-tile-title {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--skyrim-gold);
+}
+
+.home-tile-body {
+  margin: 0;
+  flex-grow: 1;
+  font-size: 0.93rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.home-tile-go {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+.home-tile:hover .home-tile-go { color: var(--skyrim-gold); }
+
+/* ---------- the closing note ---------------------------------------------- */
+.home-note {
+  margin: 2.5rem 0 0;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-tile { transition: none; }
+  .home-tile:hover { transform: none; }
+}
+
+/* ---------- spells: the add row, then one block per school -------------- */
+.spell-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin: 1rem 0 1.25rem;
+}
+.spell-add .form-label { margin: 0 0 0.25rem; }
+.spell-add-pick { flex: 1 1 22rem; min-width: 0; }
+/* Long spell names must not widen the select past the page on a phone —
+   this does not lean on Bootstrap's own .form-select width. */
+.spell-add-pick .form-select { width: 100%; max-width: 100%; }
+.spell-add .skyrim-btn { display: inline-block; width: auto; }
+
+/* A quick read on the spellbook before the per-school detail. */
+.spell-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.school-block {
+  margin-bottom: 1.75rem;
+  padding: 1rem 1rem 0.5rem;
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-left: 3px solid var(--skyrim-gold-soft);
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.25);
+}
+.school-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.35rem;
+}
+.school-head h3 {
+  margin: 0;
+  font-size: var(--font-lg);
+  color: var(--skyrim-gold);
+}
+.school-count {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.school-blurb {
+  margin: 0 0 0.75rem;
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+}
+
+/* Tier badge, so a table row reads at a glance. */
+.spell-tier {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 999px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.spell-tier-master { color: var(--skyrim-gold); border-color: var(--skyrim-gold); }
+
+.spell-dlc {
+  margin-left: 0.35rem;
+  font-size: 0.68rem;
+  color: var(--skyrim-info);
+}
+
+/* A cost the half-cost perk has already paid for. */
+.cost-halved { color: var(--skyrim-create); }
+
+/* Too low a skill to have been taught this tier yet. */
+.spell-locked { color: var(--skyrim-danger); }
+
+.spell-empty {
+  padding: 0.75rem 0;
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+}
+
+/* The working behind a cost, kept quiet so the number reads first. */
+.cost-note {
+  display: block;
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  opacity: 0.8;
+  white-space: nowrap;
+}

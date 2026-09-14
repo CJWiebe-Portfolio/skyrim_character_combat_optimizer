@@ -54,6 +54,7 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                         </div>
                         <div class="sheet-head-actions">
                             <a id="inv-link" href="#inventory" class="skyrim-btn skyrim-btn-info btn-compact">Inventory</a>
+                            <a id="spell-link" href="#spells" class="skyrim-btn skyrim-btn-info btn-compact">Spells</a>
                             <a id="edit-link" href="#" class="skyrim-btn skyrim-btn-update btn-compact">Rename</a>
                             <a href="characters.html" class="btn-link-quiet">All characters</a>
                         </div>
@@ -136,6 +137,35 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                         <div id="inv-panel"></div>
                     </section>
 
+                    <!-- ===================== SPELLS ===================== -->
+                    <section class="sheet-section" id="spells">
+                        <div class="section-head">
+                            <h2 class="panel-title">Spells</h2>
+                            <span class="points-left" id="spell-summary">&nbsp;</span>
+                        </div>
+                        <p class="text-muted-custom text-m">
+                            This character's spellbook, sorted by school of magic. In Skyrim,
+                            raising a magic skill does not make its spells hit harder &mdash; it
+                            makes them cheaper. Damage comes from the Augmented Flames, Frost
+                            and Shock perks instead, so both numbers below move with the build.
+                        </p>
+
+                        <!-- ---------- learn a spell ---------- -->
+                        <form id="add-spell-form" class="spell-add">
+                            <div class="spell-add-pick">
+                                <label class="form-label" for="add-spell">Spell</label>
+                                <select id="add-spell" class="form-select"></select>
+                            </div>
+                            <button type="submit" class="skyrim-btn skyrim-btn-create btn-compact">
+                                Learn spell
+                            </button>
+                        </form>
+
+                        <!-- ---------- what's known ---------- -->
+                        <div class="spell-stats" id="spell-stats"></div>
+                        <div id="spell-panel"></div>
+                    </section>
+
                     <!-- ===================== EFFECT ON GEAR ===================== -->
                     <section class="sheet-section">
                         <h2 class="panel-title">What this does to your gear</h2>
@@ -170,10 +200,11 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
     <script>window.SITE_ROOT = "../";</script>
     <script type="module">
         import {
-            renderChrome, requireAuth, refData, buildData, getCharacter, deleteCharacter,
-            saveBuild, withDefaultBuild,
+            renderChrome, requireAuth, refData, buildData, spellData,
+            getCharacter, deleteCharacter, saveBuild, withDefaultBuild,
             listInventory, addInventoryItem, increaseInventoryItem,
             decreaseInventoryItem, deleteInventoryItem,
+            listSpellbook, learnSpell, forgetSpell, spellCost, spellDamage,
             effectiveSpeed, fmtWeight, fmtSpeed,
             derivedLevel, attributes, pointsAvailable, carryCapacity,
             perkRank, perkAvailable, buildSummary, startingSkills, weaponDamage,
@@ -189,7 +220,7 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
 
         if (!id) { setAlert(alert, "Invalid character ID."); await halt(); }
 
-        const [data, bd] = await Promise.all([refData(), buildData()]);
+        const [data, bd, sd] = await Promise.all([refData(), buildData(), spellData()]);
         const raw = await getCharacter(user.uid, id);
         if (!raw) { setAlert(alert, "Character not found or access denied."); await halt(); }
 
@@ -203,6 +234,11 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
         const itemsById = new Map(data.items.map((i) => [i.item_id, i]));
         let inventory = [];
         try { inventory = await listInventory(user.uid, id); } catch { /* shown as empty */ }
+
+        const spellsById = new Map(sd.spells.map((s) => [s.id, s]));
+        const tierOrder = (t) => sd.tiers[t]?.order ?? 99;
+        let known = new Set();
+        try { known = new Set(await listSpellbook(user.uid, id)); } catch { /* shown as empty */ }
 
         $("char-name").textContent = character.name;
         $("char-sub").textContent = (data.races[character.raceId] ?? "Unknown") +
@@ -224,6 +260,24 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                 picker.appendChild(opt);
             });
 
+        /* ---- the spell picker is likewise built once, grouped by school ---- */
+        const spellPicker = $("add-spell");
+        sd.schoolOrder.forEach((sid) => {
+            const group = document.createElement("optgroup");
+            group.label = sd.schools[sid].name;
+            sd.spells
+                .filter((s) => String(s.skillId) === sid)
+                .sort((a, b) => tierOrder(a.tier) - tierOrder(b.tier) || a.name.localeCompare(b.name))
+                .forEach((s) => {
+                    const opt = document.createElement("option");
+                    opt.value = s.id;
+                    opt.textContent = s.name + " \u00b7 " + sd.tiers[s.tier].name +
+                        (s.dlc ? " (" + s.dlc + ")" : "");
+                    group.appendChild(opt);
+                });
+            spellPicker.appendChild(group);
+        });
+
         function markDirty() {
             dirty = true;
             $("dirty-flag").textContent = "Unsaved changes";
@@ -231,9 +285,10 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
 
         /* ================= render ================= */
         function render() {
+            const knownSpells = [...known].map((sid) => spellsById.get(sid)).filter(Boolean);
             const summary = buildSummary(
                 { raceId: character.raceId, skills, perks, attributePicks: picks },
-                inventory, itemsById, bd
+                inventory, itemsById, bd, knownSpells
             );
             const { level, points } = summary;
             const attrs = summary.attributes;
@@ -363,6 +418,9 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
             /* ---- inventory ---- */
             renderInventory();
 
+            /* ---- spells ---- */
+            renderSpells(summary);
+
             /* ---- effect on gear ---- */
             const worn = Object.entries(summary.armour.worn);
             const bw = summary.bestWeapon;
@@ -478,6 +536,134 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                     </tbody></table></div>`;
         }
 
+
+        /* ================= spells ================= */
+        function renderSpells(summary) {
+            const s = summary.spells;
+
+            /* Already-known spells stay in the list but go dim, so the picker
+               keeps its grouping rather than shrinking as you learn things. */
+            let movedSelection = false;
+            [...spellPicker.options].forEach((opt) => {
+                opt.disabled = known.has(opt.value);
+                if (opt.disabled && opt.selected) movedSelection = true;
+            });
+            if (movedSelection) {
+                const next = [...spellPicker.options].find((o) => !o.disabled);
+                spellPicker.value = next ? next.value : "";
+            }
+
+            $("spell-summary").textContent = s.count
+                ? s.count + " spell" + (s.count === 1 ? "" : "s") + " known"
+                : "none known";
+
+            const best = s.bestSpell;
+            $("spell-stats").innerHTML = `
+                <div class="stat-tile"><span class="stat-label">Spells known</span>
+                    <span class="stat-value">${s.count}</span>
+                    <span class="stat-foot">of ${sd.spells.length} in the game</span></div>
+                <div class="stat-tile"><span class="stat-label">Hardest hitting</span>
+                    <span class="stat-value">${best ? best.damage.total : "—"}</span>
+                    <span class="stat-foot">${best
+                        ? esc(best.spell.name) + " per " + best.damage.per
+                        : "no damage spell known"}</span></div>
+                <div class="stat-tile"><span class="stat-label">Average cast</span>
+                    <span class="stat-value">${s.averageCost ?? "—"}</span>
+                    <span class="stat-foot">magicka, after skill and perks</span></div>`;
+
+            $("spell-panel").innerHTML = sd.schoolOrder.map((sid) => {
+                const school = sd.schools[sid];
+                const all = sd.spells.filter((sp) => String(sp.skillId) === sid);
+                const mine = all
+                    .filter((sp) => known.has(sp.id))
+                    .sort((a, b) => tierOrder(a.tier) - tierOrder(b.tier)
+                        || a.name.localeCompare(b.name));
+                const skillLevel = Number(skills[sid] ?? bd.constants.baseSkill);
+
+                return `
+                <div class="school-block">
+                    <div class="school-head">
+                        <h3>${esc(school.name)}
+                            <span class="text-muted-custom text-m">skill ${skillLevel}</span></h3>
+                        <span class="school-count">${mine.length} of ${all.length} known</span>
+                    </div>
+                    <p class="school-blurb">${esc(school.blurb)}</p>
+                    ${mine.length ? spellTable(mine, skillLevel)
+                        : `<p class="spell-empty">Nothing from this school yet.</p>`}
+                </div>`;
+            }).join("");
+        }
+
+        /** One school's known spells, with what they cost and hit for right now. */
+        function spellTable(list, skillLevel) {
+            return `
+                <div class="tablewrap"><table class="table-skyrim">
+                    <thead><tr>
+                        <th scope="col">Spell</th><th scope="col">Tier</th>
+                        <th scope="col">Magicka</th><th scope="col">Damage</th>
+                        <th scope="col">What it does</th><th scope="col"></th>
+                    </tr></thead>
+                    <tbody>${list.map((sp) => {
+                        const cost = spellCost(sp, skills, perks, bd);
+                        const dmg = spellDamage(sp, perks, bd);
+                        const tier = sd.tiers[sp.tier];
+                        const untaught = skillLevel < tier.trainingLevel;
+                        const per = (v, p) => v + (p === "second" ? "/sec" : "");
+
+                        return `
+                        <tr>
+                            <td>${esc(sp.name)}${sp.dlc
+                                ? `<span class="spell-dlc">${esc(sp.dlc)}</span>` : ""}</td>
+                            <td><span class="spell-tier${sp.tier === "master" ? " spell-tier-master" : ""}${
+                                untaught ? " spell-locked" : ""}"
+                                title="${untaught
+                                    ? "Needs " + tier.name + " training at skill " + tier.trainingLevel
+                                    : tier.name + " level"}">${tier.name}</span></td>
+                            <td>${cost
+                                ? `<span class="${cost.halved ? "cost-halved" : ""}">${
+                                    per(cost.total, cost.per)}</span>
+                                   <span class="cost-note"> base ${cost.base}, ${
+                                    cost.skillPct}%${cost.halved ? ", halved" : ""}</span>`
+                                : `<span class="text-muted-custom" title="No source published a base cost for this DLC spell">—</span>`}</td>
+                            <td>${dmg
+                                ? `<span class="cell-strong">${per(dmg.total, dmg.per)}</span>${
+                                    dmg.perkPct ? ` <span class="text-muted-custom">(+${dmg.perkPct}%)</span>` : ""}`
+                                : "—"}</td>
+                            <td class="text-muted-custom">${esc(sp.effect)}</td>
+                            <td>
+                                <div class="qty-control">
+                                    <button class="qty-btn qty-btn-danger" type="button"
+                                            data-spell="${sp.id}"
+                                            aria-label="Forget ${esc(sp.name)}">Forget</button>
+                                </div>
+                            </td>
+                        </tr>`;
+                    }).join("")}
+                    </tbody></table></div>`;
+        }
+
+        async function reloadSpells() {
+            known = new Set(await listSpellbook(user.uid, id));
+            render();
+        }
+
+        $("add-spell-form").addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            setAlert(alert, "");
+
+            const spellId = spellPicker.value;
+            if (!spellId) return;
+            if (known.has(spellId)) return;
+
+            try {
+                await learnSpell(user.uid, id, spellId);
+                await reloadSpells();
+                toast((spellsById.get(spellId)?.name || "Spell") + " learned");
+            } catch (err) {
+                setAlert(alert, friendlyError(err));
+            }
+        });
+
         /** Add / remove / delete one inventory row, then redraw the whole sheet. */
         async function inventoryAction(btn) {
             const { act: action, id: rawId } = btn.dataset;
@@ -527,6 +713,22 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
         function wire() {
             $("inv-panel").querySelectorAll("[data-act]").forEach((b) =>
                 b.addEventListener("click", () => inventoryAction(b)));
+
+            $("spell-panel").querySelectorAll("[data-spell]").forEach((b) =>
+                b.addEventListener("click", async () => {
+                    const spellId = b.dataset.spell;
+                    const name = spellsById.get(spellId)?.name || "this spell";
+                    setAlert(alert, "");
+                    b.disabled = true;
+                    try {
+                        await forgetSpell(user.uid, id, spellId);
+                        await reloadSpells();
+                        toast(name + " forgotten");
+                    } catch (err) {
+                        setAlert(alert, friendlyError(err));
+                        b.disabled = false;
+                    }
+                }));
 
             $("attr-grid").querySelectorAll("[data-attr]").forEach((b) =>
                 b.addEventListener("click", () => {
@@ -583,7 +785,7 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
         });
 
         $("delete-btn").addEventListener("click", async () => {
-            if (!confirm("Delete " + character.name + " and everything in their inventory?")) return;
+            if (!confirm("Delete " + character.name + ", their inventory and their spellbook?")) return;
             try {
                 await deleteCharacter(user.uid, id);
                 window.location.href = "characters.html";

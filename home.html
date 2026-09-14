@@ -5,7 +5,8 @@ PROJECT: Skyrim Character Combat Optimization System
 AUTHOR: C.J. Wiebe
 =========================================================
 DESCRIPTION:
-Main dashboard landing page with navigation into items and references.
+The landing page. Says what the site is, how it is used, and where to
+start. The entry points change depending on whether anyone is signed in.
 =========================================================
 -->
 <!doctype html>
@@ -16,6 +17,14 @@ Main dashboard landing page with navigation into items and references.
 
     <!-- ===================== PAGE TITLE ===================== -->
     <title>Skyrim Character Combat Optimizer</title>
+
+    <!-- ===================== DESCRIPTION ===================== -->
+    <meta
+      name="description"
+      content="Plan a Skyrim character — race, skills, perks and gear — and see
+        what it does to damage, armour rating and carry weight before you spend
+        the perk point."
+    />
 
     <!-- ===================== FAVICON ===================== -->
     <link rel="icon" type="image/png" href="./assets/images/skyrim_icon.png" />
@@ -44,33 +53,124 @@ Main dashboard landing page with navigation into items and references.
       <main id="main" class="container py-5 mt-1 flex-grow-1">
         <div class="main-container p-4">
           <div class="main-container p-5">
-            <!-- ===================== HEADER ===================== -->
-            <div class="text-center">
-              <h1 class="section-title title-main">
-                Skyrim Character Combat Optimizer
-              </h1>
-              <p class="text-muted-custom">Created by: C. J. Wiebe</p>
-            </div>
-            <br />
+            <!-- ========================= HERO ========================= -->
+            <header class="home-hero">
+              <p class="home-eyebrow">The Elder Scrolls V: Skyrim</p>
+              <h1 class="title-main">Character Combat Optimizer</h1>
 
-            <div class="skyrim-action-card">
-              <a
-                href="general_information/all_items.html"
-                class="skyrim-btn skyrim-btn-info text-xl"
-              >
-                View All Skyrim Armours and Weapons
-              </a>
-            </div>
-            <br />
+              <p class="home-lede">
+                Plan a character on paper before you spend the perk point. Pick
+                a race, raise skills, take perks and fill the inventory — the
+                sheet works out your level, your damage, your armour rating and
+                what you can actually carry.
+              </p>
 
-            <div class="skyrim-action-card">
-              <a
-                href="references.html"
-                class="skyrim-btn skyrim-btn-info text-xl"
-              >
-                References
-              </a>
-            </div>
+              <!-- Entry points depend on whether anyone is signed in. -->
+              <div class="home-cta" id="home-cta"></div>
+
+              <p class="home-byline">Created by C. J. Wiebe</p>
+            </header>
+
+            <!-- ========================= HOW IT WORKS ========================= -->
+            <section class="home-section" aria-labelledby="how-title">
+              <h2 class="panel-title" id="how-title">How to use it</h2>
+
+              <ol class="step-grid">
+                <li class="step">
+                  <span class="step-num" aria-hidden="true">1</span>
+                  <h3 class="step-title">Make an account</h3>
+                  <p class="step-body">
+                    Characters are saved against your account, so the same
+                    roster is there whichever machine you open it on. Browsing
+                    the item list needs no account at all.
+                  </p>
+                </li>
+
+                <li class="step">
+                  <span class="step-num" aria-hidden="true">2</span>
+                  <h3 class="step-title">Add a character</h3>
+                  <p class="step-body">
+                    Give them a name and one of the ten races. The race decides
+                    which skills you start above the floor, and your opening
+                    Health, Magicka and Stamina.
+                  </p>
+                </li>
+
+                <li class="step">
+                  <span class="step-num" aria-hidden="true">3</span>
+                  <h3 class="step-title">Build the sheet</h3>
+                  <p class="step-body">
+                    Raise any of the eighteen skills, spend perk points in the
+                    One-Handed, Two-Handed, Heavy Armor and Light Armor trees,
+                    and put each level-up into Health, Magicka or Stamina. The
+                    level is derived from the skills you have raised.
+                  </p>
+                </li>
+
+                <li class="step">
+                  <span class="step-num" aria-hidden="true">4</span>
+                  <h3 class="step-title">Fit the gear</h3>
+                  <p class="step-body">
+                    Add weapons and armour to the character's inventory on that
+                    same page. Best weapon damage, armour rating, damage
+                    reduction and carry weight all move as you edit — no
+                    flipping between pages to see the effect.
+                  </p>
+                </li>
+              </ol>
+            </section>
+
+            <!-- ========================= WHERE TO GO ========================= -->
+            <section class="home-section" aria-labelledby="tiles-title">
+              <h2 class="panel-title" id="tiles-title">What is on the site</h2>
+
+              <div class="home-tiles">
+                <a class="home-tile" href="my_character/characters.html">
+                  <span class="home-tile-meta" id="tile-characters-meta"
+                    >Sign in to start</span
+                  >
+                  <h3 class="home-tile-title">My Characters</h3>
+                  <p class="home-tile-body">
+                    Your roster, with level and vitals on every card. Open a
+                    sheet to change the build, edit its inventory, or delete the
+                    character.
+                  </p>
+                  <span class="home-tile-go">Open the roster &rarr;</span>
+                </a>
+
+                <a class="home-tile" href="general_information/all_items.html">
+                  <span class="home-tile-meta"
+                    ><span id="tile-items-count">570</span> items</span
+                  >
+                  <h3 class="home-tile-title">All Items</h3>
+                  <p class="home-tile-body">
+                    Every weapon and armour piece, with damage, speed, weight,
+                    value and armour rating. Filter by category and sort by any
+                    of them. No account needed.
+                  </p>
+                  <span class="home-tile-go">Browse the items &rarr;</span>
+                </a>
+
+                <a class="home-tile" href="references.html">
+                  <span class="home-tile-meta">Five groups</span>
+                  <h3 class="home-tile-title">References</h3>
+                  <p class="home-tile-body">
+                    Everything the project was built from: the game itself, the
+                    community wikis the numbers were checked against, the
+                    datasets, the frameworks and the art.
+                  </p>
+                  <span class="home-tile-go">Read the sources &rarr;</span>
+                </a>
+              </div>
+            </section>
+
+            <!-- ========================= HONESTY NOTE ========================= -->
+            <p class="home-note">
+              Four perk trees are in so far — One-Handed, Two-Handed, Heavy
+              Armor and Light Armor — which between them cover melee damage and
+              worn armour. The remaining fourteen are listed in the data but not
+              yet playable on the sheet.
+            </p>
           </div>
         </div>
       </main>
@@ -85,8 +185,68 @@ Main dashboard landing page with navigation into items and references.
       window.SITE_ROOT = "./";
     </script>
     <script type="module">
-      import { renderChrome } from "./assets/js/app.js";
-      renderChrome("home");
+      import {
+        renderChrome,
+        refData,
+        listCharacters,
+        esc,
+      } from "./assets/js/app.js";
+
+      const { user, profile } = await renderChrome("home");
+
+      const cta = document.getElementById("home-cta");
+      const charMeta = document.getElementById("tile-characters-meta");
+
+      /* ---------- entry points ------------------------------------------ */
+      if (user) {
+        /* "C.J." already ends in a full stop; do not give it a second one. */
+        const name = profile?.firstName?.trim();
+        const who = name ? esc(name) + (name.endsWith(".") ? "" : ".") : null;
+
+        cta.innerHTML = `
+          ${who ? `<p class="home-welcome">Welcome back, ${who}</p>` : ""}
+          <div class="home-cta-row">
+            <a href="my_character/characters.html"
+               class="skyrim-btn skyrim-btn-update home-cta-primary">My characters</a>
+            <a href="my_character/create_character.html"
+               class="skyrim-btn skyrim-btn-create">&#10133; New character</a>
+          </div>`;
+
+        /* One read, the same one the roster makes — worth it to say how many. */
+        try {
+          const rows = await listCharacters(user.uid);
+          charMeta.textContent = rows.length
+            ? `${rows.length} saved`
+            : "None yet";
+        } catch {
+          charMeta.textContent = "Your roster";
+        }
+      } else {
+        cta.innerHTML = `
+          <div class="home-cta-row">
+            <a href="login/create_account.html"
+               class="skyrim-btn skyrim-btn-create home-cta-primary">Create an account</a>
+            <a href="login/login.html"
+               class="skyrim-btn skyrim-btn-update">Sign in</a>
+          </div>
+          <p class="home-cta-aside">
+            Or <a href="general_information/all_items.html">browse all 570 items</a>
+            without one.
+          </p>`;
+      }
+
+      /* ---------- live item count, so the tile cannot go stale ---------- */
+      try {
+        const data = await refData();
+        const n = data?.items?.length;
+        if (n) {
+          document.getElementById("tile-items-count").textContent = n;
+          const aside = cta.querySelector(".home-cta-aside a");
+          if (aside) aside.textContent = `browse all ${n} items`;
+        }
+      } catch {
+        /* The static 570 in the markup stands. */
+      }
     </script>
   </body>
 </html>
