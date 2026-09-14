@@ -5,8 +5,9 @@ PROJECT: Skyrim Character Combat Optimization System
 AUTHOR: C.J. Wiebe
 =========================================================
 DESCRIPTION:
-Lists every character under users/{uid}/characters, with sorting and links into
-each character's inventory.
+The roster. Every character under users/{uid}/characters shown as a card with
+its race, name, level and vitals, sortable, with one way in: the character
+sheet. Inventory and deletion both live on the sheet itself.
 =========================================================
 -->
 <!DOCTYPE html>
@@ -46,65 +47,43 @@ each character's inventory.
             <div class="main-container p-4">
                 <div class="main-container p-5">
 
-                    <div class="section-title">
-                        <h1 class="section-title title-main text-center">
-                            &#128101; Viewing Characters of <span id="owner-name"></span> &#128101;
-                        </h1>
-                        <h5 class="text-muted-custom text-center">This is all the characters you have created</h5>
-                    </div>
-                    <br>
-
-                    <!-- ========================= CREATE CHARACTER BUTTON ========================= -->
-                    <div class="col-md-5">
-                        <div class="p-3 text-center">
-                            <a href="create_character.html" class="skyrim-btn skyrim-btn-create text-lg">
-                                &#10133; Create New Character with a Inventory
-                            </a>
+                    <!-- ========================= PAGE HEAD ========================= -->
+                    <div class="roster-head">
+                        <div>
+                            <h1 class="title-main">My Characters</h1>
+                            <p class="text-muted-custom" id="roster-sub">&nbsp;</p>
                         </div>
+                        <a href="create_character.html" class="skyrim-btn skyrim-btn-create btn-compact">
+                            &#10133; New character
+                        </a>
                     </div>
-                    <br>
 
-                    <!-- ========================= FILTER + SORT FORM ========================= -->
-                    <form id="filter-form" class="row mb-4 align-items-end skyrim-filter col-md-8">
-                        <div class="col-md-5">
-                            <label class="form-label" for="f-sort">Sort By</label>
+                    <!-- ========================= SORT BAR ========================= -->
+                    <form id="filter-form" class="roster-tools">
+                        <div class="roster-tool">
+                            <label class="form-label" for="f-sort">Sort by</label>
                             <select id="f-sort" class="form-select">
-                                <option value="">None</option>
-                                <option value="characterNumber">Character Number</option>
-                                <option value="raceId">Race</option>
+                                <option value="characterNumber">Character number</option>
                                 <option value="name">Name</option>
+                                <option value="race">Race</option>
+                                <option value="level">Level</option>
                             </select>
                         </div>
-                        <div class="col-md-5">
+                        <div class="roster-tool">
                             <label class="form-label" for="f-order">Order</label>
                             <select id="f-order" class="form-select">
                                 <option value="ASC">Ascending</option>
                                 <option value="DESC">Descending</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn btn-warning w-100">Apply</button>
-                        </div>
+                        <button type="submit" class="btn-row">Apply</button>
                     </form>
 
-                    <div id="alert-slot"></div>
+                    <div id="alert-slot" aria-live="polite"></div>
 
-                    <!-- ========================= DATA TABLE ========================= -->
-                    <div class="table-responsive">
-                        <table class="table-skyrim text-lg">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Character Number</th>
-                                    <th scope="col">Race</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Inventory</th>
-                                    <th scope="col">Modify</th>
-                                </tr>
-                            </thead>
-                            <tbody id="char-rows" class="text-center">
-                                <tr><td colspan="5">Loading&hellip;</td></tr>
-                            </tbody>
-                        </table>
+                    <!-- ========================= CHARACTER CARDS ========================= -->
+                    <div id="char-grid" class="char-grid">
+                        <p class="text-muted-custom">Loading&hellip;</p>
                     </div>
 
                 </div>
@@ -122,93 +101,114 @@ each character's inventory.
     <script>window.SITE_ROOT = "../";</script>
     <script type="module">
         import {
-            renderChrome, requireAuth, refData, listCharacters, deleteCharacter,
-            esc, friendlyError, setAlert, toast
+            renderChrome, requireAuth, refData, buildData, listCharacters, withDefaultBuild,
+            derivedLevel, attributes, esc, friendlyError, setAlert, toast
         } from "../assets/js/app.js";
 
         const { profile } = await renderChrome("characters");
         const user = await requireAuth();
 
-        document.getElementById("owner-name").textContent = profile?.firstName || user.email;
+        const [data, bd] = await Promise.all([refData(), buildData()]);
 
-        const data   = await refData();
-        const tbody  = document.getElementById("char-rows");
+        const grid   = document.getElementById("char-grid");
+        const sub    = document.getElementById("roster-sub");
         const fSort  = document.getElementById("f-sort");
         const fOrder = document.getElementById("f-order");
         const alert  = document.getElementById("alert-slot");
 
+        const owner = profile?.firstName || user.email;
+
+        /** Level and vitals come straight from the saved build — no extra reads. */
+        function summarise(raw) {
+            const c = withDefaultBuild(raw, bd);
+            const attrs = attributes(c.attributePicks, bd);
+            return {
+                id: c.id,
+                characterNumber: c.characterNumber ?? null,
+                name: c.name ?? "Unnamed",
+                race: data.races[c.raceId] ?? "Unknown",
+                level: derivedLevel(c.skills, c.raceId, bd).level,
+                health: attrs.health,
+                magicka: attrs.magicka,
+                stamina: attrs.stamina
+            };
+        }
+
         let characters = [];
 
         function render() {
-            const sort = fSort.value;
+            const sort = fSort.value || "characterNumber";
             const desc = fOrder.value === "DESC";
 
-            let rows = [...characters];
-            if (sort) {
-                rows.sort((a, b) => {
-                    const x = a[sort], y = b[sort];
-                    const cmp = typeof x === "string" ? x.localeCompare(y) : (x || 0) - (y || 0);
-                    return desc ? -cmp : cmp;
-                });
-            }
+            const rows = [...characters].sort((a, b) => {
+                const x = a[sort], y = b[sort];
+                const cmp = typeof x === "string"
+                    ? x.localeCompare(y)
+                    : (x ?? 0) - (y ?? 0);
+                return desc ? -cmp : cmp;
+            });
+
+            sub.textContent = rows.length
+                ? `${owner} · ${rows.length} character${rows.length === 1 ? "" : "s"}`
+                : owner;
 
             if (!rows.length) {
-                tbody.innerHTML =
-                    `<tr><td colspan="5">No characters yet. Create one to get started.</td></tr>`;
+                grid.innerHTML = `
+                    <div class="char-empty">
+                        <p class="text-muted-custom">No characters yet.</p>
+                        <a href="create_character.html" class="skyrim-btn skyrim-btn-create btn-compact">
+                            Create your first character
+                        </a>
+                    </div>`;
                 return;
             }
 
-            tbody.innerHTML = rows.map((c) => `
-                <tr>
-                    <td>${c.characterNumber ?? "\u2014"}</td>
-                    <td>${data.races[c.raceId] ?? "Unknown"}</td>
-                    <td>${esc(c.name)}</td>
-                    <td>
-                        <a href="inventory.html?character_id=${encodeURIComponent(c.id)}"
-                           class="btn btn-primary btn-compact">Open inventory</a>
-                    </td>
-                    <td>
-                        <div class="row-actions">
-                            <a href="read_character.html?id=${encodeURIComponent(c.id)}"
-                               class="btn-row" aria-label="View ${esc(c.name)}">View</a>
-                            <a href="update_character.html?id=${encodeURIComponent(c.id)}"
-                               class="btn-row" aria-label="Edit ${esc(c.name)}">Edit</a>
-                            <button class="btn-row btn-row-danger" type="button"
-                                    data-delete="${esc(c.id)}" data-name="${esc(c.name)}"
-                                    aria-label="Delete ${esc(c.name)}">Delete</button>
+            grid.innerHTML = rows.map((c) => `
+                <article class="char-card">
+                    <div class="char-card-head">
+                        <div class="char-card-id">
+                            <span class="char-number">${c.characterNumber == null
+                                ? "—" : "#" + c.characterNumber}</span>
+                            <span class="char-race">${esc(c.race)}</span>
                         </div>
-                    </td>
-                </tr>`).join("");
+                        <h2 class="char-name">${esc(c.name)}</h2>
+                    </div>
 
-            tbody.querySelectorAll("[data-delete]").forEach((btn) => {
-                btn.addEventListener("click", async () => {
-                    const name = btn.dataset.name;
-                    if (!confirm("Delete " + name + " and everything in their inventory?")) return;
-                    btn.disabled = true;
-                    try {
-                        await deleteCharacter(user.uid, btn.dataset.delete);
-                        characters = characters.filter((c) => c.id !== btn.dataset.delete);
-                        render();
-                        toast(name + " deleted");
-                    } catch (err) {
-                        setAlert(alert, friendlyError(err));
-                        btn.disabled = false;
-                    }
-                });
-            });
+                    <dl class="char-vitals">
+                        <div class="vital vital-level">
+                            <dt>Level</dt><dd>${c.level}</dd>
+                        </div>
+                        <div class="vital vital-health">
+                            <dt>Health</dt><dd>${c.health}</dd>
+                        </div>
+                        <div class="vital vital-magicka">
+                            <dt>Magicka</dt><dd>${c.magicka}</dd>
+                        </div>
+                        <div class="vital vital-stamina">
+                            <dt>Stamina</dt><dd>${c.stamina}</dd>
+                        </div>
+                    </dl>
+
+                    <a class="char-open" href="read_character.html?id=${encodeURIComponent(c.id)}">
+                        Open character sheet
+                    </a>
+                </article>`).join("");
         }
 
         document.getElementById("filter-form").addEventListener("submit", (ev) => {
             ev.preventDefault();
             render();
         });
+        fSort.addEventListener("change", render);
+        fOrder.addEventListener("change", render);
 
         try {
-            characters = await listCharacters(user.uid);
+            characters = (await listCharacters(user.uid)).map(summarise);
             render();
             if (new URLSearchParams(location.search).get("created")) toast("Character created");
         } catch (err) {
-            tbody.innerHTML = `<tr><td colspan="5">\u2014</td></tr>`;
+            grid.innerHTML = "";
+            sub.textContent = owner;
             setAlert(alert, friendlyError(err));
         }
     </script>

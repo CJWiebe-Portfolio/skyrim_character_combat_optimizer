@@ -53,7 +53,7 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                             <p class="text-muted-custom" id="char-sub">&nbsp;</p>
                         </div>
                         <div class="sheet-head-actions">
-                            <a id="inv-link" href="#" class="skyrim-btn skyrim-btn-info btn-compact">Inventory</a>
+                            <a id="inv-link" href="#inventory" class="skyrim-btn skyrim-btn-info btn-compact">Inventory</a>
                             <a id="edit-link" href="#" class="skyrim-btn skyrim-btn-update btn-compact">Rename</a>
                             <a href="characters.html" class="btn-link-quiet">All characters</a>
                         </div>
@@ -105,6 +105,37 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                         <div id="perk-trees"></div>
                     </section>
 
+                    <!-- ===================== INVENTORY ===================== -->
+                    <section class="sheet-section" id="inventory">
+                        <div class="section-head">
+                            <h2 class="panel-title">Inventory</h2>
+                            <span class="points-left" id="inv-summary">&nbsp;</span>
+                        </div>
+                        <p class="text-muted-custom text-m">
+                            Everything this character is carrying. Weight counts against the
+                            carrying capacity above, and the best pieces here are what the
+                            numbers below are worked out from.
+                        </p>
+
+                        <!-- ---------- add an item ---------- -->
+                        <form id="add-form" class="inv-add">
+                            <div class="inv-add-item">
+                                <label class="form-label" for="add-item">Item</label>
+                                <select id="add-item" class="form-select"></select>
+                            </div>
+                            <div class="inv-add-qty">
+                                <label class="form-label" for="add-qty">Qty</label>
+                                <input id="add-qty" type="number" value="1" min="1" class="form-control">
+                            </div>
+                            <button type="submit" class="skyrim-btn skyrim-btn-create btn-compact">
+                                Add item
+                            </button>
+                        </form>
+
+                        <!-- ---------- what's carried ---------- -->
+                        <div id="inv-panel"></div>
+                    </section>
+
                     <!-- ===================== EFFECT ON GEAR ===================== -->
                     <section class="sheet-section">
                         <h2 class="panel-title">What this does to your gear</h2>
@@ -140,7 +171,10 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
     <script type="module">
         import {
             renderChrome, requireAuth, refData, buildData, getCharacter, deleteCharacter,
-            saveBuild, withDefaultBuild, listInventory,
+            saveBuild, withDefaultBuild,
+            listInventory, addInventoryItem, increaseInventoryItem,
+            decreaseInventoryItem, deleteInventoryItem,
+            effectiveSpeed, fmtWeight, fmtSpeed,
             derivedLevel, attributes, pointsAvailable, carryCapacity,
             perkRank, perkAvailable, buildSummary, startingSkills, weaponDamage,
             halt, esc, friendlyError, setAlert, toast
@@ -174,10 +208,21 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
         $("char-sub").textContent = (data.races[character.raceId] ?? "Unknown") +
             " \u00b7 character " + (character.characterNumber ?? "?");
         $("edit-link").href = "update_character.html?id=" + encodeURIComponent(id);
-        $("inv-link").href = "inventory.html?character_id=" + encodeURIComponent(id);
         if (new URLSearchParams(location.search).get("saved")) toast("Character updated");
 
         const pct = (n) => (n >= 0 ? "+" : "") + n + "%";
+        const dash = (v) => (v === null || v === undefined ? "—" : v);
+
+        /* ---- the item picker is built once; re-rendering it would lose the choice ---- */
+        const picker = $("add-item");
+        [...data.items]
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .forEach((i) => {
+                const opt = document.createElement("option");
+                opt.value = i.item_id;
+                opt.textContent = i.name;
+                picker.appendChild(opt);
+            });
 
         function markDirty() {
             dirty = true;
@@ -315,12 +360,15 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
                 </div>`;
             }).join("");
 
+            /* ---- inventory ---- */
+            renderInventory();
+
             /* ---- effect on gear ---- */
             const worn = Object.entries(summary.armour.worn);
             const bw = summary.bestWeapon;
             $("gear-effect").innerHTML = (!worn.length && !bw)
                 ? `<p class="text-muted-custom">Nothing in this character's inventory yet.
-                     <a href="${$("inv-link").href}">Add some gear</a> and its numbers appear here.</p>`
+                     <a href="#inventory">Add some gear</a> and its numbers appear here.</p>`
                 : `
                 ${bw ? `
                 <h3 class="perk-tree-title">Best weapon</h3>
@@ -363,8 +411,123 @@ Skyrim's own — see "sources" in assets/data/skyrim.json.
             wire();
         }
 
+        /* ================= inventory ================= */
+        function renderInventory() {
+            if (!inventory.length) {
+                $("inv-summary").textContent = "empty";
+                $("inv-panel").innerHTML =
+                    `<p class="text-muted-custom">Nothing carried yet. Add something above.</p>`;
+                return;
+            }
+
+            const rows = inventory
+                .map((row) => {
+                    const item = itemsById.get(row.itemId);
+                    if (!item) return null;
+                    return { ...item, speed: effectiveSpeed(item, data), quantity: row.quantity };
+                })
+                .filter(Boolean)
+                .sort((a, b) => a.name.localeCompare(b.name));
+
+            const totalWeight = rows.reduce((s, r) => s + (r.weight || 0) * r.quantity, 0);
+            const totalGold   = rows.reduce((s, r) => s + (r.gold_value || 0) * r.quantity, 0);
+            const totalItems  = rows.reduce((s, r) => s + r.quantity, 0);
+
+            $("inv-summary").textContent =
+                `${totalItems} item${totalItems === 1 ? "" : "s"} · ` +
+                `${totalWeight.toFixed(2)} weight · ${totalGold} gold`;
+
+            $("inv-panel").innerHTML = `
+                <div class="tablewrap"><table class="table-skyrim">
+                    <thead><tr>
+                        <th scope="col">Item</th><th scope="col">Damage</th>
+                        <th scope="col">Speed</th><th scope="col">Defence</th>
+                        <th scope="col">Weight</th><th scope="col">Gold</th>
+                        <th scope="col">Category</th><th scope="col">Class</th>
+                        <th scope="col">Perk</th><th scope="col">Upgrade</th>
+                        <th scope="col">Qty</th>
+                    </tr></thead>
+                    <tbody>${rows.map((it) => `
+                        <tr>
+                            <td>${esc(it.name)}</td>
+                            <td>${dash(it.damage)}</td>
+                            <td>${dash(fmtSpeed(it.speed))}</td>
+                            <td>${dash(it.defence)}</td>
+                            <td>${dash(fmtWeight(it.weight))}</td>
+                            <td>${dash(it.gold_value)}</td>
+                            <td>${data.categories[it.category_id] ?? "Unknown"}</td>
+                            <td>${data.classifications[it.classification_id] ?? "Unknown"}</td>
+                            <td>${data.perks[it.perk_id] ?? "—"}</td>
+                            <td>${data.upgrades[it.item_upgrade] ?? "—"}</td>
+                            <td>
+                                <div class="qty-control">
+                                    <button class="qty-btn" type="button"
+                                            data-act="decrease" data-id="${it.item_id}"
+                                            aria-label="Remove one ${esc(it.name)}">&minus;</button>
+                                    <span class="qty-value"
+                                          aria-label="${it.quantity} in inventory">${it.quantity}</span>
+                                    <button class="qty-btn" type="button"
+                                            data-act="increase" data-id="${it.item_id}"
+                                            aria-label="Add one ${esc(it.name)}">+</button>
+                                    <button class="qty-btn qty-btn-danger" type="button"
+                                            data-act="delete" data-id="${it.item_id}"
+                                            aria-label="Remove all ${esc(it.name)} from inventory">Remove</button>
+                                </div>
+                            </td>
+                        </tr>`).join("")}
+                    </tbody></table></div>`;
+        }
+
+        /** Add / remove / delete one inventory row, then redraw the whole sheet. */
+        async function inventoryAction(btn) {
+            const { act: action, id: rawId } = btn.dataset;
+            const itemId = Number(rawId);
+            const itemName = itemsById.get(itemId)?.name || "this item";
+
+            if (action === "delete" &&
+                !confirm("Remove all " + itemName + " from this inventory?")) return;
+
+            setAlert(alert, "");
+            btn.disabled = true;
+            try {
+                if (action === "increase")      await increaseInventoryItem(user.uid, id, itemId);
+                else if (action === "decrease") await decreaseInventoryItem(user.uid, id, itemId);
+                else if (action === "delete")   await deleteInventoryItem(user.uid, id, itemId);
+                await reloadInventory();
+                if (action === "delete") toast(itemName + " removed");
+            } catch (err) {
+                setAlert(alert, friendlyError(err));
+                btn.disabled = false;
+            }
+        }
+
+        async function reloadInventory() {
+            inventory = await listInventory(user.uid, id);
+            render();
+        }
+
+        $("add-form").addEventListener("submit", async (ev) => {
+            ev.preventDefault();
+            setAlert(alert, "");
+
+            const itemId = Number(picker.value);
+            const qty = Math.max(1, Number($("add-qty").value) || 1);
+
+            try {
+                await addInventoryItem(user.uid, id, itemId, qty);
+                await reloadInventory();
+                const added = itemsById.get(itemId)?.name || "Item";
+                toast(qty > 1 ? `${qty} × ${added} added` : `${added} added`);
+            } catch (err) {
+                setAlert(alert, friendlyError(err));
+            }
+        });
+
         /* ================= interaction ================= */
         function wire() {
+            $("inv-panel").querySelectorAll("[data-act]").forEach((b) =>
+                b.addEventListener("click", () => inventoryAction(b)));
+
             $("attr-grid").querySelectorAll("[data-attr]").forEach((b) =>
                 b.addEventListener("click", () => {
                     const k = b.dataset.attr, d = Number(b.dataset.dir);

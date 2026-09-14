@@ -1217,3 +1217,170 @@ body { overflow-x: hidden; }
   .perk { flex-direction: column; align-items: stretch; gap: 0.5rem; }
   .perk .qty-control { justify-content: flex-end; }
 }
+
+/* ==========================================================================
+   MY CHARACTERS — the roster, as cards rather than a wide table
+   ========================================================================== */
+
+.roster-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+  padding-bottom: 1rem;
+}
+.roster-head h1 { margin: 0; }
+.roster-head p { margin: 0.25rem 0 0; font-size: 1rem; }
+.roster-head .skyrim-btn { display: inline-block; width: auto; }
+
+/* The sort controls sit on one line and wrap, rather than filling a grid row. */
+.roster-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin: 1.5rem 0 1.75rem;
+}
+.roster-tool { display: flex; flex-direction: column; gap: 0.25rem; }
+.roster-tool .form-label { margin: 0; }
+.roster-tool .form-select { min-width: 12rem; }
+.roster-tools .btn-row { padding: 0.5rem 1.1rem; }
+
+.char-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
+  gap: 1.1rem;
+}
+
+.char-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.15rem 1.25rem 1.25rem;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: var(--radius);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.char-card:hover {
+  border-color: rgba(212, 175, 55, 0.45);
+  transform: translateY(-2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .char-card { transition: none; }
+  .char-card:hover { transform: none; }
+}
+
+.char-card-head { display: flex; flex-direction: column; gap: 0.3rem; }
+
+/* Number and race are the quiet line; the name is what you scan for. */
+.char-card-id {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.char-number {
+  padding: 0.08rem 0.4rem;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+.char-race { letter-spacing: 0.08em; }
+
+.char-name {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: var(--skyrim-gold);
+  overflow-wrap: anywhere;
+}
+
+.char-vitals {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+  margin: 0;
+}
+.char-vitals .vital {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.45rem 0.2rem;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(212, 175, 55, 0.12);
+  border-radius: 6px;
+}
+.char-vitals dt {
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.char-vitals dd {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-main);
+}
+.char-vitals .vital-level dd   { color: var(--skyrim-gold); }
+.char-vitals .vital-health dd  { color: #e08d8b; }
+.char-vitals .vital-magicka dd { color: #8fc7e8; }
+.char-vitals .vital-stamina dd { color: #9fcf9f; }
+
+/* One way in, so the card has a single obvious action. */
+.char-open {
+  display: block;
+  margin-top: auto;
+  padding: 0.5rem 0.9rem;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--skyrim-gold);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 6px;
+  background: rgba(212, 175, 55, 0.06);
+}
+.char-open:hover {
+  color: var(--skyrim-dark);
+  background: var(--skyrim-gold);
+  border-color: var(--skyrim-gold);
+  box-shadow: 0 0 12px var(--skyrim-gold-shadow);
+}
+
+.char-empty {
+  grid-column: 1 / -1;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  border: 1px dashed rgba(212, 175, 55, 0.25);
+  border-radius: var(--radius);
+}
+.char-empty .skyrim-btn { display: inline-block; width: auto; }
+
+@media (max-width: 380px) {
+  .char-vitals { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---------- the character sheet's own "add an item" row ------------------ */
+.inv-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin: 1rem 0 1.25rem;
+}
+.inv-add .form-label { margin: 0 0 0.25rem; }
+.inv-add-item { flex: 1 1 18rem; min-width: 0; }
+.inv-add-qty  { flex: 0 0 6rem; }
+.inv-add .skyrim-btn { display: inline-block; width: auto; }

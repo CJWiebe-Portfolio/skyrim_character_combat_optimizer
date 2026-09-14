@@ -5,8 +5,8 @@ PROJECT: Skyrim Character Combat Optimization System
 AUTHOR: C.J. Wiebe
 =========================================================
 DESCRIPTION:
-Create, read, update and delete the items in one character's inventory, stored at
-users/{uid}/characters/{characterId}/inventory/{itemId}.
+Inventory management now lives on the character sheet, so this page only
+forwards old links and bookmarks to the sheet's Inventory section.
 =========================================================
 -->
 <!DOCTYPE html>
@@ -15,306 +15,31 @@ users/{uid}/characters/{characterId}/inventory/{itemId}.
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- ===================== PAGE TITLE ===================== -->
-    <title>Inventory Management</title>
-
-    <!-- ===================== FAVICON ===================== -->
+    <title>Inventory moved</title>
     <link rel="icon" type="image/png" href="../assets/images/skyrim_icon.png">
-
-    <!-- ===================== CSS ===================== -->
-    <!-- =========== BOOTSTRAP =========== -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- =========== GENERAL STYLES =========== -->
     <link rel="stylesheet" href="../assets/css/general_style.css">
-    <!-- =========== BACKGROUND =========== -->
     <link rel="stylesheet" href="../assets/css/background_picture.css">
 </head>
 
 <body>
-    <div class="d-flex flex-column min-vh-100">
-
-        <!-- Keyboard users land here first and can jump past the navigation. -->
-        <a class="skip-link" href="#main">Skip to main content</a>
-
-        <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
-        <div id="navbar-slot"></div>
-
-        <!-- ===================== MAIN CONTENT ===================== -->
-        <main id="main">
-        <div class="container py-5 mt-1 flex-grow-1">
-            <div class="main-container p-4">
-                <div class="main-container p-5">
-
-                    <div class="section-title">
-                        <h1 class="section-title title-main text-center">
-                            &#127890; <span id="char-name"></span>'s Inventory &#127890;
-                        </h1>
-                        <h5 class="text-muted-custom text-center">
-                            You can manage your character's inventory from here by adding items or managing the
-                            quantity of existing ones, and deleting items as needed.
-                        </h5>
-                        <br>
-                        <a href="characters.html" class="btn btn-primary text-lg">Back to My Characters</a>
-                    </div>
-                    <br>
-
-                    <div id="alert-slot"></div>
-
-                    <!-- ADD ITEM FORM -->
-                    <div class="card-body">
-                        <form id="add-form" class="row mb-4 align-items-end skyrim-filter col-md-8">
-                            <div class="col-md-5">
-                                <label class="form-label" for="add-item">Item</label>
-                                <select id="add-item" class="form-select"></select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label" for="add-qty">Qty</label>
-                                <input id="add-qty" type="number" value="1" min="1" class="form-control">
-                            </div>
-                            <div class="col-md-3">
-                                <button type="submit" class="btn btn-success w-100">Add Item</button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- CARRY CAPACITY -->
-                    <div id="carry-panel" class="inset-panel"></div>
-
-                    <!-- INVENTORY TOTALS -->
-                    <p id="inv-summary" class="text-muted-custom text-lg"></p>
-
-                    <!-- INVENTORY TABLE -->
-                    <div class="table-responsive">
-                        <table class="table-skyrim">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Item</th>
-                                    <th scope="col">Damage</th>
-                                    <th scope="col">Speed</th>
-                                    <th scope="col">Defence</th>
-                                    <th scope="col">Weight</th>
-                                    <th scope="col">Gold</th>
-                                    <th scope="col">Category</th>
-                                    <th scope="col">Class</th>
-                                    <th scope="col">Perk</th>
-                                    <th scope="col">Upgrade</th>
-                                    <th scope="col">Qty</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inv-rows">
-                                <tr><td colspan="11">Loading&hellip;</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-            </div>
+    <div class="container py-5">
+        <div class="main-container p-5">
+            <h1 class="title-main">Inventory has moved</h1>
+            <p class="text-muted-custom">
+                Inventories are now managed on the character sheet.
+                <a id="go" href="characters.html">Take me there</a>.
+            </p>
         </div>
-        </main>
-
-        <!-- ===================== FOOTER (rendered by app.js) ===================== -->
-        <div id="footer-slot"></div>
-
     </div>
 
-    <!-- ===================== SCRIPTS ===================== -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>window.SITE_ROOT = "../";</script>
-    <script type="module">
-        import {
-            renderChrome, requireAuth, refData, buildData, effectiveSpeed, fmtWeight, fmtSpeed,
-            getCharacter, withDefaultBuild, buildSummary,
-            listInventory, addInventoryItem, increaseInventoryItem,
-            decreaseInventoryItem, deleteInventoryItem,
-            halt, esc, friendlyError, setAlert, toast
-        } from "../assets/js/app.js";
-
-        renderChrome("characters");
-        const user = await requireAuth();
-
-        const alert = document.getElementById("alert-slot");
+    <script>
         const cid = new URLSearchParams(location.search).get("character_id");
-
-        if (!cid) {
-            setAlert(alert, "No character selected.");
-            await halt();
-        }
-
-        const [data, bd] = await Promise.all([refData(), buildData()]);
-        const rawCharacter = await getCharacter(user.uid, cid);
-        const character = rawCharacter ? withDefaultBuild(rawCharacter, bd) : null;
-
-        if (!character) {
-            setAlert(alert, "Character not found or access denied.");
-            await halt();
-        }
-
-        const sheetLink = "read_character.html?id=" + encodeURIComponent(cid);
-
-        document.getElementById("char-name").textContent = character.name;
-        document.title = character.name + "'s Inventory";
-
-        // ---------- Item picker, sorted by name like the PHP query ----------
-        const itemsById = new Map(data.items.map((i) => [i.item_id, i]));
-        const picker = document.getElementById("add-item");
-        [...data.items]
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .forEach((i) => {
-                const opt = document.createElement("option");
-                opt.value = i.item_id;
-                opt.textContent = i.name;
-                picker.appendChild(opt);
-            });
-
-        const tbody   = document.getElementById("inv-rows");
-        const summary = document.getElementById("inv-summary");
-        const dash    = (v) => (v === null || v === undefined ? "\u2014" : v);
-
-        let inventory = [];
-
-        function render() {
-            if (!inventory.length) {
-                tbody.innerHTML = `<tr><td colspan="11">No items in inventory.</td></tr>`;
-                summary.textContent = "";
-                renderCarry();
-                return;
-            }
-
-            const rows = inventory
-                .map((row) => {
-                    const item = itemsById.get(row.itemId);
-                    if (!item) return null;
-                    return { ...item, speed: effectiveSpeed(item, data), quantity: row.quantity };
-                })
-                .filter(Boolean)
-                .sort((a, b) => a.name.localeCompare(b.name));
-
-            const totalWeight = rows.reduce((s, r) => s + (r.weight || 0) * r.quantity, 0);
-            const totalGold   = rows.reduce((s, r) => s + (r.gold_value || 0) * r.quantity, 0);
-            const totalItems  = rows.reduce((s, r) => s + r.quantity, 0);
-            summary.textContent =
-                `${totalItems} item${totalItems === 1 ? "" : "s"} \u00b7 ` +
-                `${totalWeight.toFixed(2)} weight \u00b7 ${totalGold} gold`;
-
-            renderCarry();
-
-            tbody.innerHTML = rows.map((it) => `
-                <tr>
-                    <td>${esc(it.name)}</td>
-                    <td>${dash(it.damage)}</td>
-                    <td>${dash(fmtSpeed(it.speed))}</td>
-                    <td>${dash(it.defence)}</td>
-                    <td>${dash(fmtWeight(it.weight))}</td>
-                    <td>${dash(it.gold_value)}</td>
-                    <td>${data.categories[it.category_id] ?? "Unknown"}</td>
-                    <td>${data.classifications[it.classification_id] ?? "Unknown"}</td>
-                    <td>${data.perks[it.perk_id] ?? "\u2014"}</td>
-                    <td>${data.upgrades[it.item_upgrade] ?? "\u2014"}</td>
-                    <td>
-                        <div class="qty-control">
-                            <button class="qty-btn" type="button"
-                                    data-act="decrease" data-id="${it.item_id}"
-                                    aria-label="Remove one ${esc(it.name)}">&minus;</button>
-                            <span class="qty-value" aria-label="${it.quantity} in inventory">${it.quantity}</span>
-                            <button class="qty-btn" type="button"
-                                    data-act="increase" data-id="${it.item_id}"
-                                    aria-label="Add one ${esc(it.name)}">+</button>
-                            <button class="qty-btn qty-btn-danger" type="button"
-                                    data-act="delete" data-id="${it.item_id}"
-                                    aria-label="Remove all ${esc(it.name)} from inventory">Remove</button>
-                        </div>
-                    </td>
-                </tr>`).join("");
-
-            tbody.querySelectorAll("[data-act]").forEach((btn) => {
-                btn.addEventListener("click", () => act(btn));
-            });
-        }
-
-        /**
-         * Carrying capacity, which depends on the character's Stamina picks and on
-         * perks like Conditioning that make a whole armour type weightless.
-         */
-        function renderCarry() {
-            const s = buildSummary(
-                { raceId: character.raceId, skills: character.skills,
-                  perks: character.perks, attributePicks: character.attributePicks },
-                inventory, itemsById, bd
-            );
-            const c = s.carry;
-            document.getElementById("carry-panel").innerHTML = `
-                <div class="carry-row">
-                    <span><strong>${c.carried}</strong> / ${c.capacity} carried</span>
-                    <span class="${c.overEncumbered ? "carry-over" : "text-muted-custom"}">
-                        ${c.overEncumbered
-                            ? "Over-encumbered by " + Math.round((c.carried - c.capacity) * 100) / 100
-                            : c.remaining + " to spare"}</span>
-                </div>
-                <div class="meter" role="img"
-                     aria-label="Carrying ${c.carried} of ${c.capacity}, ${c.usedPercent}% full">
-                    <div class="meter-fill ${c.overEncumbered ? "is-over" : ""}"
-                         style="width:${Math.min(100, c.usedPercent)}%"></div>
-                </div>
-                <p class="text-muted-custom text-m">
-                    300 base plus 5 per level-up point in Stamina.
-                    Change that on the <a href="${sheetLink}">character sheet</a>.
-                </p>`;
-        }
-
-        async function act(btn) {
-            const { act: action, id } = btn.dataset;
-            const itemId = Number(id);
-            const itemName = itemsById.get(itemId)?.name || "this item";
-
-            if (action === "delete" && !confirm("Remove all " + itemName + " from this inventory?")) return;
-
-            setAlert(alert, "");
-            btn.disabled = true;
-            try {
-                if (action === "increase") {
-                    await increaseInventoryItem(user.uid, cid, itemId);
-                } else if (action === "decrease") {
-                    await decreaseInventoryItem(user.uid, cid, itemId);
-                } else if (action === "delete") {
-                    await deleteInventoryItem(user.uid, cid, itemId);
-                }
-                await reload();
-                if (action === "delete") toast(itemName + " removed");
-            } catch (err) {
-                setAlert(alert, friendlyError(err));
-                btn.disabled = false;
-            }
-        }
-
-        async function reload() {
-            inventory = await listInventory(user.uid, cid);
-            render();
-        }
-
-        document.getElementById("add-form").addEventListener("submit", async (ev) => {
-            ev.preventDefault();
-            setAlert(alert, "");
-
-            const itemId = Number(picker.value);
-            const qty = Math.max(1, Number(document.getElementById("add-qty").value) || 1);
-
-            try {
-                await addInventoryItem(user.uid, cid, itemId, qty);
-                await reload();
-                const added = itemsById.get(itemId)?.name || "Item";
-                toast(qty > 1 ? `${qty} × ${added} added` : `${added} added`);
-            } catch (err) {
-                setAlert(alert, friendlyError(err));
-            }
-        });
-
-        try {
-            await reload();
-        } catch (err) {
-            tbody.innerHTML = `<tr><td colspan="11">\u2014</td></tr>`;
-            setAlert(alert, friendlyError(err));
-        }
+        const target = cid
+            ? "read_character.html?id=" + encodeURIComponent(cid) + "#inventory"
+            : "characters.html";
+        document.getElementById("go").href = target;
+        location.replace(target);
     </script>
 </body>
 
