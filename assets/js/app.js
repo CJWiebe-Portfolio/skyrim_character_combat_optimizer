@@ -30,7 +30,7 @@ import {
   sendEmailVerification,
   deleteUser,
   EmailAuthProvider,
-  reauthenticateWithCredential
+  reauthenticateWithCredential,
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 import {
   getFirestore,
@@ -46,7 +46,7 @@ import {
   orderBy,
   serverTimestamp,
   increment,
-  writeBatch
+  writeBatch,
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
 import { firebaseConfig } from "./firebase-config.js";
@@ -60,8 +60,9 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 /** True while firebase-config.js still holds the placeholder values. */
-export const CONFIG_IS_PLACEHOLDER =
-  String(firebaseConfig.apiKey || "").startsWith("PASTE_YOUR");
+export const CONFIG_IS_PLACEHOLDER = String(
+  firebaseConfig.apiKey || "",
+).startsWith("PASTE_YOUR");
 
 /* =========================================================
    PATHS
@@ -84,7 +85,8 @@ let _data = null;
 export async function refData() {
   if (_data) return _data;
   const res = await fetch(url("assets/data/items.json"));
-  if (!res.ok) throw new Error("Could not load items.json (" + res.status + ")");
+  if (!res.ok)
+    throw new Error("Could not load items.json (" + res.status + ")");
   _data = await res.json();
   return _data;
 }
@@ -167,7 +169,7 @@ export async function signup({ firstName, lastName, email, password, dob }) {
       email,
       dob: dob || "",
       role: "user",
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
     });
   } catch (err) {
     try {
@@ -246,7 +248,7 @@ export async function ensureProfile(user) {
     email: user.email || "",
     dob: "",
     role: "user",
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
   };
   await setDoc(doc(db, "users", user.uid), seeded, { merge: true });
   return seeded;
@@ -281,7 +283,8 @@ export async function getCharacter(uid, cid) {
 /** Mirrors the PHP "MAX(character_number) + 1 per account" logic. */
 export async function createCharacter(uid, { name, raceId }) {
   const existing = await listCharacters(uid);
-  const next = existing.reduce((m, c) => Math.max(m, c.characterNumber || 0), 0) + 1;
+  const next =
+    existing.reduce((m, c) => Math.max(m, c.characterNumber || 0), 0) + 1;
   // Seed the build from the race, exactly as character creation does in game.
   let build = {};
   try {
@@ -289,7 +292,7 @@ export async function createCharacter(uid, { name, raceId }) {
     build = {
       skills: startingSkills(raceId, bd),
       perks: {},
-      attributePicks: { health: 0, magicka: 0, stamina: 0 }
+      attributePicks: { health: 0, magicka: 0, stamina: 0 },
     };
   } catch (e) {
     console.warn("Could not seed starting skills:", e);
@@ -300,7 +303,7 @@ export async function createCharacter(uid, { name, raceId }) {
     raceId: Number(raceId),
     characterNumber: next,
     ...build,
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
   });
   return ref.id;
 }
@@ -317,11 +320,16 @@ export function saveBuild(uid, cid, { skills, perks, attributePicks }) {
 export function withDefaultBuild(character, bd) {
   return {
     ...character,
-    skills: character.skills && Object.keys(character.skills).length
-      ? character.skills
-      : startingSkills(character.raceId, bd),
+    skills:
+      character.skills && Object.keys(character.skills).length
+        ? character.skills
+        : startingSkills(character.raceId, bd),
     perks: character.perks || {},
-    attributePicks: character.attributePicks || { health: 0, magicka: 0, stamina: 0 }
+    attributePicks: character.attributePicks || {
+      health: 0,
+      magicka: 0,
+      stamina: 0,
+    },
   };
 }
 
@@ -333,7 +341,7 @@ export function updateCharacter(uid, cid, { name, raceId }) {
 export async function deleteCharacter(uid, cid) {
   const [inv, spells] = await Promise.all([
     getDocs(collection(db, "users", uid, "characters", cid, "inventory")),
-    getDocs(collection(db, "users", uid, "characters", cid, "spellbook"))
+    getDocs(collection(db, "users", uid, "characters", cid, "spellbook")),
   ]);
   const batch = writeBatch(db);
   inv.docs.forEach((d) => batch.delete(d.ref));
@@ -349,7 +357,8 @@ export async function deleteCharacter(uid, cid) {
    character" is enforced by the data model itself.
    ========================================================= */
 
-const invCol = (uid, cid) => collection(db, "users", uid, "characters", cid, "inventory");
+const invCol = (uid, cid) =>
+  collection(db, "users", uid, "characters", cid, "inventory");
 const invDoc = (uid, cid, itemId) =>
   doc(db, "users", uid, "characters", cid, "inventory", String(itemId));
 
@@ -396,7 +405,8 @@ export function deleteInventoryItem(uid, cid, itemId) {
    there is no quantity, so the document id alone carries the fact.
    ========================================================= */
 
-const spellCol = (uid, cid) => collection(db, "users", uid, "characters", cid, "spellbook");
+const spellCol = (uid, cid) =>
+  collection(db, "users", uid, "characters", cid, "spellbook");
 const spellDoc = (uid, cid, spellId) =>
   doc(db, "users", uid, "characters", cid, "spellbook", String(spellId));
 
@@ -416,7 +426,9 @@ export function forgetSpell(uid, cid, spellId) {
 /** Learns several at once — used by "learn every spell in this school". */
 export async function learnSpells(uid, cid, spellIds) {
   const batch = writeBatch(db);
-  spellIds.forEach((sid) => batch.set(spellDoc(uid, cid, sid), { spellId: String(sid) }));
+  spellIds.forEach((sid) =>
+    batch.set(spellDoc(uid, cid, sid), { spellId: String(sid) }),
+  );
   await batch.commit();
 }
 
@@ -431,8 +443,12 @@ export async function forgetSpells(uid, cid, spellIds) {
    ========================================================= */
 
 const esc = (s) =>
-  String(s ?? "").replace(/[&<>"']/g, (c) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+  String(s ?? "").replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
   );
 export { esc };
 
@@ -517,7 +533,7 @@ function footerHTML(user) {
         <div class="col-md-3 mb-3">
           <h5 class="fw-bold text-lg">Skyrim Character Combat Optimizer</h5>
           <p class="small mb-0 text-m">
-            Combat Optimization System for analyzing builds, gear, and efficiency.
+            Create and optimize your Skyrim character builds with weapons, armour, and spells, with skills, perks, attributes, and carry weight.
           </p>
         </div>
 
@@ -527,7 +543,6 @@ function footerHTML(user) {
             <li><a href="${url("home.html")}">Home</a></li>
             <li><a href="${url("general_information/all_items.html")}">All Items</a></li>
             <li><a href="${url("general_information/all_spells.html")}">All Spells</a></li>
-            <li><a href="${url("references.html")}">References</a></li>
             ${
               signedIn
                 ? `
@@ -545,12 +560,13 @@ function footerHTML(user) {
           <ul class="list-unstyled text-m">
             <li><a href="${url("legal/terms.html")}">Terms &amp; Conditions</a></li>
             <li><a href="${url("legal/privacy.html")}">Privacy Policy</a></li>
+            <li><a href="${url("references.html")}">Project References</a></li>
           </ul>
         </div>
 
         <div class="col-md-3 mb-3">
           <h6 class="fw-bold text-lg">About</h6>
-          <p class="small mb-0 text-m">C. J. Wiebe</p>
+          <p class="small mb-0 text-m">This site was created by C. J. Wiebe</p>
 
           <!-- External links: NOT wrapped in url(). That helper prefixes the site
                root for internal pages and would mangle a full URL. -->
@@ -675,7 +691,8 @@ export function friendlyError(err) {
     "auth/email-already-in-use": "An account already uses that email address.",
     "auth/weak-password": "Password must be at least 6 characters.",
     "auth/too-many-requests": "Too many attempts. Try again in a few minutes.",
-    "auth/requires-recent-login": "Please enter your current password to confirm this change.",
+    "auth/requires-recent-login":
+      "Please enter your current password to confirm this change.",
     "auth/operation-not-allowed":
       "Email/password sign-in is not enabled in the Firebase console yet.",
     "auth/missing-email": "Enter your email address first.",
@@ -686,9 +703,9 @@ export function friendlyError(err) {
       "Firestore rejected that request. The security rules have not been published yet \u2014 " +
       "in the Firebase console, open Databases & Storage \u2192 Firestore \u2192 Rules, paste the " +
       "contents of firestore.rules from this repo, and click Publish.",
-    "unavailable":
+    unavailable:
       "Could not reach Firestore. Check your connection, and that a Firestore database " +
-      "has been created for this project."
+      "has been created for this project.",
   };
   return map[code] || err?.message || "Something went wrong.";
 }
@@ -744,7 +761,8 @@ let _build = null;
 export async function buildData() {
   if (_build) return _build;
   const res = await fetch(url("assets/data/skyrim.json"));
-  if (!res.ok) throw new Error("Could not load skyrim.json (" + res.status + ")");
+  if (!res.ok)
+    throw new Error("Could not load skyrim.json (" + res.status + ")");
   _build = await res.json();
   return _build;
 }
@@ -755,7 +773,8 @@ let _spells = null;
 export async function spellData() {
   if (_spells) return _spells;
   const res = await fetch(url("assets/data/spells.json"));
-  if (!res.ok) throw new Error("Could not load spells.json (" + res.status + ")");
+  if (!res.ok)
+    throw new Error("Could not load spells.json (" + res.status + ")");
   _spells = await res.json();
   return _spells;
 }
@@ -769,7 +788,11 @@ export function startingSkills(raceId, bd) {
 /** Starting attributes. Skyrim gives every race 100/100/100. */
 export function startingAttributes(bd) {
   const c = bd.constants;
-  return { health: c.startingHealth, magicka: c.startingMagicka, stamina: c.startingStamina };
+  return {
+    health: c.startingHealth,
+    magicka: c.startingMagicka,
+    stamina: c.startingStamina,
+  };
 }
 
 /**
@@ -777,7 +800,7 @@ export function startingAttributes(bd) {
  *
  *   a skill reaching level S grants S character XP
  *   level N -> N+1 costs (N + 3) * 25
- *
+ *h
  * Returns the level plus the progress into the next one, so the UI can show
  * a bar rather than just a number.
  */
@@ -790,7 +813,7 @@ export function derivedLevel(skills, raceId, bd) {
     const from = start[sid] ?? c.baseSkill;
     const to = Math.max(from, Number(level) || from);
     // Sum of every rank gained: (to*(to+1) - from*(from+1)) / 2
-    xp += (to * (to + 1) - from * (from + 1)) / 2 * c.xpPerSkillRank;
+    xp += ((to * (to + 1) - from * (from + 1)) / 2) * c.xpPerSkillRank;
   }
 
   let level = 1;
@@ -807,15 +830,20 @@ export function derivedLevel(skills, raceId, bd) {
 /** One perk point and one attribute pick per level gained after the first. */
 export function pointsAvailable(level, perks, attributePicks) {
   const earned = Math.max(0, level - 1);
-  const perksSpent = Object.values(perks || {}).reduce((s, r) => s + (Number(r) || 0), 0);
-  const picksSpent = (attributePicks?.health || 0) + (attributePicks?.magicka || 0) +
-                     (attributePicks?.stamina || 0);
+  const perksSpent = Object.values(perks || {}).reduce(
+    (s, r) => s + (Number(r) || 0),
+    0,
+  );
+  const picksSpent =
+    (attributePicks?.health || 0) +
+    (attributePicks?.magicka || 0) +
+    (attributePicks?.stamina || 0);
   return {
     earned,
     perkPointsSpent: perksSpent,
     perkPointsLeft: earned - perksSpent,
     attributePicksSpent: picksSpent,
-    attributePicksLeft: earned - picksSpent
+    attributePicksLeft: earned - picksSpent,
   };
 }
 
@@ -824,16 +852,19 @@ export function attributes(attributePicks, bd) {
   const c = bd.constants;
   const p = attributePicks || {};
   return {
-    health:  c.startingHealth  + c.attributePerLevel * (p.health  || 0),
+    health: c.startingHealth + c.attributePerLevel * (p.health || 0),
     magicka: c.startingMagicka + c.attributePerLevel * (p.magicka || 0),
-    stamina: c.startingStamina + c.attributePerLevel * (p.stamina || 0)
+    stamina: c.startingStamina + c.attributePerLevel * (p.stamina || 0),
   };
 }
 
 /** Carry weight: 300 base, plus 5 for every level-up point put into Stamina. */
 export function carryCapacity(attributePicks, bd) {
   const c = bd.constants;
-  return c.carryWeightBase + c.carryWeightPerStaminaPick * (attributePicks?.stamina || 0);
+  return (
+    c.carryWeightBase +
+    c.carryWeightPerStaminaPick * (attributePicks?.stamina || 0)
+  );
 }
 
 /** Total ranks taken in one perk, 0 if untaken. */
@@ -863,7 +894,9 @@ function effectPct(tree, perks, type) {
 }
 
 function hasEffect(tree, perks, type) {
-  return (tree || []).some((p) => p.effect?.type === type && perkRank(perks, p.id) > 0);
+  return (tree || []).some(
+    (p) => p.effect?.type === type && perkRank(perks, p.id) > 0,
+  );
 }
 
 /**
@@ -875,11 +908,16 @@ export function weaponDamage(item, skills, perks, bd) {
   if (!base) return null;
 
   const skillId = bd.classificationSkill[String(item.classification_id)];
-  if (!skillId) return { base, total: base, skillId: null, skillPct: 0, perkPct: 0 };
+  if (!skillId)
+    return { base, total: base, skillId: null, skillPct: 0, perkPct: 0 };
 
   const skill = Number(skills?.[skillId] ?? bd.constants.baseSkill);
   const skillMult = 1 + bd.constants.weaponDamagePerSkillPoint * skill;
-  const perkPct = effectPct(bd.perks[String(skillId)], perks, "weaponDamagePct");
+  const perkPct = effectPct(
+    bd.perks[String(skillId)],
+    perks,
+    "weaponDamagePct",
+  );
   const total = base * skillMult * (1 + perkPct / 100);
 
   return {
@@ -888,7 +926,7 @@ export function weaponDamage(item, skills, perks, bd) {
     skillId,
     skillLevel: skill,
     skillPct: Math.round((skillMult - 1) * 1000) / 10,
-    perkPct
+    perkPct,
   };
 }
 
@@ -902,7 +940,15 @@ export function armorPieceRating(item, skills, perks, bd, fullSet = false) {
   if (!base) return null;
 
   const skillId = bd.classificationSkill[String(item.classification_id)];
-  if (!skillId) return { base, total: base, skillId: null, skillPct: 0, perkPct: 0, setPct: 0 };
+  if (!skillId)
+    return {
+      base,
+      total: base,
+      skillId: null,
+      skillPct: 0,
+      perkPct: 0,
+      setPct: 0,
+    };
 
   const skill = Number(skills?.[skillId] ?? bd.constants.baseSkill);
   const skillMult = 1 + bd.constants.armorRatingPerSkillPoint * skill;
@@ -918,7 +964,7 @@ export function armorPieceRating(item, skills, perks, bd, fullSet = false) {
     skillLevel: skill,
     skillPct: Math.round((skillMult - 1) * 1000) / 10,
     perkPct,
-    setPct
+    setPct,
   };
 }
 
@@ -933,7 +979,7 @@ export function damageReduction(displayedRating, piecesWorn, bd) {
   return {
     percent: Math.min(pct, c.maxDamageReduction),
     capped: pct >= c.maxDamageReduction,
-    ratingForCap: c.armorCapRating
+    ratingForCap: c.armorCapRating,
   };
 }
 
@@ -963,9 +1009,10 @@ export function spellCostSkillMultiplier(skillLevel, bd) {
 export function spellHalfCostTaken(spell, perks, bd) {
   const tree = bd.perks[String(spell.skillId)] || [];
   return tree.some(
-    (p) => p.effect?.type === "spellCostHalf" &&
-           p.effect.tier === spell.tier &&
-           perkRank(perks, p.id) > 0
+    (p) =>
+      p.effect?.type === "spellCostHalf" &&
+      p.effect.tier === spell.tier &&
+      perkRank(perks, p.id) > 0,
   );
 }
 
@@ -976,7 +1023,8 @@ export function spellHalfCostTaken(spell, perks, bd) {
  */
 export function spellCost(spell, skills, perks, bd) {
   // null, not zero: the DLC spells whose base cost no source published.
-  if (spell.cost === null || spell.cost === undefined || spell.cost === "") return null;
+  if (spell.cost === null || spell.cost === undefined || spell.cost === "")
+    return null;
   const base = Number(spell.cost);
   if (!Number.isFinite(base)) return null;
 
@@ -991,7 +1039,7 @@ export function spellCost(spell, skills, perks, bd) {
     skillPct: -Math.round((1 - skillMult) * 1000) / 10,
     halved,
     total: Math.round(base * skillMult * perkMult),
-    per: spell.costPer || "cast"
+    per: spell.costPer || "cast",
   };
 }
 
@@ -1015,7 +1063,7 @@ export function spellDamage(spell, perks, bd) {
     base,
     perkPct,
     total: Math.round(base * (1 + perkPct / 100) * 10) / 10,
-    per: spell.damagePer || "hit"
+    per: spell.damagePer || "hit",
   };
 }
 
@@ -1024,7 +1072,11 @@ export function spellDamage(spell, perks, bd) {
  * `inventory` is the rows from listInventory(); `items` the static item list.
  */
 export function buildSummary(
-  { raceId, skills, perks, attributePicks }, inventory, itemsById, bd, knownSpells
+  { raceId, skills, perks, attributePicks },
+  inventory,
+  itemsById,
+  bd,
+  knownSpells,
 ) {
   const lvl = derivedLevel(skills, raceId, bd);
   const attrs = attributes(attributePicks, bd);
@@ -1071,7 +1123,8 @@ export function buildSummary(
     if (!slot) continue;
     const r = armorPieceRating(item, skills, perks, bd, fullSet);
     if (!r) continue;
-    if (!worn[slot] || r.total > worn[slot].rating.total) worn[slot] = { item, rating: r };
+    if (!worn[slot] || r.total > worn[slot].rating.total)
+      worn[slot] = { item, rating: r };
   }
 
   const displayed = Object.values(worn).reduce((s, w) => s + w.rating.total, 0);
@@ -1086,17 +1139,17 @@ export function buildSummary(
       carried: Math.round(carried * 100) / 100,
       remaining: Math.round((capacity - carried) * 100) / 100,
       overEncumbered: carried > capacity,
-      usedPercent: Math.min(100, Math.round((carried / capacity) * 1000) / 10)
+      usedPercent: Math.min(100, Math.round((carried / capacity) * 1000) / 10),
     },
     armour: {
       worn,
       fullSet,
       displayedRating: Math.round(displayed * 10) / 10,
       damageReduction: Math.round(dr.percent * 10) / 10,
-      capped: dr.capped
+      capped: dr.capped,
     },
     bestWeapon,
-    spells: spellSummary(knownSpells, skills, perks, bd)
+    spells: spellSummary(knownSpells, skills, perks, bd),
   };
 }
 
@@ -1117,7 +1170,10 @@ export function spellSummary(knownSpells, skills, perks, bd) {
     const damage = spellDamage(spell, perks, bd);
 
     bySchool[sid] = (bySchool[sid] || 0) + 1;
-    if (cost) { totalCost += cost.total; priced += 1; }
+    if (cost) {
+      totalCost += cost.total;
+      priced += 1;
+    }
 
     if (damage && (!bestSpell || damage.total > bestSpell.damage.total)) {
       bestSpell = { spell, damage, cost };
@@ -1128,6 +1184,6 @@ export function spellSummary(knownSpells, skills, perks, bd) {
     count: known.length,
     bySchool,
     bestSpell,
-    averageCost: priced ? Math.round(totalCost / priced) : null
+    averageCost: priced ? Math.round(totalCost / priced) : null,
   };
 }
