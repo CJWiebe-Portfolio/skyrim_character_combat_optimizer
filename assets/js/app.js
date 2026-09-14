@@ -466,6 +466,9 @@ function navbarHTML(user, profile, active) {
             <a class="nav-link nav-btn ${is("items")}" href="${url("general_information/all_items.html")}">All Items</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link nav-btn ${is("spells")}" href="${url("general_information/all_spells.html")}">All Spells</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link nav-btn ${is("references")}" href="${url("references.html")}">References</a>
           </li>
 
@@ -497,15 +500,21 @@ function navbarHTML(user, profile, active) {
   </nav>`;
 }
 
-function footerHTML() {
+/**
+ * The footer's Navigation column mirrors the navbar, including the two
+ * signed-in-only destinations, so someone at the bottom of a long table does
+ * not have to scroll back up to move on.
+ */
+function footerHTML(user) {
   const now = new Date();
   const build = now.toISOString().slice(0, 10);
+  const signedIn = !!user;
   return `
   <footer class="site-footer mt-auto py-4">
     <div class="container">
       <div class="row text-center text-md-start">
 
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
           <h5 class="fw-bold text-lg">Skyrim Character Combat Optimizer</h5>
           <p class="small mb-0 text-m">
             Combat Optimization System for analyzing builds, gear, and efficiency.
@@ -514,13 +523,32 @@ function footerHTML() {
 
         <div class="col-md-4 mb-3">
           <h6 class="fw-bold text-lg">Navigation</h6>
-          <ul class="list-unstyled text-m">
+          <ul class="list-unstyled text-m footer-nav">
             <li><a href="${url("home.html")}">Home</a></li>
+            <li><a href="${url("general_information/all_items.html")}">All Items</a></li>
+            <li><a href="${url("general_information/all_spells.html")}">All Spells</a></li>
             <li><a href="${url("references.html")}">References</a></li>
+            ${
+              signedIn
+                ? `
+            <li><a href="${url("my_character/characters.html")}">My Characters</a></li>
+            <li><a href="${url("my_account/read_account.html")}">My Account</a></li>`
+                : ""
+            }
           </ul>
         </div>
 
-        <div class="col-md-4 mb-3">
+        <!-- Internal pages, so these DO go through url(): they live one folder
+             deep, and the helper is what makes the link resolve from any depth. -->
+        <div class="col-md-2 mb-3">
+          <h6 class="fw-bold text-lg">Legal</h6>
+          <ul class="list-unstyled text-m">
+            <li><a href="${url("legal/terms.html")}">Terms &amp; Conditions</a></li>
+            <li><a href="${url("legal/privacy.html")}">Privacy Policy</a></li>
+          </ul>
+        </div>
+
+        <div class="col-md-3 mb-3">
           <h6 class="fw-bold text-lg">About</h6>
           <p class="small mb-0 text-m">C. J. Wiebe</p>
 
@@ -556,7 +584,20 @@ function footerHTML() {
 
       <div class="text-center text-lg">
         ${now.getFullYear()} - Skyrim Character Combat Optimizer
-        <p class="small">Version 1.0 &middot; Build ${build}</p>
+        <p class="small mb-1">Version 1.0 &middot; Build ${build}</p>
+
+        <!-- Repeated here because the Legal column is easy to miss on a phone,
+             where the four columns stack and this band is what stays in view. -->
+        <p class="small footer-legal mb-1">
+          <a href="${url("legal/terms.html")}">Terms &amp; Conditions</a>
+          <span aria-hidden="true">&middot;</span>
+          <a href="${url("legal/privacy.html")}">Privacy Policy</a>
+        </p>
+
+        <p class="small footer-disclaimer mb-0">
+          An unofficial fan project. Not affiliated with or endorsed by Bethesda Softworks
+          or ZeniMax Media. All trade marks are the property of their respective owners.
+        </p>
       </div>
     </div>
   </footer>`;
@@ -583,7 +624,7 @@ export async function renderChrome(activePage) {
   if (nav) nav.innerHTML = navbarHTML(user, profile, activePage);
 
   const foot = document.getElementById("footer-slot");
-  if (foot) foot.innerHTML = footerHTML();
+  if (foot) foot.innerHTML = footerHTML(user);
 
   document.querySelectorAll('[data-action="logout"]').forEach((el) => {
     el.addEventListener("click", async (ev) => {

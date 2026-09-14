@@ -1822,3 +1822,386 @@ body { overflow-x: hidden; }
   opacity: 0.8;
   white-space: nowrap;
 }
+
+/* ==========================================================================
+   BROWSE PAGES  (All Items, All Spells)
+   A search field, a filter bar that reflows instead of overflowing, and a
+   card view for phones — where a ten-column table is not readable at all.
+   ========================================================================== */
+
+/* The inner panel used to be a flat .p-5, which is 3rem of padding on a
+   360px screen. Scale it with the viewport instead. */
+.browse-panel {
+  padding: clamp(1rem, 0.35rem + 2.6vw, 3rem);
+}
+
+/* ---------- filter bar ---------------------------------------------------- */
+
+/* Flex rather than fixed columns: the items page has four controls and the
+   spells page five, and both need to end up one-per-row on a phone. */
+.browse-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.8rem 1rem;
+  margin: 1.5rem 0 1.25rem;
+}
+
+/* Each dropdown claims an equal share of whatever row it lands in, and drops to
+   its own row rather than shrinking below a readable width. */
+.filter-field { flex: 1 1 11rem; min-width: 0; }
+
+/* Search gets its own full-width row above the dropdowns. */
+.filter-field-search { flex: 1 1 100%; }
+
+/* Reset is a button, not a field — it should not take a field's share. */
+.filter-field-action { flex: 0 1 9rem; }
+
+.browse-filter .form-label { margin-bottom: 0.25rem; }
+
+.filter-hint {
+  margin: 0.35rem 0 0;
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
+/* ---------- the search field --------------------------------------------- */
+
+.search-wrap {
+  position: relative;
+  display: block;
+}
+
+.skyrim-filter .search-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--text-main);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 6px;
+  font-size: var(--font-md);
+  /* 16px minimum, or iOS zooms the whole page when the field takes focus. */
+  min-height: 2.75rem;
+  padding: 0.45rem 2.4rem 0.45rem 0.75rem;
+}
+
+.skyrim-filter .search-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.55;
+}
+
+.skyrim-filter .search-input:focus {
+  background: rgba(0, 0, 0, 0.75);
+  color: var(--text-main);
+  border-color: var(--skyrim-gold);
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.3);
+}
+
+/* WebKit draws its own clear button; ours is the one that keeps the state in
+   step, so hide theirs rather than showing two. */
+.search-input::-webkit-search-cancel-button,
+.search-input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
+
+.search-clear {
+  position: absolute;
+  top: 50%;
+  right: 0.35rem;
+  transform: translateY(-50%);
+  width: 2rem;
+  height: 2rem;
+  line-height: 1;
+  font-size: 1.35rem;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.search-clear:hover { color: var(--skyrim-gold); background: rgba(212, 175, 55, 0.12); }
+
+/* ---------- the phone card view ------------------------------------------ */
+
+.record-cards {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.record-card {
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-left: 3px solid var(--skyrim-gold-soft);
+  border-radius: var(--radius);
+  padding: 0.85rem 0.95rem;
+}
+
+.record-card-name {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  line-height: 1.25;
+  color: var(--skyrim-gold);
+}
+
+.record-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.65rem;
+}
+
+.record-pill {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 999px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Stats sit in as many columns as fit, so a dagger with three numbers does not
+   leave five empty slots. */
+.record-card-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(4.75rem, 1fr));
+  gap: 0.5rem 0.85rem;
+  margin: 0;
+}
+
+.record-stat dt {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+.record-stat dd {
+  margin: 0;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Perk and upgrade material are reference, not stats — below the rule. */
+.record-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 0.7rem 0 0;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.record-card-note {
+  margin: 0.7rem 0 0;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  font-size: var(--font-sm);
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.record-empty {
+  margin: 0;
+  padding: 1.25rem 0;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* ---------- spell table --------------------------------------------------- */
+
+/* The effect line rides under the name instead of claiming a column of its own,
+   which would have pushed the table another 20rem wide. */
+.spell-name {
+  display: block;
+  font-weight: 600;
+}
+.spell-effect {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: var(--font-sm);
+  line-height: 1.35;
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+.spell-table th:first-child,
+.spell-table td:first-child { min-width: 18rem; }
+
+/* "/ sec" is a unit, not a number — keep it out of the way of the figure. */
+.rate {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+.browse-note {
+  margin: 1.25rem 0 0;
+  font-size: var(--font-sm);
+  line-height: 1.5;
+  opacity: 0.7;
+}
+
+/* ---------- which view shows at which width ------------------------------ */
+
+/* The sideways-scroll hint only makes sense while the table is on screen:
+   above the phone breakpoint, and below the width the table fits at. */
+@media (max-width: 767.98px) {
+  .scroll-hint { display: none; }
+  .browse-filter { margin-top: 1.25rem; }
+  /* One finger, one control: stacked, and tall enough to hit. */
+  .browse-filter .form-select { min-height: 2.75rem; font-size: var(--font-md); }
+  .browse-filter .btn { min-height: 2.75rem; }
+  .result-count { font-size: 0.95rem; }
+}
+
+/* ---------- footer navigation -------------------------------------------- */
+
+/* Six links read better as two short columns than one long one, and the pair
+   of columns stays balanced whether the signed-in links are there (six) or
+   not (four). */
+.footer-nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.1rem 1rem;
+}
+
+/* ---------- navbar brand on a phone --------------------------------------- */
+
+/* Bootstrap keeps .navbar-brand on one line, and this brand is six words long:
+   below the lg breakpoint it ran past the right edge and pushed the toggler
+   onto a second row. Let it wrap and sit beside the toggler instead. */
+@media (max-width: 991.98px) {
+  .navbar-brand {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: normal;
+    font-size: 1.05rem;
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+    margin-right: 0.5rem;
+  }
+  .navbar-brand img {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* ==========================================================================
+   LEGAL PAGES  (legal/terms.html, legal/privacy.html)
+   Long-form prose rather than panels of numbers, so the column narrows and
+   the clause numbers are generated - adding or moving a clause never means
+   renumbering by hand, and the anchors stay stable because they are names.
+   ========================================================================== */
+
+.legal-body { counter-reset: legal-section; }
+
+/* Effective / updated dates, sitting quietly under the lede. */
+.legal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 1.5rem;
+  margin: 1rem 0 0;
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+/* Each clause is a titled band, matching the reference page's section rhythm. */
+.legal-section { scroll-margin-top: 5rem; }
+
+.legal-section > .panel-title { counter-increment: legal-section; }
+.legal-section > .panel-title::before {
+  content: counter(legal-section) ". ";
+  color: var(--skyrim-gold-soft);
+}
+
+/* Past about 75 characters the eye loses its place on the return sweep. */
+.legal-section p,
+.legal-section ul,
+.legal-section ol,
+.legal-section .legal-note,
+.legal-section .legal-table { max-width: 75ch; }
+
+.legal-section p { margin-bottom: 0.9rem; }
+
+.legal-section ul,
+.legal-section ol {
+  margin-bottom: 1.15rem;
+  padding-left: 1.3rem;
+}
+.legal-section li { margin-bottom: 0.45rem; }
+.legal-section ul.plain-list { padding-left: 0; }
+
+.legal-section h3 {
+  font-size: var(--font-md);
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 1.5rem 0 0.65rem;
+}
+
+/* The notices a reader must not skim past. */
+.legal-note {
+  margin: 1.4rem 0;
+  padding: 1rem 1.2rem;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-left: 3px solid var(--skyrim-gold);
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.28);
+  font-size: 0.95rem;
+}
+.legal-note ul { margin-bottom: 0; }
+
+/* What is collected, and why, reads as pairs rather than as a paragraph. */
+.legal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.4rem 0 1.3rem;
+  font-size: 0.95rem;
+}
+.legal-table th,
+.legal-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+}
+.legal-table thead th {
+  color: var(--skyrim-gold);
+  font-weight: 600;
+  border-bottom-color: rgba(212, 175, 55, 0.35);
+}
+.legal-table tbody th {
+  color: var(--text-main);
+  font-weight: 600;
+}
+.legal-table tbody tr:last-child th,
+.legal-table tbody tr:last-child td { border-bottom: none; }
+
+/* Same reasoning as .browse-panel: a flat 3rem of padding is most of a phone
+   screen. Scale it with the viewport instead of overriding Bootstrap's p-5. */
+.legal-panel { padding: clamp(1rem, 0.35rem + 2.6vw, 3rem); }
+
+@media (max-width: 575.98px) {
+  .legal-table { font-size: 0.88rem; }
+  .legal-table th,
+  .legal-table td { padding: 0.45rem 0.4rem; }
+}
+
+/* ---------- footer legal strip ------------------------------------------- */
+
+.footer-legal a { white-space: nowrap; }
+.footer-legal span { margin: 0 0.5rem; opacity: 0.5; }
+
+.footer-disclaimer {
+  max-width: 62ch;
+  margin-inline: auto;
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  opacity: 0.7;
+}

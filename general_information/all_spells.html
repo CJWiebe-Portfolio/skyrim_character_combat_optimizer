@@ -1,0 +1,415 @@
+<!--
+=========================================================
+FILE: all_spells.html
+PROJECT: Skyrim Character Combat Optimization System
+AUTHOR: C.J. Wiebe
+=========================================================
+DESCRIPTION:
+Shows every spell in Skyrim, with search, school and tier
+filtering and sorting. Spell data is served statically from
+assets/data/spells.json — the same file the character sheet's
+spellbook reads, so the two can never disagree.
+
+Built to match all_items.html: same filter bar, same result
+count, same table-on-desktop / cards-on-phone switch.
+=========================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- ===================== PAGE TITLE ===================== -->
+    <title>All Spells of Skyrim</title>
+
+    <!-- ===================== FAVICON ===================== -->
+    <link rel="icon" type="image/png" href="../assets/images/skyrim_icon.png">
+
+    <!-- ===================== CSS ===================== -->
+    <!-- =========== BOOTSTRAP =========== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- =========== GENERAL STYLES =========== -->
+    <link rel="stylesheet" href="../assets/css/general_style.css">
+    <!-- =========== BACKGROUND =========== -->
+    <link rel="stylesheet" href="../assets/css/background_picture.css">
+</head>
+
+<body>
+    <div class="d-flex flex-column min-vh-100">
+
+        <!-- Keyboard users land here first and can jump past the navigation. -->
+        <a class="skip-link" href="#main">Skip to main content</a>
+
+        <!-- ===================== NAVBAR (rendered by app.js) ===================== -->
+        <div id="navbar-slot"></div>
+
+        <!-- ===================== MAIN CONTENT ===================== -->
+        <main id="main">
+        <div class="container py-5 mt-1 flex-grow-1">
+            <div class="main-container p-4">
+                <div class="main-container browse-panel">
+
+                    <div class="section-title">
+                        <h1 class="section-title title-main text-center">&#128302; Viewing All Spells &#10024;</h1>
+                        <h5 class="text-muted-custom text-center">
+                            Every spell across the five schools of magic, including the downloaded content
+                        </h5>
+                    </div>
+
+                    <!-- ========================= SEARCH + FILTER + SORT ========================= -->
+                    <form id="filter-form" class="skyrim-filter browse-filter" role="search">
+
+                        <div class="filter-field filter-field-search">
+                            <label class="form-label" for="f-search">Search</label>
+                            <div class="search-wrap">
+                                <input id="f-search" name="q" type="search" class="form-control search-input"
+                                       placeholder="Name, school, element or effect&hellip;"
+                                       autocomplete="off" spellcheck="false"
+                                       aria-describedby="search-help">
+                                <button type="button" id="f-search-clear" class="search-clear" hidden
+                                        aria-label="Clear search">&times;</button>
+                            </div>
+                            <p id="search-help" class="field-hint filter-hint">
+                                Matches the spell name, school, tier, element, source and what the spell does.
+                            </p>
+                        </div>
+
+                        <div class="filter-field">
+                            <label class="form-label" for="f-school">School</label>
+                            <select id="f-school" name="school" class="form-select">
+                                <option value="">All</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-field">
+                            <label class="form-label" for="f-tier">Tier</label>
+                            <select id="f-tier" name="tier" class="form-select">
+                                <option value="">All</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-field">
+                            <label class="form-label" for="f-sort">Sort By</label>
+                            <select id="f-sort" name="sort" class="form-select">
+                                <option value="">None</option>
+                                <option value="name">Name</option>
+                                <option value="schoolName">School</option>
+                                <option value="tierOrder">Tier</option>
+                                <option value="cost">Magicka Cost</option>
+                                <option value="damage">Damage</option>
+                                <option value="elementName">Element</option>
+                                <option value="sourceName">Source</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-field">
+                            <label class="form-label" for="f-order">Order</label>
+                            <select id="f-order" name="order" class="form-select">
+                                <option value="ASC">Ascending</option>
+                                <option value="DESC">Descending</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-field filter-field-action">
+                            <button type="button" id="f-reset" class="btn w-100">Reset</button>
+                        </div>
+
+                    </form>
+
+                    <p id="spell-count" class="result-count" role="status" aria-live="polite"></p>
+                    <p class="scroll-hint text-muted-custom">Scroll the table sideways to see every column.</p>
+
+                    <!-- ========================= DATA TABLE (tablet and up) ========================= -->
+                    <div class="table-responsive" id="spell-table-wrap">
+                        <table class="table-skyrim text-lg spell-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Spell</th>
+                                    <th scope="col">School</th>
+                                    <th scope="col">Tier</th>
+                                    <th scope="col">Magicka</th>
+                                    <th scope="col">Damage</th>
+                                    <th scope="col">Element</th>
+                                    <th scope="col">Source</th>
+                                </tr>
+                            </thead>
+                            <tbody id="spell-rows">
+                                <tr><td colspan="7">Loading spells&hellip;</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- ========================= CARD LIST (phones) ========================= -->
+                    <div class="record-cards" id="spell-cards" hidden></div>
+
+                    <!-- ========================= WHERE THE NUMBERS CAME FROM ========================= -->
+                    <p class="browse-note text-muted-custom" id="spell-sources"></p>
+
+                </div>
+            </div>
+        </div>
+        </main>
+
+        <!-- ===================== FOOTER (rendered by app.js) ===================== -->
+        <div id="footer-slot"></div>
+
+    </div>
+
+    <!-- ===================== SCRIPTS ===================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>window.SITE_ROOT = "../";</script>
+    <script type="module">
+        import { renderChrome, spellData, esc } from "../assets/js/app.js";
+
+        renderChrome("spells");
+
+        const form      = document.getElementById("filter-form");
+        const fSearch   = document.getElementById("f-search");
+        const fClear    = document.getElementById("f-search-clear");
+        const fSchool   = document.getElementById("f-school");
+        const fTier     = document.getElementById("f-tier");
+        const fSort     = document.getElementById("f-sort");
+        const fOrder    = document.getElementById("f-order");
+        const tbody     = document.getElementById("spell-rows");
+        const tableWrap = document.getElementById("spell-table-wrap");
+        const cardWrap  = document.getElementById("spell-cards");
+        const count     = document.getElementById("spell-count");
+
+        const data = await spellData();
+
+        // Schools in the order the game lists them, not object key order.
+        for (const id of data.schoolOrder) {
+            const opt = document.createElement("option");
+            opt.value = id;
+            opt.textContent = data.schools[id].name;
+            fSchool.appendChild(opt);
+        }
+
+        // Novice through Master.
+        const tiersByOrder = Object.entries(data.tiers)
+            .sort((a, b) => a[1].order - b[1].order);
+        for (const [key, tier] of tiersByOrder) {
+            const opt = document.createElement("option");
+            opt.value = key;
+            opt.textContent = tier.name;
+            fTier.appendChild(opt);
+        }
+
+        const cap = (s) => s ? s[0].toUpperCase() + s.slice(1) : "";
+
+        /* Flatten each spell into the shape the table, the cards and the sort all
+           want, and build one lower-case haystack per spell for the search. */
+        const rowsAll = data.spells.map((sp) => {
+            const school     = data.schools[String(sp.skillId)];
+            const tier       = data.tiers[sp.tier];
+            const schoolName = school ? school.name : "Unknown";
+            const tierName   = tier ? tier.name : cap(sp.tier);
+            const element    = sp.element ? cap(sp.element) : "";
+            const source     = sp.dlc || "Base game";
+
+            return {
+                ...sp,
+                schoolName,
+                tierName,
+                tierOrder:   tier ? tier.order : 0,
+                elementName: element,
+                sourceName:  source,
+                haystack: [sp.name, schoolName, tierName, element, source, sp.effect]
+                    .join(" ").toLowerCase()
+            };
+        });
+
+        // Read filter state from the query string so a filtered view can be linked.
+        const params = new URLSearchParams(location.search);
+        fSearch.value = params.get("q") || "";
+        fSchool.value = params.get("school") || "";
+        fTier.value   = params.get("tier") || "";
+        fSort.value   = params.get("sort") || "";
+        fOrder.value  = params.get("order") === "DESC" ? "DESC" : "ASC";
+
+        /* ---------- formatting ---------- */
+
+        // "14 / sec" reads better than a bare number when half the spells are
+        // sustained and half are cast once.
+        function costText(sp) {
+            if (sp.cost === null || sp.cost === undefined) return "—";
+            return `${sp.cost}${sp.costPer === "second" ? " <span class='rate'>/ sec</span>" : ""}`;
+        }
+
+        function damageText(sp) {
+            if (sp.damage === null || sp.damage === undefined) return "—";
+            const per = sp.damagePer === "second" ? " / sec"
+                      : sp.damagePer === "hit"    ? " / hit"
+                      : "";
+            return `${sp.damage}<span class='rate'>${per}</span>`;
+        }
+
+        // Master spells are the ones worth spotting in a long list.
+        const tierBadge = (sp) =>
+            `<span class="spell-tier${sp.tier === "master" ? " spell-tier-master" : ""}">${esc(sp.tierName)}</span>`;
+
+        /* ---------- the two views ---------- */
+
+        const phone = window.matchMedia("(max-width: 767.98px)");
+
+        function tableHTML(rows) {
+            if (!rows.length) {
+                return `<tr><td colspan="7">No spells match that search.</td></tr>`;
+            }
+            return rows.map((sp) => `
+                <tr>
+                    <td>
+                        <span class="spell-name">${esc(sp.name)}</span>
+                        <span class="spell-effect">${esc(sp.effect)}</span>
+                    </td>
+                    <td>${esc(sp.schoolName)}</td>
+                    <td>${tierBadge(sp)}</td>
+                    <td>${costText(sp)}</td>
+                    <td>${damageText(sp)}</td>
+                    <td>${sp.elementName ? esc(sp.elementName) : "—"}</td>
+                    <td>${sp.dlc ? `<span class="spell-dlc">${esc(sp.dlc)}</span>` : "Base game"}</td>
+                </tr>`).join("");
+        }
+
+        function cardsHTML(rows) {
+            if (!rows.length) {
+                return `<p class="record-empty">No spells match that search.</p>`;
+            }
+            return rows.map((sp) => `
+                <article class="record-card">
+                    <h2 class="record-card-name">${esc(sp.name)}</h2>
+                    <p class="record-card-tags">
+                        <span class="record-pill">${esc(sp.schoolName)}</span>
+                        ${tierBadge(sp)}
+                        ${sp.dlc ? `<span class="spell-dlc">${esc(sp.dlc)}</span>` : ""}
+                    </p>
+                    <dl class="record-card-stats">
+                        <div class="record-stat">
+                            <dt>Magicka</dt>
+                            <dd>${costText(sp)}</dd>
+                        </div>
+                        ${
+                            sp.damage === null || sp.damage === undefined ? "" : `
+                        <div class="record-stat">
+                            <dt>Damage</dt>
+                            <dd>${damageText(sp)}</dd>
+                        </div>`
+                        }
+                        ${
+                            sp.elementName ? `
+                        <div class="record-stat">
+                            <dt>Element</dt>
+                            <dd>${esc(sp.elementName)}</dd>
+                        </div>` : ""
+                        }
+                    </dl>
+                    <p class="record-card-note">${esc(sp.effect)}</p>
+                </article>`).join("");
+        }
+
+        /* ---------- filter, sort, render ---------- */
+
+        function render() {
+            const term   = fSearch.value.trim().toLowerCase();
+            const school = fSchool.value;
+            const tier   = fTier.value;
+            const sort   = fSort.value;
+            const desc   = fOrder.value === "DESC";
+
+            let rows = rowsAll;
+
+            if (school) rows = rows.filter((sp) => String(sp.skillId) === school);
+            if (tier)   rows = rows.filter((sp) => sp.tier === tier);
+
+            if (term) {
+                const words = term.split(/\s+/);
+                rows = rows.filter((sp) => words.every((w) => sp.haystack.includes(w)));
+            }
+
+            if (sort) {
+                rows = rows.slice().sort((a, b) => {
+                    const x = a[sort], y = b[sort];
+                    // The DLC spells with no published cost sort last either way.
+                    if (x === null || x === undefined || x === "") return 1;
+                    if (y === null || y === undefined || y === "") return -1;
+                    const cmp = typeof x === "string"
+                        ? x.localeCompare(y, undefined, { sensitivity: "base" })
+                        : x - y;
+                    return desc ? -cmp : cmp;
+                });
+            }
+
+            const total = rowsAll.length;
+            count.textContent = rows.length === total
+                ? `Showing all ${total} spells`
+                : `Showing ${rows.length} of ${total} spells`;
+
+            fClear.hidden = !fSearch.value;
+
+            if (phone.matches) {
+                tableWrap.hidden = true;
+                cardWrap.hidden  = false;
+                cardWrap.innerHTML = cardsHTML(rows);
+                tbody.innerHTML = "";
+            } else {
+                cardWrap.hidden  = true;
+                tableWrap.hidden = false;
+                tbody.innerHTML  = tableHTML(rows);
+                cardWrap.innerHTML = "";
+            }
+        }
+
+        function apply() {
+            const q = new URLSearchParams();
+            if (fSearch.value.trim()) q.set("q", fSearch.value.trim());
+            if (fSchool.value) q.set("school", fSchool.value);
+            if (fTier.value)   q.set("tier", fTier.value);
+            if (fSort.value)   q.set("sort", fSort.value);
+            q.set("order", fOrder.value);
+            history.replaceState(null, "", "?" + q.toString());
+            render();
+        }
+
+        let typing;
+        fSearch.addEventListener("input", () => {
+            clearTimeout(typing);
+            fClear.hidden = !fSearch.value;
+            typing = setTimeout(apply, 140);
+        });
+
+        fSearch.addEventListener("search", apply);
+
+        fClear.addEventListener("click", () => {
+            fSearch.value = "";
+            fSearch.focus();
+            apply();
+        });
+
+        [fSchool, fTier, fSort, fOrder].forEach((el) => el.addEventListener("change", apply));
+
+        form.addEventListener("submit", (ev) => { ev.preventDefault(); apply(); });
+
+        document.getElementById("f-reset").addEventListener("click", () => {
+            fSearch.value = "";
+            fSchool.value = "";
+            fTier.value = "";
+            fSort.value = "";
+            fOrder.value = "ASC";
+            apply();
+        });
+
+        phone.addEventListener("change", render);
+
+        // The note spells.json carries about the DLC costs, rather than leaving a
+        // column of dashes unexplained.
+        if (data.sources?.note) {
+            document.getElementById("spell-sources").textContent = data.sources.note;
+        }
+
+        render();
+    </script>
+</body>
+
+</html>

@@ -151,6 +151,19 @@ start. The entry points change depending on whether anyone is signed in.
                   <span class="home-tile-go">Browse the items &rarr;</span>
                 </a>
 
+                <a class="home-tile" href="general_information/all_spells.html">
+                  <span class="home-tile-meta"
+                    ><span id="tile-spells-count">111</span> spells</span
+                  >
+                  <h3 class="home-tile-title">All Spells</h3>
+                  <p class="home-tile-body">
+                    Every spell in the five schools of magic, with its tier,
+                    magicka cost, damage and what it actually does. Filter by
+                    school or tier. No account needed.
+                  </p>
+                  <span class="home-tile-go">Browse the spells &rarr;</span>
+                </a>
+
                 <a class="home-tile" href="references.html">
                   <span class="home-tile-meta">Five groups</span>
                   <h3 class="home-tile-title">References</h3>
@@ -188,6 +201,7 @@ start. The entry points change depending on whether anyone is signed in.
       import {
         renderChrome,
         refData,
+        spellData,
         listCharacters,
         esc,
       } from "./assets/js/app.js";
@@ -246,6 +260,15 @@ start. The entry points change depending on whether anyone is signed in.
         }
       } catch {
         /* The static 570 in the markup stands. */
+      }
+
+      /* ---------- and the same for the spell count --------------------- */
+      try {
+        const spells = await spellData();
+        const n = spells?.spells?.length;
+        if (n) document.getElementById("tile-spells-count").textContent = n;
+      } catch {
+        /* The static 111 in the markup stands. */
       }
     </script>
   </body>

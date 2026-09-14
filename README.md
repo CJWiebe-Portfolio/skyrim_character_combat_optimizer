@@ -135,7 +135,8 @@ references.html                 Sources used by the project
 firestore.rules                 Security rules — paste into the Firebase console
 
 general_information/
-  all_items.html                All 570 weapons and armour, filter + sort
+  all_items.html                All 570 weapons and armour, search + filter + sort
+  all_spells.html               All 111 spells, search + filter by school and tier
 
 login/
   login.html                    Sign in

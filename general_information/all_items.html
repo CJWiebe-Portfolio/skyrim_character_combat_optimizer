@@ -5,8 +5,13 @@ PROJECT: Skyrim Character Combat Optimization System
 AUTHOR: C.J. Wiebe
 =========================================================
 DESCRIPTION:
-Shows every weapon and armour in Skyrim, with category filtering and sorting.
-Item data is served statically from assets/data/items.json.
+Shows every weapon and armour in Skyrim, with search, category
+filtering and sorting. Item data is served statically from
+assets/data/items.json.
+
+On a phone the ten-column table is unreadable, so the same rows
+render as one card per item instead. The switch is a matchMedia
+query, not duplicated markup, so only one view is ever built.
 =========================================================
 -->
 <!DOCTYPE html>
@@ -44,7 +49,7 @@ Item data is served statically from assets/data/items.json.
         <main id="main">
         <div class="container py-5 mt-1 flex-grow-1">
             <div class="main-container p-4">
-                <div class="main-container p-5">
+                <div class="main-container browse-panel">
 
                     <div class="section-title">
                         <h1 class="section-title title-main text-center">&#128737;&#65039; Viewing All Items &#9876;&#65039;</h1>
@@ -52,19 +57,34 @@ Item data is served statically from assets/data/items.json.
                             This includes all the items in the base game and all of the downloaded content
                         </h5>
                     </div>
-                    <br>
 
-                    <!-- ========================= FILTER + SORT FORM ========================= -->
-                    <form id="filter-form" class="row mb-4 align-items-end skyrim-filter col-md-12">
+                    <!-- ========================= SEARCH + FILTER + SORT ========================= -->
+                    <form id="filter-form" class="skyrim-filter browse-filter" role="search">
 
-                        <div class="col-md-4">
+                        <!-- Search spans the row: it is the control people reach for first. -->
+                        <div class="filter-field filter-field-search">
+                            <label class="form-label" for="f-search">Search</label>
+                            <div class="search-wrap">
+                                <input id="f-search" name="q" type="search" class="form-control search-input"
+                                       placeholder="Name, category, perk or material&hellip;"
+                                       autocomplete="off" spellcheck="false"
+                                       aria-describedby="search-help">
+                                <button type="button" id="f-search-clear" class="search-clear" hidden
+                                        aria-label="Clear search">&times;</button>
+                            </div>
+                            <p id="search-help" class="field-hint filter-hint">
+                                Matches the item name, its category, classification, material perk and upgrade material.
+                            </p>
+                        </div>
+
+                        <div class="filter-field">
                             <label class="form-label" for="f-category">Category</label>
                             <select id="f-category" name="category" class="form-select">
                                 <option value="">All</option>
                             </select>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="filter-field">
                             <label class="form-label" for="f-sort">Sort By</label>
                             <select id="f-sort" name="sort" class="form-select">
                                 <option value="">None</option>
@@ -81,7 +101,7 @@ Item data is served statically from assets/data/items.json.
                             </select>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="filter-field">
                             <label class="form-label" for="f-order">Order</label>
                             <select id="f-order" name="order" class="form-select">
                                 <option value="ASC">Ascending</option>
@@ -89,8 +109,8 @@ Item data is served statically from assets/data/items.json.
                             </select>
                         </div>
 
-                        <div class="col-md-2">
-                            <button type="button" id="f-reset" class="btn btn-warning w-100">Reset</button>
+                        <div class="filter-field filter-field-action">
+                            <button type="button" id="f-reset" class="btn w-100">Reset</button>
                         </div>
 
                     </form>
@@ -98,8 +118,8 @@ Item data is served statically from assets/data/items.json.
                     <p id="item-count" class="result-count" role="status" aria-live="polite"></p>
                     <p class="scroll-hint text-muted-custom">Scroll the table sideways to see every column.</p>
 
-                    <!-- ========================= DATA TABLE ========================= -->
-                    <div class="table-responsive">
+                    <!-- ========================= DATA TABLE (tablet and up) ========================= -->
+                    <div class="table-responsive" id="item-table-wrap">
                         <table class="table-skyrim text-lg">
                             <thead>
                                 <tr>
@@ -121,6 +141,9 @@ Item data is served statically from assets/data/items.json.
                         </table>
                     </div>
 
+                    <!-- ========================= CARD LIST (phones) ========================= -->
+                    <div class="record-cards" id="item-cards" hidden></div>
+
                 </div>
             </div>
         </div>
@@ -140,12 +163,16 @@ Item data is served statically from assets/data/items.json.
 
         renderChrome("items");
 
-        const form   = document.getElementById("filter-form");
-        const fCat   = document.getElementById("f-category");
-        const fSort  = document.getElementById("f-sort");
-        const fOrder = document.getElementById("f-order");
-        const tbody  = document.getElementById("item-rows");
-        const count  = document.getElementById("item-count");
+        const form     = document.getElementById("filter-form");
+        const fSearch  = document.getElementById("f-search");
+        const fClear   = document.getElementById("f-search-clear");
+        const fCat     = document.getElementById("f-category");
+        const fSort    = document.getElementById("f-sort");
+        const fOrder   = document.getElementById("f-order");
+        const tbody    = document.getElementById("item-rows");
+        const tableWrap= document.getElementById("item-table-wrap");
+        const cardWrap = document.getElementById("item-cards");
+        const count    = document.getElementById("item-count");
 
         const data = await refData();
 
@@ -159,27 +186,120 @@ Item data is served statically from assets/data/items.json.
             fCat.appendChild(opt);
         }
 
+        const label = (map, id) => map[id] ?? "Unknown";
+        const dash  = (v) => (v === null || v === undefined ? "—" : v);
+
+        /* Each item gets one lower-case haystack, built once. Searching 570 items
+           on every keystroke is then a substring test rather than five lookups. */
+        const rowsAll = data.items.map((it) => {
+            const category       = label(data.categories, it.category_id);
+            const classification = label(data.classifications, it.classification_id);
+            const perk           = data.perks[it.perk_id] ?? "";
+            const upgrade        = data.upgrades[it.item_upgrade] ?? "";
+            return {
+                ...it,
+                speed: effectiveSpeed(it, data),
+                category, classification, perk, upgrade,
+                haystack: [it.name, category, classification, perk, upgrade]
+                    .join(" ").toLowerCase()
+            };
+        });
+
         // Read filter state from the query string, so links and reloads still work
         // the same way the PHP $_GET parameters did.
         const params = new URLSearchParams(location.search);
-        fCat.value   = params.get("category") || "";
-        fSort.value  = params.get("sort") || "";
-        fOrder.value = params.get("order") === "DESC" ? "DESC" : "ASC";
+        fSearch.value = params.get("q") || "";
+        fCat.value    = params.get("category") || "";
+        fSort.value   = params.get("sort") || "";
+        fOrder.value  = params.get("order") === "DESC" ? "DESC" : "ASC";
 
-        const label = (map, id) => map[id] ?? "Unknown";
-        const dash  = (v) => (v === null || v === undefined ? "\u2014" : v);
+        /* ---------- the two views ---------- */
+
+        // Below Bootstrap's md breakpoint the table needs more sideways room than
+        // a phone has, so the same rows render as cards instead.
+        const phone = window.matchMedia("(max-width: 767.98px)");
+
+        function tableHTML(rows) {
+            return rows.length
+                ? rows.map((it) => `
+                    <tr>
+                        <td>${esc(it.name)}</td>
+                        <td>${dash(it.damage)}</td>
+                        <td>${dash(fmtSpeed(it.speed))}</td>
+                        <td>${dash(it.defence)}</td>
+                        <td>${dash(fmtWeight(it.weight))}</td>
+                        <td>${dash(it.gold_value)}</td>
+                        <td>${esc(it.category)}</td>
+                        <td>${esc(it.classification)}</td>
+                        <td>${it.perk ? esc(it.perk) : "—"}</td>
+                        <td>${it.upgrade ? esc(it.upgrade) : "—"}</td>
+                    </tr>`).join("")
+                : `<tr><td colspan="10">No items match that search.</td></tr>`;
+        }
+
+        // A stat with no value is left out entirely rather than printed as a dash:
+        // a bow has no defence, and an empty row is just noise on a small screen.
+        function statHTML(pairs) {
+            return pairs
+                .filter(([, v]) => v !== null && v !== undefined && v !== "")
+                .map(([k, v]) => `
+                    <div class="record-stat">
+                        <dt>${k}</dt>
+                        <dd>${esc(v)}</dd>
+                    </div>`).join("");
+        }
+
+        function cardsHTML(rows) {
+            if (!rows.length) {
+                return `<p class="record-empty">No items match that search.</p>`;
+            }
+            return rows.map((it) => `
+                <article class="record-card">
+                    <h2 class="record-card-name">${esc(it.name)}</h2>
+                    <p class="record-card-tags">
+                        <span class="record-pill">${esc(it.category)}</span>
+                        <span class="record-pill">${esc(it.classification)}</span>
+                    </p>
+                    <dl class="record-card-stats">
+                        ${statHTML([
+                            ["Damage",  it.damage],
+                            ["Speed",   fmtSpeed(it.speed)],
+                            ["Defence", it.defence],
+                            ["Weight",  fmtWeight(it.weight)],
+                            ["Gold",    it.gold_value]
+                        ])}
+                    </dl>
+                    ${
+                        it.perk || it.upgrade
+                            ? `<dl class="record-card-meta">
+                                   ${statHTML([["Perk", it.perk], ["Upgrade", it.upgrade]])}
+                               </dl>`
+                            : ""
+                    }
+                </article>`).join("");
+        }
+
+        /* ---------- filter, sort, render ---------- */
 
         function render() {
+            const term     = fSearch.value.trim().toLowerCase();
             const category = fCat.value;
             const sort     = fSort.value;
             const desc     = fOrder.value === "DESC";
 
-            let rows = data.items.map((it) => ({ ...it, speed: effectiveSpeed(it, data) }));
+            let rows = rowsAll;
 
             if (category) rows = rows.filter((it) => String(it.category_id) === category);
 
+            // Every word has to match somewhere, so "ebony sword" narrows rather
+            // than widening the way a single joined string would.
+            if (term) {
+                const words = term.split(/\s+/);
+                rows = rows.filter((it) => words.every((w) => it.haystack.includes(w)));
+            }
+
             if (sort) {
-                rows.sort((a, b) => {
+                rows = rows.slice().sort((a, b) => {
                     const x = a[sort], y = b[sort];
                     // NULLs sort last, matching how the table read in MySQL.
                     if (x === null || x === undefined) return 1;
@@ -191,30 +311,30 @@ Item data is served statically from assets/data/items.json.
                 });
             }
 
-            const total = data.items.length;
+            const total = rowsAll.length;
             count.textContent = rows.length === total
                 ? `Showing all ${total} items`
                 : `Showing ${rows.length} of ${total} items`;
 
-            tbody.innerHTML = rows.length
-                ? rows.map((it) => `
-                    <tr>
-                        <td>${esc(it.name)}</td>
-                        <td>${dash(it.damage)}</td>
-                        <td>${dash(fmtSpeed(it.speed))}</td>
-                        <td>${dash(it.defence)}</td>
-                        <td>${dash(fmtWeight(it.weight))}</td>
-                        <td>${dash(it.gold_value)}</td>
-                        <td>${label(data.categories, it.category_id)}</td>
-                        <td>${label(data.classifications, it.classification_id)}</td>
-                        <td>${data.perks[it.perk_id] ?? "\u2014"}</td>
-                        <td>${data.upgrades[it.item_upgrade] ?? "\u2014"}</td>
-                    </tr>`).join("")
-                : `<tr><td colspan="10">No items match that filter.</td></tr>`;
+            fClear.hidden = !fSearch.value;
+
+            if (phone.matches) {
+                tableWrap.hidden = true;
+                cardWrap.hidden  = false;
+                cardWrap.innerHTML = cardsHTML(rows);
+                // Keep the hidden table cheap rather than holding 570 stale rows.
+                tbody.innerHTML = "";
+            } else {
+                cardWrap.hidden  = true;
+                tableWrap.hidden = false;
+                tbody.innerHTML  = tableHTML(rows);
+                cardWrap.innerHTML = "";
+            }
         }
 
         function apply() {
             const q = new URLSearchParams();
+            if (fSearch.value.trim()) q.set("q", fSearch.value.trim());
             if (fCat.value)  q.set("category", fCat.value);
             if (fSort.value) q.set("sort", fSort.value);
             q.set("order", fOrder.value);
@@ -223,17 +343,39 @@ Item data is served statically from assets/data/items.json.
             render();
         }
 
+        // Typing is fast; re-rendering 570 rows per keystroke is not. Wait for a
+        // pause before doing the work.
+        let typing;
+        fSearch.addEventListener("input", () => {
+            clearTimeout(typing);
+            fClear.hidden = !fSearch.value;
+            typing = setTimeout(apply, 140);
+        });
+
+        // A search field's own clear button fires "search", not "input", in Safari.
+        fSearch.addEventListener("search", apply);
+
+        fClear.addEventListener("click", () => {
+            fSearch.value = "";
+            fSearch.focus();
+            apply();
+        });
+
         // Apply on change rather than making people find a button.
         [fCat, fSort, fOrder].forEach((el) => el.addEventListener("change", apply));
 
         form.addEventListener("submit", (ev) => { ev.preventDefault(); apply(); });
 
         document.getElementById("f-reset").addEventListener("click", () => {
+            fSearch.value = "";
             fCat.value = "";
             fSort.value = "";
             fOrder.value = "ASC";
             apply();
         });
+
+        // Rotating a phone, or dragging a desktop window narrow, swaps the view.
+        phone.addEventListener("change", render);
 
         render();
     </script>
